@@ -2,6 +2,7 @@ import modal
 from fastapi import FastAPI
 import gradio as gr
 from gradio.routes import mount_gradio_app
+import secrets
 
 # Create Modal app
 app = modal.App("modal-for-noobs-epic_green_tts_app")
@@ -32,7 +33,6 @@ import torch
 import numpy as np
 from transformers import pipeline, AutoProcessor, BarkModel
 import scipy.io.wavfile as wavfile
-import random
 import time
 
 # Modal's signature green theme! 💚
@@ -145,7 +145,7 @@ def synthesize_epic_speech(text, voice_preset="v2/en_speaker_6", add_effects=Tru
                 "✨ Modal magic in action: ",
                 "🔥 Prepare for audio awesomeness! "
             ]
-            text = random.choice(creative_intros) + text
+            text = secrets.choice(creative_intros) + text
         
         # Generate speech using Bark
         if bark_model and processor:

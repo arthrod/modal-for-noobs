@@ -8,8 +8,8 @@ import torch
 import numpy as np
 from transformers import pipeline, AutoProcessor, BarkModel
 import scipy.io.wavfile as wavfile
-import random
 import time
+import secrets
 
 # Modal's signature green theme! 💚
 MODAL_GREEN = "#00D26A"
@@ -121,7 +121,7 @@ def synthesize_epic_speech(text, voice_preset="v2/en_speaker_6", add_effects=Tru
                 "✨ Modal magic in action: ",
                 "🔥 Prepare for audio awesomeness! "
             ]
-            text = random.choice(creative_intros) + text
+            text = secrets.choice(creative_intros) + text
         
         # Generate speech using Bark
         if bark_model and processor:

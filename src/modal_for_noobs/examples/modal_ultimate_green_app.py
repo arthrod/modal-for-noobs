@@ -2,6 +2,7 @@ import modal
 from fastapi import FastAPI
 import gradio as gr
 from gradio.routes import mount_gradio_app
+import secrets
 
 # Create Modal app
 app = modal.App("modal-for-noobs-ultimate_green_app")
@@ -21,7 +22,6 @@ The most beautiful, creative, GPU-ready app in Modal green!
 """
 
 import gradio as gr
-import random
 import time
 
 # Modal's signature green theme! 💚
@@ -107,7 +107,7 @@ def generate_epic_greeting(name, enthusiasm, style):
     }
     
     greetings = modal_greetings.get(style, modal_greetings["epic"])
-    selected_greeting = random.choice(greetings)
+    selected_greeting = secrets.choice(greetings)
     
     # Add enthusiasm multiplier
     excitement = "!" * min(enthusiasm, 10)
@@ -141,15 +141,15 @@ def create_modal_poem(topic, lines):
     
     poems = []
     for i in range(min(lines, 5)):
-        template = random.choice(poem_templates)
+        template = secrets.choice(poem_templates)
         poem = template.format(
             topic=topic if topic else "Modal",
-            adj1=random.choice(["beautiful", "powerful", "elegant", "amazing"]),
-            adj2=random.choice(["crystal", "emerald", "silver", "golden"]),
-            word1=random.choice(modal_words),
-            word2=random.choice(modal_words),
-            word3=random.choice(modal_words),
-            word4=random.choice(modal_words)
+            adj1=secrets.choice(["beautiful", "powerful", "elegant", "amazing"]),
+            adj2=secrets.choice(["crystal", "emerald", "silver", "golden"]),
+            word1=secrets.choice(modal_words),
+            word2=secrets.choice(modal_words),
+            word3=secrets.choice(modal_words),
+            word4=secrets.choice(modal_words)
         )
         poems.append(f"Verse {i+1}:\n{poem}")
     
@@ -171,7 +171,7 @@ def generate_modal_wisdom():
         "🌍 'Modal connects your ideas to the world, one green container at a time.' - Global Thinker"
     ]
     
-    return random.choice(wisdom_quotes)
+    return secrets.choice(wisdom_quotes)
 
 def create_ultimate_interface():
     """Create the ULTIMATE Modal-green interface! 🎨💚"""
