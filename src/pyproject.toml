@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easy-modal"
+version = "1.0.0"
+description = "Idiot-proof Gradio deployment CLI for Modal"
+authors = [{name = "Easy Modal Team", email = "team@easymodal.dev"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "click>=8.0.0",
+    "modal>=0.57.0",
+    "gradio>=4.0.0",
+    "fastapi>=0.100.0",
+    "pyyaml>=6.0",
+    "rich>=10.0.0",
+    "requests>=2.25.0"
+]
+
+[project.scripts]
+easy-modal = "easy_modal_cli:cli"
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "flake8"]

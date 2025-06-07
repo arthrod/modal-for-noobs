@@ -1,0 +1,41 @@
+"""Tests for documentation code blocks."""
+
+import doctest
+import os
+import re
+
+import pytest
+
+
+@pytest.fixture
+def docstring(root_dir):
+    """Extract code blocks from README.md."""
+    # Read the README.md file
+    with (root_dir / "README.md").open() as f:
+        content = f.read()
+
+    # Extract Python code blocks (assuming they are in triple backticks)
+    blocks = re.findall(r"```python(.*?)```", content, re.DOTALL)
+
+    code = "\n".join(blocks).strip()
+
+    # Add a docstring wrapper for doctest to process the code
+    return f"\n{code}\n"
+
+
+def test_blocks(root_dir, docstring, capfd):
+    """Test that code blocks in README execute without errors."""
+    os.chdir(root_dir)
+
+    try:
+        doctest.run_docstring_examples(docstring, globals())
+    except doctest.DocTestFailure as e:
+        # If a DocTestFailure occurs, capture it and manually fail the test
+        pytest.fail(f"Doctests failed: {e}")
+
+    # Capture the output after running doctests
+    captured = capfd.readouterr()
+
+    # If there is any output (error message), fail the test
+    if captured.out:
+        pytest.fail(f"Doctests failed with the following output:\n{captured.out} and \n{docstring}")
