@@ -19,6 +19,7 @@ from modal_for_noobs.config import Config, config
 from modal_for_noobs.config_loader import config_loader
 from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
+import secrets
 
 # Modal's signature green theme
 MODAL_GREEN = "#00D26A"
@@ -61,8 +62,7 @@ def print_modal_banner(br_huehuehue: bool = False):
     
     # Add a random feature highlight
     if features:
-        import random
-        feature = random.choice(features)
+        feature = secrets.choice(features)
         banner_text.append(f"\n{feature}", style="bold white")
     
     rprint(Panel(

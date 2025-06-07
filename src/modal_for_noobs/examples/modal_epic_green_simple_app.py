@@ -2,6 +2,7 @@ import modal
 from fastapi import FastAPI
 import gradio as gr
 from gradio.routes import mount_gradio_app
+import secrets
 
 # Create Modal app
 app = modal.App("modal-for-noobs-epic_green_simple_app")
@@ -28,7 +29,6 @@ Beautiful, Modal-themed, GPU-ready creativity app!
 """
 
 import gradio as gr
-import random
 import time
 import json
 
@@ -137,7 +137,7 @@ def generate_modal_poetry(theme, style, creativity_level):
     for i in range(creativity_level):
         if style == "haiku":
             poem = f"""
-{random.choice(starters)}
+{secrets.choice(starters)}
 Modal green containers flow
 Serverless and bright
 GPU magic works
@@ -146,7 +146,7 @@ Code becomes music
 """
         elif style == "rap":
             poem = f"""
-{random.choice(starters)} Modal's in the house tonight!
+{secrets.choice(starters)} Modal's in the house tonight!
 Deploying apps with serverless might
 GPU power, green and bright
 Making code deployment right!
@@ -158,7 +158,7 @@ Infrastructure reconciling!
 """
         elif style == "shakespearean":
             poem = f"""
-{random.choice(starters)} What light through yonder server breaks?
+{secrets.choice(starters)} What light through yonder server breaks?
 'Tis Modal, and the GPU is the sun!
 Arise, fair deployment, and kill the envious lag
 That is already sick and pale with grief
@@ -166,14 +166,14 @@ That thou, her container, art far more beautiful than she.
 """
         else:  # epic
             poem = f"""
-{random.choice(starters)} In the realm of {random.choice(modal_words)},
-Where {random.choice(modal_words)} meets {random.choice(modal_words)},
+{secrets.choice(starters)} In the realm of {secrets.choice(modal_words)},
+Where {secrets.choice(modal_words)} meets {secrets.choice(modal_words)},
 The {theme} shines like {MODAL_GREEN} light,
-Bringing {random.choice(modal_words)} to life!
+Bringing {secrets.choice(modal_words)} to life!
 
 GPU thunder rolls across the cloud,
 Modal magic, green and proud!
-{random.choice(modal_words)} dreams come true,
+{secrets.choice(modal_words)} dreams come true,
 In containers built for me and you! 💚
 """
         poems.append(poem.strip())
@@ -234,7 +234,7 @@ def generate_modal_facts():
         "🎯 With Modal, you can focus on creativity instead of DevOps complexity!"
     ]
     
-    return random.choice(facts)
+    return secrets.choice(facts)
 
 def create_epic_interface():
     """Create the most EPIC Modal-green interface ever! 🎨💚"""

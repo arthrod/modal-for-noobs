@@ -2,6 +2,7 @@ import modal
 from fastapi import FastAPI
 import gradio as gr
 from gradio.routes import mount_gradio_app
+import secrets
 
 # Create Modal app
 app = modal.App("modal-for-noobs-ultimate_voice_green_app")
@@ -29,7 +30,6 @@ WITH MICROPHONE AND SPEAKER! 🎤🔊
 """
 
 import gradio as gr
-import random
 import time
 import tempfile
 import os
@@ -145,7 +145,7 @@ def process_voice_input(audio_input):
             "🔥 Epic voice detected! Modal's GPU is working on something special! ⚡"
         ]
         
-        response_text = random.choice(voice_responses)
+        response_text = secrets.choice(voice_responses)
         
         # Generate a simple response audio (synthesized message)
         response_audio = generate_voice_response(response_text)
@@ -227,7 +227,7 @@ def generate_epic_voice_greeting(name, style, with_audio=False):
     }
     
     greetings = voice_greetings.get(style, voice_greetings["epic"])
-    text_response = random.choice(greetings)
+    text_response = secrets.choice(greetings)
     
     if with_audio:
         audio_response = generate_voice_response(text_response)
@@ -246,7 +246,7 @@ def create_voice_poem(topic, with_voice=False):
         f"🎵 {topic or 'Green magic'} dances through the air,\nVoices singing everywhere,\nModal's microphones with care,\nCapture beauty beyond compare! 🌟"
     ]
     
-    poem_text = random.choice(voice_poems)
+    poem_text = secrets.choice(voice_poems)
     
     if with_voice:
         poem_audio = generate_voice_response(poem_text)
