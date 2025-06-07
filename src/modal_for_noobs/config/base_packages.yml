@@ -1,0 +1,35 @@
+# 💚 Modal-for-noobs Base Package Configuration 💚
+# Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
+
+minimum:
+  - gradio
+  - fastapi[standard]
+  - uvicorn
+
+optimized:
+  - gradio
+  - fastapi[standard]
+  - uvicorn
+  - torch
+  - transformers
+  - accelerate
+  - diffusers
+  - pillow
+  - numpy
+  - pandas
+
+gra_jupy:
+  - gradio
+  - fastapi[standard]
+  - uvicorn
+  - jupyter
+  - jupyterlab
+  - notebook
+  - ipywidgets
+  - matplotlib
+  - plotly
+  - seaborn
+  - pandas
+  - numpy
+  - torch
+  - transformers

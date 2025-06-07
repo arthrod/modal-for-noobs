@@ -3,7 +3,7 @@
 import os
 from unittest.mock import patch
 
-from newdotfiles.config import Config
+from modal_for_noobs.config import Config
 
 
 def test_config_defaults():

@@ -1,11 +1,11 @@
 _commit: v0.4.73
 _src_path: git@github.com:tschm/package.git
-description: newdotfiles
-gh_create: gh repo create arthrod/newdotfiles --public --description 'newdotfiles'
-page: https://arthrod.github.io/newdotfiles
-project_name: newdotfiles
-repository: https://github.com/arthrod/newdotfiles
-ssh_uri: git@github.com:arthrod/newdotfiles.git
+description: modal-for-noobs
+gh_create: gh repo create arthrod/modal-for-noobs --public --description 'modal-for-noobs'
+page: https://arthrod.github.io/modal-for-noobs
+project_name: modal-for-noobs
+repository: https://github.com/arthrod/modal-for-noobs
+ssh_uri: git@github.com:arthrod/modal-for-noobs.git
 status: public
 use_dependabot: true
 use_devcontainer: true

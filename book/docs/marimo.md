@@ -2,4 +2,4 @@
 
 ## Demos
 
-- [demo](https://arthrod.github.io/newdotfiles/marimo/demo.html)
+- [demo](https://arthrod.github.io/modal-for-noobs/marimo/demo.html)

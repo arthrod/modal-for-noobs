@@ -33,7 +33,7 @@ jobs:
 
       - uses: tschm/cradle/actions/pdoc@v0.1.71  # Custom action to generate API documentation
         with:
-          source-folder: src/newdotfiles  # Source code folder to document
+          source-folder: src/modal-for-noobs  # Source code folder to document
 
 
   # Job to run tests and generate coverage reports
@@ -46,7 +46,7 @@ jobs:
       - uses: tschm/cradle/actions/coverage@v0.1.71  # Custom action to run tests with coverage
         with:
           tests-folder: src/tests  # Folder containing the tests
-          source-folder: src/newdotfiles  # Source code folder to test
+          source-folder: src/modal-for-noobs  # Source code folder to test
           coveralls: 'false'  # Don't upload to Coveralls
 
   # Job to run Jupyter notebooks

@@ -2,8 +2,8 @@
 
 ## Timing
 
-[Report](https://arthrod.github.io/newdotfiles/tests/html-report/report.html)
+[Report](https://arthrod.github.io/modal-for-noobs/tests/html-report/report.html)
 
 ## Coverage
 
-[Coverage](https://arthrod.github.io/newdotfiles/tests/html-coverage/index.html)
+[Coverage](https://arthrod.github.io/modal-for-noobs/tests/html-coverage/index.html)

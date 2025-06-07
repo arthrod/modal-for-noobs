@@ -21,7 +21,7 @@ jobs:
 
       - uses: tschm/cradle/actions/deptry@v0.1.71  # Custom action to run deptry for dependency analysis
         with:
-          source-folder: src/newdotfiles  # Source code folder to analyze
+          source-folder: src/modal-for-noobs  # Source code folder to analyze
 
   # Job to run pre-commit checks on the repository
   pre-commit:

@@ -1,6 +1,6 @@
-# Contributing to newdotfiles
+# Contributing to modal-for-noobs
 
-This document is a guide to contributing to newdotfiles
+This document is a guide to contributing to modal-for-noobs
 
 We welcome all contributions. You don't need to be an expert (in optimization)
 to help out.
@@ -16,11 +16,11 @@ Before sending a pull request, make sure you do the following:
 - [Write unit tests](#writing-unit-tests)
 - Run the [unit tests](#running-unit-tests) and check that they're passing
 
-## Building newdotfiles from source
+## Building modal-for-noobs from source
 
-You'll need to build newdotfiles locally in order to start editing code.
+You'll need to build modal-for-noobs locally in order to start editing code.
 
-To install newdotfiles from source, clone the GitHub
+To install modal-for-noobs from source, clone the GitHub
 repository, navigate to its root, and run the following command:
 
 ```bash
@@ -29,26 +29,26 @@ make install
 
 ## Contributing code
 
-To contribute to newdotfiles, send us pull requests.
+To contribute to modal-for-noobs, send us pull requests.
 For those new to contributing, check out GitHub's
 [guide](https://help.github.com/articles/using-pull-requests/).
 
-Once you've made your pull request, a member of the newdotfiles
+Once you've made your pull request, a member of the modal-for-noobs
 development team will assign themselves to review it. You might have a few
 back-and-forths with your reviewer before it is accepted, which is completely normal.
 Your pull request will trigger continuous integration tests for many different
 Python versions and different platforms. If these tests start failing, please
 fix your code and send another commit, which will re-trigger the tests.
 
-If you'd like to add a new feature to newdotfiles, please do propose your
+If you'd like to add a new feature to modal-for-noobs, please do propose your
 change on a GitHub issue, to make sure that your priorities align with ours.
 
 If you'd like to contribute code but don't know where to start, try one of the
 following:
 
-- Read the newdotfiles source and enhance the documentation,
+- Read the modal-for-noobs source and enhance the documentation,
   or address TODOs
-- Browse the [issue tracker](https://github.com/arthrod/newdotfiles/issues),
+- Browse the [issue tracker](https://github.com/arthrod/modal-for-noobs/issues),
   and look for the issues tagged "help wanted".
 
 ## License
@@ -72,7 +72,7 @@ errors that are reported before sending the pull request.
 
 Most code changes will require new unit tests. Even bug fixes require unit tests,
 since the presence of bugs usually indicates insufficient tests.
-newdotfiles tests live in the directory `tests`,
+modal-for-noobs tests live in the directory `tests`,
 which contains many files, each of which contains many unit tests.
 When adding tests, try to find a file in which your tests should belong;
 if you're testing a new feature, you might want to create a new test file.

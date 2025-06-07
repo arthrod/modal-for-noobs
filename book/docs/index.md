@@ -1,12 +1,12 @@
-# 📦 [newdotfiles](https://arthrod.github.io/newdotfiles/book)
+# 📦 [modal-for-noobs](https://arthrod.github.io/modal-for-noobs/book)
 
-[![PyPI version](https://badge.fury.io/py/newdotfiles.svg)](https://badge.fury.io/py/newdotfiles)
+[![PyPI version](https://badge.fury.io/py/modal-for-noobs.svg)](https://badge.fury.io/py/modal-for-noobs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
-[![CI](https://github.com/arthrod/newdotfiles/actions/workflows/ci.yml/badge.svg)](https://github.com/arthrod/newdotfiles/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/arthrod/newdotfiles/badge.svg?branch=main)](https://coveralls.io/github/arthrod/newdotfiles?branch=main)
+[![CI](https://github.com/arthrod/modal-for-noobs/actions/workflows/ci.yml/badge.svg)](https://github.com/arthrod/modal-for-noobs/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/arthrod/modal-for-noobs/badge.svg?branch=main)](https://coveralls.io/github/arthrod/modal-for-noobs?branch=main)
 [![Created with qCradle](https://img.shields.io/badge/Created%20with-qCradle-blue?style=flat-square)](https://github.com/tschm/package)
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arthrod/newdotfiles)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/arthrod/modal-for-noobs)
 
 ## 🚀 Getting Started
 

@@ -1,3 +1,3 @@
 # API
 
-[API](https://arthrod.github.io/newdotfiles/pdoc/)
+[API](https://arthrod.github.io/modal-for-noobs/pdoc/)

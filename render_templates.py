@@ -9,8 +9,8 @@ def render_templates():
     """Render all template files with default values."""
     # Template files that need rendering
     template_files = [
-        "src/{{ package_name | default('newdotfiles') }}/__init__.py",
-        "src/{{ package_name | default('newdotfiles') }}/cli.py", 
+        "src/{{ package_name | default('modal-for-noobs') }}/__init__.py",
+        "src/{{ package_name | default('modal-for-noobs') }}/cli.py", 
         "pyproject.toml"
     ]
     

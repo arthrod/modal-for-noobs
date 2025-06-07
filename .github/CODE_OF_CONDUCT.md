@@ -1,4 +1,4 @@
-# newdotfiles Code of Conduct
+# modal-for-noobs Code of Conduct
 
 ## Our Pledge
 

@@ -1,7 +1,7 @@
 [project]
 name = "modal-for-noobs"
 version = "0.1.0"
-description = "A Python boilerplate project"
+description = "🚀 Async-first, idiot-proof Gradio deployment CLI for Modal"
 authors = [{name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu"}]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -13,6 +13,14 @@ dependencies = [
     "uvloop>=0.21.0",
     "unkey-py>=0.6.2",
     "python-dotenv>=1.0.0",
+    "modal>=1.0.3",
+    "gradio>=5.33.0",
+    "fastapi>=0.115.12",
+    "rich>=14.0.0",
+    "pyyaml>=6.0.2",
+    "huggingface-hub>=0.32.4",
+    "typer>=0.16.0",
+    "httpx>=0.27.2",
 ]
 
 [project.urls]
@@ -20,7 +28,7 @@ Repository = "https://github.com/arthrod/modal-for-noobs"
 Issues = "https://github.com/arthrod/modal-for-noobs/issues"
 
 [project.scripts]
-newdotfiles = "newdotfiles.cli:main"
+modal-for-noobs = "modal_for_noobs.cli:main"
 
 [dependency-groups]
 test = [
@@ -82,7 +90,7 @@ unfixable = ["B"]
 "__init__.py" = ["D"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["newdotfiles"]
+known-first-party = ["modal_for_noobs"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -98,13 +106,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/newdotfiles"]
+packages = ["src/modal_for_noobs"]
 
 [tool.hatch.build]
 include = [
     "LICENSE",
     "README.md",
-    "src/newdotfiles"
+    "src/modal_for_noobs"
 ]
 
 [tool.bandit]
