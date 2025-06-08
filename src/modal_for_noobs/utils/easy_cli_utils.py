@@ -121,9 +121,6 @@ async def setup_modal_auth_async() -> bool:
         logger.error("Modal CLI not found. Please install modal: pip install modal")
         return False
     except OSError as e:
-        logger.error(f"Subprocess error during modal setup: {e}")
-        return False
-    except OSError as e:
         logger.error(f"OS error during modal setup: {e}")
         return False
 
