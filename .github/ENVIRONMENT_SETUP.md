@@ -11,7 +11,7 @@ To enable the security features in the CI/CD workflows, you need to set up GitHu
   - Wait timer: Optional 5-10 minute wait
   - Restrict deployments to: `main` branch only
 
-### 2. `release` Environment  
+### 2. `release` Environment
 - **Purpose**: For creating GitHub releases
 - **Protection Rules**:
   - Required reviewers: Add at least 1 reviewer
@@ -40,6 +40,6 @@ To enable the security features in the CI/CD workflows, you need to set up GitHu
 ## Benefits
 
 - **Manual approval required**: No accidental deployments
-- **Branch/tag restrictions**: Only deploy from appropriate sources  
+- **Branch/tag restrictions**: Only deploy from appropriate sources
 - **Audit trail**: Track who approved deployments and when
 - **Secret isolation**: Sensitive tokens only available in protected environments

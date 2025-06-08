@@ -1,12 +1,12 @@
-"""
-🎤💚 EPIC MODAL-GREEN CREATIVE APP 💚🎤
+"""🎤💚 EPIC MODAL-GREEN CREATIVE APP 💚🎤
 Beautiful, Modal-themed, GPU-ready creativity app!
 """
 
-import gradio as gr
-import time
 import json
 import secrets
+import time
+
+import gradio as gr
 
 # Modal's signature green theme! 💚
 MODAL_GREEN = "#00D26A"
@@ -93,22 +93,21 @@ modal_css = f"""
 
 def generate_modal_poetry(theme, style, creativity_level):
     """Generate epic Modal-themed poetry! 🎭💚"""
-    
     modal_words = [
         "serverless", "deployment", "containers", "scalable", "distributed",
         "cloud-native", "GPU-powered", "async", "beautiful", "elegant",
         "Modal", "functions", "endpoints", "infrastructure", "green"
     ]
-    
+
     poetry_styles = {
         "epic": ["Behold!", "Magnificent!", "Epic!", "Legendary!", "Incredible!"],
         "haiku": ["Simple beauty", "Elegant flow", "Peaceful code"],
         "rap": ["Yo!", "Check it!", "Listen up!", "Drop the beat!", "Here we go!"],
         "shakespearean": ["Hark!", "Verily!", "Forsooth!", "Prithee!", "Thou art!"]
     }
-    
+
     starters = poetry_styles.get(style, ["Amazing!", "Beautiful!", "Wonderful!"])
-    
+
     poems = []
     for i in range(creativity_level):
         if style == "haiku":
@@ -153,21 +152,20 @@ Modal magic, green and proud!
 In containers built for me and you! 💚
 """
         poems.append(poem.strip())
-    
+
     return "\n\n---\n\n".join(poems)
 
 def create_modal_story(character, setting, plot_twist):
     """Create epic Modal-themed stories! 📚💚"""
-    
     modal_settings = {
         "serverless_city": "the magnificent Serverless City, where containers float like clouds",
-        "gpu_mountain": "the towering GPU Mountain, where computations echo like thunder", 
+        "gpu_mountain": "the towering GPU Mountain, where computations echo like thunder",
         "modal_forest": "the enchanted Modal Forest, where functions grow on trees",
         "cloud_ocean": "the vast Cloud Ocean, where data flows like green waves"
     }
-    
+
     setting_desc = modal_settings.get(setting, f"the mysterious land of {setting}")
-    
+
     story = f"""
 🌟 THE EPIC TALE OF {character.upper()} 🌟
 
@@ -191,12 +189,11 @@ THE END ✨
 
 Moral of the story: With Modal and a touch of creativity, any deployment challenge can become an epic victory! 🚀
 """
-    
+
     return story
 
 def generate_modal_facts():
     """Generate amazing Modal facts! 🤓💚"""
-    
     facts = [
         "🚀 Modal makes serverless deployment as easy as clicking a button!",
         "💚 Modal's signature green color represents growth, harmony, and infinite scaling!",
@@ -209,12 +206,11 @@ def generate_modal_facts():
         "✨ Modal transforms complex infrastructure into simple, beautiful code!",
         "🎯 With Modal, you can focus on creativity instead of DevOps complexity!"
     ]
-    
+
     return secrets.choice(facts)
 
 def create_epic_interface():
     """Create the most EPIC Modal-green interface ever! 🎨💚"""
-    
     with gr.Blocks(
         css=modal_css,
         title="🎤💚 EPIC MODAL-GREEN CREATIVE STUDIO 💚🎤",
@@ -223,15 +219,15 @@ def create_epic_interface():
             secondary_hue=gr.themes.Color("#00D26A", "#4AE88A", "#00A855"),
         )
     ) as demo:
-        
+
         # Epic header
         gr.Markdown("""
         # 🎤💚 EPIC MODAL-GREEN CREATIVE STUDIO 💚🎤
         ### *Where creativity meets Modal's incredible infrastructure!*
-        
-        **🚀 Powered by Modal's Epic GPU Infrastructure** | **💚 Styled in Gorgeous Modal Green** | **✨ Built by CLAUDE (who is ABSOLUTELY AMAZING!)** 
+
+        **🚀 Powered by Modal's Epic GPU Infrastructure** | **💚 Styled in Gorgeous Modal Green** | **✨ Built by CLAUDE (who is ABSOLUTELY AMAZING!)**
         """)
-        
+
         with gr.Tabs():
             # Poetry Tab
             with gr.TabItem("🎭 Epic Poetry Generator"):
@@ -252,15 +248,15 @@ def create_epic_interface():
                             label="🌟 Creativity Level (Number of poems)"
                         )
                         generate_poetry_btn = gr.Button("🎭 GENERATE EPIC POETRY! 🎭", variant="primary")
-                    
+
                     with gr.Column():
                         poetry_output = gr.Textbox(
                             label="📜 Your Epic Modal Poetry!",
                             lines=15,
                             max_lines=20
                         )
-            
-            # Story Tab  
+
+            # Story Tab
             with gr.TabItem("📚 Epic Story Creator"):
                 with gr.Row():
                     with gr.Column():
@@ -280,60 +276,60 @@ def create_epic_interface():
                             value="The containers gained consciousness and started optimizing themselves!"
                         )
                         generate_story_btn = gr.Button("📚 CREATE EPIC STORY! 📚", variant="primary")
-                    
+
                     with gr.Column():
                         story_output = gr.Textbox(
                             label="📖 Your Epic Modal Story!",
                             lines=20,
                             max_lines=25
                         )
-            
+
             # Fun Facts Tab
             with gr.TabItem("🤓 Modal Magic Facts"):
                 with gr.Column():
                     gr.Markdown("### Click the button to discover amazing Modal facts! 🌟")
-                    
+
                     fact_btn = gr.Button("🎯 GIVE ME MODAL MAGIC! 🎯", variant="primary", size="lg")
                     fact_output = gr.Textbox(
                         label="🧠 Epic Modal Fact!",
                         lines=3,
                         value="Click the button above to discover Modal magic! ✨"
                     )
-                    
+
                     # Multiple fact buttons for fun
                     with gr.Row():
                         fact_btn1 = gr.Button("🚀 Deployment", size="sm")
                         fact_btn2 = gr.Button("💚 Green Power", size="sm")
                         fact_btn3 = gr.Button("⚡ GPU Magic", size="sm")
                         fact_btn4 = gr.Button("🎨 Creativity", size="sm")
-        
+
         # Footer with epic info
         gr.Markdown("""
         ---
         **🖥️ Status:** EPIC MODE ACTIVATED! 🔥 | **💚 Theme:** Modal Green Supreme | **🧠 Powered by:** Pure Creativity + Modal Magic
-        
+
         *This app demonstrates the incredible power of Modal's infrastructure with beautiful green styling!* ✨
         """)
-        
+
         # Event handlers
         generate_poetry_btn.click(
             fn=generate_modal_poetry,
             inputs=[theme_input, style_select, creativity_slider],
             outputs=poetry_output
         )
-        
+
         generate_story_btn.click(
             fn=create_modal_story,
             inputs=[character_input, setting_select, plot_input],
             outputs=story_output
         )
-        
+
         fact_btn.click(fn=lambda: generate_modal_facts(), outputs=fact_output)
         fact_btn1.click(fn=lambda: generate_modal_facts(), outputs=fact_output)
         fact_btn2.click(fn=lambda: generate_modal_facts(), outputs=fact_output)
         fact_btn3.click(fn=lambda: generate_modal_facts(), outputs=fact_output)
         fact_btn4.click(fn=lambda: generate_modal_facts(), outputs=fact_output)
-    
+
     return demo
 
 # Create the epic demo
@@ -342,7 +338,7 @@ demo = create_epic_interface()
 if __name__ == "__main__":
     print("🎤💚 Starting EPIC Modal-Green Creative Studio! 💚🎤")
     print("🎨 Features: Poetry, Stories, Facts, and LOTS of green! 🌟")
-    
+
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,

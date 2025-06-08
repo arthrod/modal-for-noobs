@@ -21,7 +21,7 @@ with gr.Blocks() as demo:
 
 demo.launch()
 """)
-    
+
     result = validate_app_file(app_file)
     assert result["valid"]
     assert "torch" in result["detected_ml_libraries"]
@@ -45,7 +45,7 @@ with gr.Blocks() as demo:
 
 demo.launch()
 """)
-    
+
     result = validate_app_file(app_file)
     assert result["valid"]
     assert "matplotlib" in result["detected_jupyter"]
@@ -61,9 +61,9 @@ def test_get_modal_status_success(mock_modal_api):
         {"name": "test-app", "status": "running"},
         {"name": "other-app", "status": "stopped"}
     ])
-    
+
     status = get_modal_status()
-    
+
     assert status["authenticated"]
     assert status["total_deployments"] == 2
     assert status["active_deployments"] == 1
@@ -73,9 +73,9 @@ def test_get_modal_status_success(mock_modal_api):
 def test_get_modal_status_error(mock_modal_api):
     """Test Modal status retrieval with error."""
     mock_modal_api.check_auth = AsyncMock(side_effect=Exception("Test error"))
-    
+
     status = get_modal_status()
-    
+
     assert not status["authenticated"]
     assert status["total_deployments"] == 0
     assert "error" in status

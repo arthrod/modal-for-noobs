@@ -10,8 +10,8 @@ import pytest
 from typer.testing import CliRunner
 
 from modal_for_noobs.cli import app
-from modal_for_noobs.modal_deploy import ModalDeployer
 from modal_for_noobs.config import Config
+from modal_for_noobs.modal_deploy import ModalDeployer
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ import numpy as np
 def generate_plot(title):
     x = np.linspace(0, 10, 100)
     y = np.sin(x)
-    
+
     fig, ax = plt.subplots()
     ax.plot(x, y)
     ax.set_title(title)
@@ -61,13 +61,13 @@ def analyze_text(text, model_choice):
 
 with gr.Blocks() as demo:
     gr.Markdown("# Complex App")
-    
+
     with gr.Tab("Plot"):
         title_input = gr.Textbox(label="Title")
         plot_output = gr.Plot()
         plot_btn = gr.Button("Generate")
         plot_btn.click(generate_plot, inputs=title_input, outputs=plot_output)
-    
+
     with gr.Tab("Analysis"):
         text_input = gr.Textbox(label="Text")
         model_dropdown = gr.Dropdown(["GPT-4", "Claude", "Llama"], label="Model")
@@ -119,7 +119,7 @@ def test_config_info_command(runner):
 async def test_modal_deployer_auth_check():
     """Test Modal authentication check."""
     deployer = ModalDeployer()
-    
+
     with patch.dict("os.environ", {"MODAL_TOKEN_ID": "test", "MODAL_TOKEN_SECRET": "test"}):
         assert await deployer.check_modal_auth_async() is True
 
@@ -128,12 +128,12 @@ async def test_modal_deployer_auth_check():
 async def test_create_deployment_file(sample_gradio_app):
     """Test deployment file creation."""
     deployer = ModalDeployer()
-    
+
     deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
-    
+
     assert deployment_file.exists()
     assert deployment_file.name == f"modal_{sample_gradio_app.stem}.py"
-    
+
     content = deployment_file.read_text()
     assert "modal.App" in content
     assert "deploy_gradio" in content
@@ -157,7 +157,7 @@ def test_time_to_get_serious_help(runner):
 
 class TestCLICommands:
     """Test all CLI commands comprehensively."""
-    
+
     def test_main_help(self, runner):
         """Test main CLI help output."""
         result = runner.invoke(app, ["--help"])
@@ -166,7 +166,7 @@ class TestCLICommands:
         assert "deploy" in result.stdout
         assert "kill-a-deployment" in result.stdout
         assert "milk-logs" in result.stdout
-    
+
     def test_deploy_help(self, runner):
         """Test deploy command help."""
         result = runner.invoke(app, ["deploy", "--help"])
@@ -175,61 +175,61 @@ class TestCLICommands:
         assert "--wizard" in result.stdout
         assert "--optimized" in result.stdout
         assert "--br-huehuehue" in result.stdout
-    
+
     def test_deploy_missing_file(self, runner):
         """Test deploy with non-existent file."""
         result = runner.invoke(app, ["deploy", "nonexistent.py"])
         assert result.exit_code != 0
-    
+
     def test_deploy_wizard_mode(self, runner, sample_gradio_app):
         """Test deploy with wizard mode."""
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--wizard", "--dry-run"])
         assert result.exit_code == 0
-    
+
     def test_deploy_optimized_mode(self, runner, sample_gradio_app):
         """Test deploy with optimized mode."""
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--optimized", "--dry-run"])
         assert result.exit_code == 0
-    
+
     def test_deploy_brazilian_mode(self, runner, sample_gradio_app):
         """Test deploy with Brazilian mode."""
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--br-huehuehue", "--dry-run"])
         assert result.exit_code == 0
         assert "brasileiro" in result.stdout.lower() or "huehuehue" in result.stdout.lower()
-    
+
     def test_deploy_complex_app(self, runner, complex_gradio_app):
         """Test deploy with complex Gradio app."""
         result = runner.invoke(app, ["deploy", str(complex_gradio_app), "--optimized", "--dry-run"])
         assert result.exit_code == 0
-    
+
     def test_run_examples_help(self, runner):
         """Test run-examples command help."""
         result = runner.invoke(app, ["run-examples", "--help"])
         assert result.exit_code == 0
         assert "built-in examples" in result.stdout
-    
+
     def test_run_examples_list(self, runner):
         """Test listing available examples."""
         result = runner.invoke(app, ["run-examples"])
         assert result.exit_code == 0
         # Should list available examples
-    
+
     def test_run_examples_specific(self, runner):
         """Test running specific example."""
         result = runner.invoke(app, ["run-examples", "simple_hello", "--dry-run"])
         assert result.exit_code == 0
-    
+
     def test_run_examples_nonexistent(self, runner):
         """Test running non-existent example."""
         result = runner.invoke(app, ["run-examples", "nonexistent_example"])
         assert result.exit_code != 0
-    
+
     def test_kill_deployment_help(self, runner):
         """Test kill-a-deployment command help."""
         result = runner.invoke(app, ["kill-a-deployment", "--help"])
         assert result.exit_code == 0
         assert "terminate" in result.stdout.lower()
-    
+
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_deployment_list(self, mock_kill, runner):
         """Test listing deployments to kill."""
@@ -239,7 +239,7 @@ class TestCLICommands:
         result = runner.invoke(app, ["kill-a-deployment"])
         assert result.exit_code == 0
         mock_kill.assert_called_once()
-    
+
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_specific_deployment(self, mock_kill, runner):
         """Test killing specific deployment."""
@@ -249,7 +249,7 @@ class TestCLICommands:
         result = runner.invoke(app, ["kill-a-deployment", "ap-test123"])
         assert result.exit_code == 0
         mock_kill.assert_called_once_with("ap-test123", False)
-    
+
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_deployment_brazilian(self, mock_kill, runner):
         """Test kill deployment with Brazilian mode."""
@@ -259,13 +259,13 @@ class TestCLICommands:
         result = runner.invoke(app, ["kill-a-deployment", "ap-test123", "--br-huehuehue"])
         assert result.exit_code == 0
         mock_kill.assert_called_once_with("ap-test123", True)
-    
+
     def test_milk_logs_help(self, runner):
         """Test milk-logs command help."""
         result = runner.invoke(app, ["milk-logs", "--help"])
         assert result.exit_code == 0
         assert "logs" in result.stdout.lower()
-    
+
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_basic(self, mock_milk, runner):
         """Test basic log milking."""
@@ -275,7 +275,7 @@ class TestCLICommands:
         result = runner.invoke(app, ["milk-logs"])
         assert result.exit_code == 0
         mock_milk.assert_called_once()
-    
+
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_specific_app(self, mock_milk, runner):
         """Test milking logs for specific app."""
@@ -285,7 +285,7 @@ class TestCLICommands:
         result = runner.invoke(app, ["milk-logs", "test-app"])
         assert result.exit_code == 0
         mock_milk.assert_called_once_with("test-app", False, 100, False)
-    
+
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_follow(self, mock_milk, runner):
         """Test following logs."""
@@ -295,13 +295,13 @@ class TestCLICommands:
         result = runner.invoke(app, ["milk-logs", "test-app", "--follow"])
         assert result.exit_code == 0
         mock_milk.assert_called_once_with("test-app", True, 100, False)
-    
+
     def test_sanity_check_help(self, runner):
         """Test sanity-check command help."""
         result = runner.invoke(app, ["sanity-check", "--help"])
         assert result.exit_code == 0
         assert "sanity check" in result.stdout.lower()
-    
+
     @patch("modal_for_noobs.cli._sanity_check_async")
     def test_sanity_check_basic(self, mock_sanity, runner):
         """Test basic sanity check."""
@@ -311,19 +311,19 @@ class TestCLICommands:
         result = runner.invoke(app, ["sanity-check"])
         assert result.exit_code == 0
         mock_sanity.assert_called_once()
-    
+
     def test_config_command(self, runner):
         """Test config command."""
         result = runner.invoke(app, ["config"])
         assert result.exit_code == 0
         assert "configuration" in result.stdout.lower()
-    
+
     def test_auth_help(self, runner):
         """Test auth command help."""
         result = runner.invoke(app, ["auth", "--help"])
         assert result.exit_code == 0
         assert "authentication" in result.stdout.lower()
-    
+
     @patch("modal_for_noobs.cli._setup_auth_async")
     def test_auth_setup(self, mock_auth, runner):
         """Test authentication setup."""
@@ -337,20 +337,20 @@ class TestCLICommands:
 
 class TestAsyncFunctions:
     """Test async functionality."""
-    
+
     @pytest.mark.asyncio
     async def test_modal_deployer_init(self):
         """Test ModalDeployer initialization."""
         deployer = ModalDeployer()
         assert deployer is not None
-    
+
     @pytest.mark.asyncio
     async def test_modal_auth_check_with_tokens(self, mock_modal_auth):
         """Test Modal auth check with tokens."""
         deployer = ModalDeployer()
         result = await deployer.check_modal_auth_async()
         assert result is True
-    
+
     @pytest.mark.asyncio
     async def test_modal_auth_check_without_tokens(self):
         """Test Modal auth check without tokens."""
@@ -358,59 +358,59 @@ class TestAsyncFunctions:
             deployer = ModalDeployer()
             result = await deployer.check_modal_auth_async()
             assert result is False
-    
+
     @pytest.mark.asyncio
     async def test_create_deployment_file_minimum(self, sample_gradio_app):
         """Test creating deployment file with minimum config."""
         deployer = ModalDeployer()
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
-        
+
         assert deployment_file.exists()
         content = deployment_file.read_text()
         assert "modal.App" in content
         assert "gradio" in content
         assert "fastapi" in content
-    
+
     @pytest.mark.asyncio
     async def test_create_deployment_file_optimized(self, sample_gradio_app):
         """Test creating deployment file with optimized config."""
         deployer = ModalDeployer()
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "optimized")
-        
+
         assert deployment_file.exists()
         content = deployment_file.read_text()
         assert "modal.App" in content
         assert "gradio" in content
         assert "torch" in content or "tensorflow" in content or "scikit-learn" in content
-    
+
     @pytest.mark.asyncio
     async def test_deploy_dry_run_async(self, sample_gradio_app, mock_subprocess):
         """Test async deployment with dry run."""
         deployer = ModalDeployer()
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
-        
+
         # Should not raise an exception
         assert deployment_file.exists()
 
 
 class TestConfigSystem:
     """Test configuration system."""
-    
+
     def test_config_init_default(self):
         """Test config initialization with defaults."""
         config = Config()
         assert config.environment in ["development", "production"]
         assert config.log_level in ["DEBUG", "INFO", "WARNING", "ERROR"]
-    
+
     def test_config_with_env_file(self, tmp_path):
         """Test config with custom env file."""
         env_file = tmp_path / ".test_env"
         env_file.write_text("ENVIRONMENT=test\nLOG_LEVEL=INFO\n")
-        
+
         config = Config(str(env_file))
         assert config.environment == "test"
         assert config.log_level == "INFO"
-    
+
     def test_config_unkey_settings(self):
         """Test Unkey configuration."""
         config = Config()
@@ -421,31 +421,31 @@ class TestConfigSystem:
 
 class TestErrorHandling:
     """Test error handling and edge cases."""
-    
+
     def test_deploy_invalid_python_file(self, runner, tmp_path):
         """Test deploy with invalid Python file."""
         invalid_file = tmp_path / "invalid.py"
         invalid_file.write_text("import invalid_module_that_doesnt_exist\n")
-        
+
         result = runner.invoke(app, ["deploy", str(invalid_file), "--dry-run"])
         # Should handle gracefully
-    
+
     def test_deploy_non_python_file(self, runner, tmp_path):
         """Test deploy with non-Python file."""
         text_file = tmp_path / "test.txt"
         text_file.write_text("This is not Python code")
-        
+
         result = runner.invoke(app, ["deploy", str(text_file)])
         assert result.exit_code != 0
-    
+
     @patch("modal_for_noobs.cli._deploy_async")
     def test_deploy_async_failure(self, mock_deploy, runner, sample_gradio_app):
         """Test deploy async function failure."""
         mock_deploy.side_effect = Exception("Test deployment failure")
-        
+
         result = runner.invoke(app, ["deploy", str(sample_gradio_app)])
         # Should handle exception gracefully
-    
+
     def test_config_missing_env_file(self, runner):
         """Test config with missing env file."""
         result = runner.invoke(app, ["config", "--env-file", "nonexistent.env"])
@@ -454,31 +454,31 @@ class TestErrorHandling:
 
 class TestIntegration:
     """Integration tests for full workflows."""
-    
+
     def test_full_deploy_workflow_dry_run(self, runner, sample_gradio_app):
         """Test complete deploy workflow with dry run."""
         # Test basic deploy
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--dry-run"])
         assert result.exit_code == 0
-        
+
         # Test with wizard
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--wizard", "--dry-run"])
         assert result.exit_code == 0
-        
+
         # Test with optimized
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--optimized", "--dry-run"])
         assert result.exit_code == 0
-    
+
     def test_examples_workflow(self, runner):
         """Test examples workflow."""
         # List examples
         result = runner.invoke(app, ["run-examples"])
         assert result.exit_code == 0
-        
+
         # Try to run simple example with dry run
         result = runner.invoke(app, ["run-examples", "simple_hello", "--dry-run"])
         assert result.exit_code == 0
-    
+
     @patch("modal_for_noobs.cli._kill_deployment_async")
     @patch("modal_for_noobs.cli._milk_logs_async")
     @patch("modal_for_noobs.cli._sanity_check_async")
@@ -492,26 +492,26 @@ class TestIntegration:
         async def mock_sanity_async(*args, **kwargs):
             return None
         mock_sanity.return_value = mock_sanity_async()
-        
+
         # Sanity check
         result = runner.invoke(app, ["sanity-check"])
         assert result.exit_code == 0
-        
+
         # List deployments to kill
         result = runner.invoke(app, ["kill-a-deployment"])
         assert result.exit_code == 0
-        
+
         # Check logs
         result = runner.invoke(app, ["milk-logs"])
         assert result.exit_code == 0
-    
+
     def test_brazilian_mode_workflow(self, runner, sample_gradio_app):
         """Test Brazilian mode across commands."""
         # Deploy with Brazilian mode
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--br-huehuehue", "--dry-run"])
         assert result.exit_code == 0
         assert "huehuehue" in result.stdout.lower() or "brasileiro" in result.stdout.lower()
-        
+
         # Examples with Brazilian mode
         result = runner.invoke(app, ["run-examples", "simple_hello", "--br-huehuehue", "--dry-run"])
         assert result.exit_code == 0

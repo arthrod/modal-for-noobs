@@ -8,7 +8,7 @@ This is your **special place** to drop all the precious files that make your Gra
 
 - **📄 `requirements.txt`** - Your app's dependencies
 - **🖼️ Images and assets** - Photos, logos, backgrounds
-- **🎵 Audio files** - Sound effects, music, voice samples  
+- **🎵 Audio files** - Sound effects, music, voice samples
 - **📊 Data files** - CSV, JSON, models, datasets
 - **🔧 Config files** - Environment files, settings
 - **📚 Documentation** - User guides, API docs

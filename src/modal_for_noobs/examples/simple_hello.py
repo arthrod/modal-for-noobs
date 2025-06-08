@@ -1,5 +1,4 @@
-"""
-👋 Simple Hello World - Your first Modal app that says hello with Modal green styling!
+"""👋 Simple Hello World - Your first Modal app that says hello with Modal green styling!
 """
 
 import gradio as gr
@@ -38,7 +37,7 @@ def greet(name):
     """Greet function with Modal styling."""
     if not name.strip():
         return "👋 Hello! Please enter your name!"
-    
+
     return f"🚀💚 Hello {name}! Welcome to Modal-for-noobs! 💚🚀"
 
 # Create interface

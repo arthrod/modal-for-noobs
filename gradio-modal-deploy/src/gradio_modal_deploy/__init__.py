@@ -29,7 +29,7 @@ __email__ = "arthrod@umich.edu"
 __all__ = [
     # Components
     "ModalDeployButton",
-    "ModalExplorer", 
+    "ModalExplorer",
     "ModalStatusMonitor",
     "ModalTheme",
     # Decorators

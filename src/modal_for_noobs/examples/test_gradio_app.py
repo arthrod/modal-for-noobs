@@ -1,5 +1,6 @@
 import gradio as gr
 
+
 def greet(name, intensity):
     """Simple greeting function"""
     return "Hello, " + name + "!" * int(intensity)

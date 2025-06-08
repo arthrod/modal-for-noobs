@@ -35,7 +35,7 @@ modal-for-noobs = "modal_for_noobs.cli:main"
 [dependency-groups]
 test = [
     "pytest>=8.3.4",
-    "pytest-cov>=6.0.0", 
+    "pytest-cov>=6.0.0",
     "pytest-asyncio>=0.25.2",
     "pytest-mock>=3.14.0",
     "pytest-sugar>=1.0.0",
@@ -66,27 +66,27 @@ lint = [
 default-groups = ["test", "dev", "lint"]
 
 [tool.ruff]
-include = [                        
+include = [
     "pyproject.toml",
     "src/**/*.{py,js,jsx,ts,tsx,css,scss,html,sh,yaml,yml}",
-    "scripts/**/*.{py,js,jsx,ts,tsx,css,scss,html,sh,yaml,yml}", 
+    "scripts/**/*.{py,js,jsx,ts,tsx,css,scss,html,sh,yaml,yml}",
 ]
 line-length = 140
 fix = true
-target-version = "py311"           
+target-version = "py311"
 exclude = ["build", "dist", "*.egg-info"]
 
 [tool.ruff.lint]
 fixable = ["UP", "I", "D"]
 ignore = [
-    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191", 
-    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012", 
+    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191",
+    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012",
     "S311", "SIM108", "SIM300", "T201", "TRY003", "TRY301", "W293",
     "Q000", "Q001", "Q002", "Q003", "D200", "D205", "D400", "D401"
 ]
 select = [
-    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE", 
-    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC", 
+    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE",
+    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC",
     "PLE", "PLW", "PT", "PTH", "RET", "RUF", "S", "SIM", "T", "TRY", "UP", "W", "D"
 ]
 unfixable = ["B"]
@@ -104,7 +104,7 @@ convention = "google"
 
 [tool.ruff.format]
 quote-style = "double"
-indent-style = "space" 
+indent-style = "space"
 line-ending = "lf"
 docstring-code-format = true
 
@@ -160,8 +160,6 @@ omit = [
     "*/__init__.py",
     "src/modal_for_noobs/huggingface.py",
     "src/modal_for_noobs/modal_deploy.py",
-    "src/modal_for_noobs/config_loader.py",
-    "src/modal_for_noobs/cli.py",
 ]
 
 [tool.mypy]
@@ -179,7 +177,7 @@ exclude = [
 project_includes = ["src"]
 project_excludes = [
     "**/.[!/.]*",
-    "**/*venv/**", 
+    "**/*venv/**",
     ".mypy_cache",
     ".pytest_cache",
     ".ruff_cache",
@@ -189,7 +187,7 @@ project_excludes = [
 ]
 search_path = ["src"]
 
-# Python environment  
+# Python environment
 python_platform = "linux"
 python_version = "3.11"
 python_interpreter = ".venv/bin/python"

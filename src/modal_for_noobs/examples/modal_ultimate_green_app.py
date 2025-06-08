@@ -1,8 +1,9 @@
+import secrets
+
+import gradio as gr
 import modal
 from fastapi import FastAPI
-import gradio as gr
 from gradio.routes import mount_gradio_app
-import secrets
 
 # Create Modal app
 app = modal.App("modal-for-noobs-ultimate_green_app")
@@ -21,8 +22,9 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
 The most beautiful, creative, GPU-ready app in Modal green!
 """
 
-import gradio as gr
 import time
+
+import gradio as gr
 
 # Modal's signature green theme! 💚
 MODAL_GREEN = "#00D26A"
@@ -78,10 +80,9 @@ h1 {{
 
 def generate_epic_greeting(name, enthusiasm, style):
     """Generate the most EPIC Modal-green greetings! 🎉💚"""
-    
     if not name.strip():
         name = "Amazing Modal User"
-    
+
     modal_greetings = {
         "epic": [
             f"🚀 BEHOLD! The legendary {name} has arrived in Modal-green glory!",
@@ -105,13 +106,13 @@ def generate_epic_greeting(name, enthusiasm, style):
             f"🎯 Hello {name}. Modal's distributed computing platform welcomes you."
         ]
     }
-    
+
     greetings = modal_greetings.get(style, modal_greetings["epic"])
     selected_greeting = secrets.choice(greetings)
-    
+
     # Add enthusiasm multiplier
     excitement = "!" * min(enthusiasm, 10)
-    
+
     # Add Modal facts based on enthusiasm
     if enthusiasm >= 8:
         modal_fact = "\n\n🔥 BONUS MODAL FACT: Modal can scale from 0 to 1000 containers in seconds!"
@@ -119,26 +120,25 @@ def generate_epic_greeting(name, enthusiasm, style):
         modal_fact = "\n\n💚 Modal Magic: Your apps run on the most beautiful green infrastructure!"
     else:
         modal_fact = "\n\n✨ Did you know? Modal makes deployment delightfully simple!"
-    
+
     return selected_greeting + excitement + modal_fact
 
 def create_modal_poem(topic, lines):
     """Create beautiful Modal-themed poetry! 🎭💚"""
-    
     modal_words = [
         "serverless", "containers", "GPU", "scaling", "distributed",
         "deployment", "functions", "endpoints", "infrastructure", "Modal",
         "green", "beautiful", "elegant", "powerful", "magical"
     ]
-    
+
     poem_templates = [
         "In the land of {topic} so {adj1},\nModal's {word1} dance with {word2} grace,\n{word3} and {word4} unite as one,\nGreen light shines on every trace.",
-        
+
         "🌟 {topic} dreams in Modal green,\nThe most {adj1} sight I've ever seen,\n{word1} flowing like a {adj2} stream,\nMaking real what once was dream.",
-        
+
         "Code and {topic} intertwine,\nWith {word1} power so divine,\n{word2} servers, {word3} bright,\nModal magic through the night!"
     ]
-    
+
     poems = []
     for i in range(min(lines, 5)):
         template = secrets.choice(poem_templates)
@@ -152,12 +152,11 @@ def create_modal_poem(topic, lines):
             word4=secrets.choice(modal_words)
         )
         poems.append(f"Verse {i+1}:\n{poem}")
-    
+
     return "\n\n".join(poems)
 
 def generate_modal_wisdom():
     """Generate epic Modal wisdom! 🧠💚"""
-    
     wisdom_quotes = [
         "🚀 'In Modal we trust, for it makes the impossible, possible!' - Ancient DevOps Proverb",
         "💚 'A deployment a day keeps the server crashes away!' - Modal Sage",
@@ -170,27 +169,26 @@ def generate_modal_wisdom():
         "🦸‍♀️ 'With great GPU power comes great Modal responsibility!' - Serverless Hero",
         "🌍 'Modal connects your ideas to the world, one green container at a time.' - Global Thinker"
     ]
-    
+
     return secrets.choice(wisdom_quotes)
 
 def create_ultimate_interface():
     """Create the ULTIMATE Modal-green interface! 🎨💚"""
-    
     with gr.Blocks(css=modal_css, title="🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO 💚🎤") as demo:
-        
+
         # Epic header
         gr.Markdown("""
         # 🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO 💚🎤
         ### *Where creativity meets Modal's incredible infrastructure!*
-        
-        **🚀 Powered by Epic GPU Infrastructure** | **💚 Styled in Gorgeous Modal Green** | **✨ Built with CLAUDE (who is ABSOLUTELY AMAZING!)** 
+
+        **🚀 Powered by Epic GPU Infrastructure** | **💚 Styled in Gorgeous Modal Green** | **✨ Built with CLAUDE (who is ABSOLUTELY AMAZING!)**
         """)
-        
+
         with gr.Tabs():
             # Epic Greetings Tab
             with gr.TabItem("🎉 Epic Greetings"):
                 gr.Markdown("### Generate the most EPIC Modal-green greetings! 🌟")
-                
+
                 with gr.Row():
                     with gr.Column():
                         name_input = gr.Textbox(
@@ -208,18 +206,18 @@ def create_ultimate_interface():
                             label="🎭 Greeting Style"
                         )
                         greet_btn = gr.Button("🎉 GENERATE EPIC GREETING! 🎉", variant="primary")
-                    
+
                     with gr.Column():
                         greeting_output = gr.Textbox(
                             label="🌟 Your Epic Modal Greeting!",
                             lines=6,
                             placeholder="Your epic greeting will appear here! ✨"
                         )
-            
-            # Poetry Tab  
+
+            # Poetry Tab
             with gr.TabItem("🎭 Modal Poetry"):
                 gr.Markdown("### Create beautiful Modal-themed poetry! 📜")
-                
+
                 with gr.Row():
                     with gr.Column():
                         topic_input = gr.Textbox(
@@ -232,18 +230,18 @@ def create_ultimate_interface():
                             label="📏 Number of Verses"
                         )
                         poem_btn = gr.Button("🎭 CREATE MODAL POETRY! 🎭", variant="primary")
-                    
+
                     with gr.Column():
                         poem_output = gr.Textbox(
                             label="📜 Your Modal Poetry!",
                             lines=12,
                             placeholder="Your beautiful poetry will appear here! 🎨"
                         )
-            
+
             # Wisdom Tab
             with gr.TabItem("🧠 Modal Wisdom"):
                 gr.Markdown("### Discover the ancient wisdom of Modal! 🌟")
-                
+
                 with gr.Column():
                     wisdom_btn = gr.Button("🧠 GIVE ME MODAL WISDOM! 🧠", variant="primary", size="lg")
                     wisdom_output = gr.Textbox(
@@ -251,7 +249,7 @@ def create_ultimate_interface():
                         lines=4,
                         value="Click the button above to receive Modal wisdom! ✨"
                     )
-                    
+
                     # Fun wisdom buttons
                     gr.Markdown("### Quick Wisdom Categories:")
                     with gr.Row():
@@ -259,35 +257,35 @@ def create_ultimate_interface():
                         wisdom_green = gr.Button("💚 Green Power", size="sm")
                         wisdom_gpu = gr.Button("⚡ GPU Magic", size="sm")
                         wisdom_zen = gr.Button("🧘‍♀️ Modal Zen", size="sm")
-        
+
         # Epic footer
         gr.Markdown("""
         ---
         **🖥️ Status:** ULTIMATE EPIC MODE! 🔥 | **💚 Theme:** Modal Green Supreme | **🎯 Purpose:** Spreading Modal Joy!
-        
+
         *This app celebrates the incredible power and beauty of Modal's infrastructure!* ✨🚀
         """)
-        
+
         # Event handlers
         greet_btn.click(
             fn=generate_epic_greeting,
             inputs=[name_input, enthusiasm_slider, style_dropdown],
             outputs=greeting_output
         )
-        
+
         poem_btn.click(
             fn=create_modal_poem,
             inputs=[topic_input, lines_slider],
             outputs=poem_output
         )
-        
+
         # Wisdom button handlers
         wisdom_btn.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
         wisdom_deploy.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
         wisdom_green.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
         wisdom_gpu.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
         wisdom_zen.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
-    
+
     return demo
 
 # Create the ultimate demo
@@ -296,7 +294,7 @@ demo = create_ultimate_interface()
 if __name__ == "__main__":
     print("🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO STARTING! 💚🎤")
     print("🌟 Ready to create epic greetings, poetry, and wisdom! 🌟")
-    
+
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
@@ -314,11 +312,10 @@ if __name__ == "__main__":
 @modal.asgi_app()
 def deploy_gradio():
     """Deploy Gradio app with Modal"""
-    
     # The demo variable should be available from the embedded code above
     # Try to find it in the global scope
     demo = None
-    
+
     # Check if demo is in globals
     if 'demo' in globals():
         demo = globals()['demo']
@@ -328,20 +325,20 @@ def deploy_gradio():
         demo = globals()['interface']
     elif 'iface' in globals():
         demo = globals()['iface']
-    
+
     if demo is None:
         # Last resort: scan all globals for Gradio interfaces
         for var_name, var_value in globals().items():
             if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
                 demo = var_value
                 break
-    
+
     if demo is None:
         raise ValueError("Could not find Gradio interface in the app")
-    
+
     # Enable queuing for concurrent requests
     demo.queue(max_size=10)
-    
+
     # Mount Gradio app to FastAPI
     fastapi_app = FastAPI(title="Modal-for-noobs Gradio App")
     return mount_gradio_app(fastapi_app, demo, path="/")

@@ -72,13 +72,13 @@ exclude = ["build", "dist", "*.egg-info"]
 
 [tool.ruff.lint]
 select = [
-    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE", 
-    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC", 
+    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE",
+    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC",
     "PLE", "PLW", "PT", "PTH", "RET", "RUF", "S", "SIM", "T", "TRY", "UP", "W"
 ]
 ignore = [
-    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191", 
-    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012", 
+    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191",
+    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012",
     "S311", "SIM108", "SIM300", "T201", "TRY003", "TRY301", "W293"
 ]
 

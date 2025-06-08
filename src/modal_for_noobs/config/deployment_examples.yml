@@ -7,19 +7,19 @@ examples:
     description: "Voice-enabled Gradio app with microphone + speaker"
     path: "src/modal_for_noobs/examples/ultimate_voice_green_app.py"
     mode: "optimized"
-    
+
   creative_studio:
     name: "🎭 Ultimate Green Creative Studio"
     description: "Complete creative studio with ML models"
     path: "src/modal_for_noobs/examples/ultimate_green_app.py"
     mode: "optimized"
-    
+
   simple_test:
     name: "🎯 Simple Test Gradio App"
     description: "Basic Gradio app for testing"
     path: "src/modal_for_noobs/examples/test_gradio_app.py"
     mode: "minimum"
-    
+
   contract_analyzer:
     name: "⚖️ Neurotic Contract Analyzer"
     description: "AI-powered contract analysis with Cicero-3-0"

@@ -1,6 +1,6 @@
+import gradio as gr
 import modal
 from fastapi import FastAPI
-import gradio as gr
 from gradio.routes import mount_gradio_app
 
 # Create Modal app
@@ -23,6 +23,7 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
 
 # Original Gradio app code embedded
 import gradio as gr
+
 
 def greet(name, intensity):
     """Simple greeting function"""
@@ -54,11 +55,10 @@ if __name__ == "__main__":
 @modal.asgi_app()
 def deploy_gradio():
     """Deploy Gradio app with Modal"""
-    
     # The demo variable should be available from the embedded code above
     # Try to find it in the global scope
     demo = None
-    
+
     # Check if demo is in globals
     if 'demo' in globals():
         demo = globals()['demo']
@@ -68,20 +68,20 @@ def deploy_gradio():
         demo = globals()['interface']
     elif 'iface' in globals():
         demo = globals()['iface']
-    
+
     if demo is None:
         # Last resort: scan all globals for Gradio interfaces
         for var_name, var_value in globals().items():
             if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
                 demo = var_value
                 break
-    
+
     if demo is None:
         raise ValueError("Could not find Gradio interface in the app")
-    
+
     # Enable queuing for concurrent requests
     demo.queue(max_size=10)
-    
+
     # Mount Gradio app to FastAPI
     fastapi_app = FastAPI(title="Modal-for-noobs Gradio App")
     return mount_gradio_app(fastapi_app, demo, path="/")

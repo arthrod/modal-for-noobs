@@ -8,4 +8,4 @@ from .cli import app, main
 from .config import config
 from .modal_deploy import ModalDeployer
 
-__all__ = ["__author__", "__email__", "__version__", "app", "main", "config", "ModalDeployer"]
+__all__ = ["__author__", "__email__", "__version__", "ModalDeployer", "app", "config", "main"]

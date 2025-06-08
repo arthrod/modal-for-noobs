@@ -13,7 +13,7 @@ def test_modal_deploy_button_creation():
         mode="minimum",
         timeout_minutes=30
     )
-    
+
     assert button.app_file == Path("test_app.py")
     assert button.mode == "minimum"
     assert button.timeout_minutes == 30

@@ -10,28 +10,28 @@ def render_templates():
     # Template files that need rendering
     template_files = [
         "src/{{ package_name | default('modal-for-noobs') }}/__init__.py",
-        "src/{{ package_name | default('modal-for-noobs') }}/cli.py", 
+        "src/{{ package_name | default('modal-for-noobs') }}/cli.py",
         "pyproject.toml"
     ]
-    
+
     # Create Jinja2 environment
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape()
     )
-    
+
     for template_file in template_files:
         if Path(template_file).exists():
             print(f"Rendering {template_file}")
-            
+
             # Load and render template
             template = env.get_template(template_file)
             rendered = template.render()
-            
+
             # Write back to file
             with open(template_file, 'w') as f:
                 f.write(rendered)
-            
+
             print(f"✓ Rendered {template_file}")
 
 if __name__ == "__main__":
