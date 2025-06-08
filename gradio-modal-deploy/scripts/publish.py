@@ -10,12 +10,13 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
+from security import safe_command
 
 
 def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
     print(f"🔥 Running: {cmd}")
-    result = subprocess.run(cmd, shell=False, capture_output=True, text=True)
+    result = safe_command.run(subprocess.run, cmd, shell=False, capture_output=True, text=True)
     
     if check and result.returncode != 0:
         print(f"❌ Command failed: {cmd}")
