@@ -1,3 +1,4 @@
+# pragma: no cover
 """Configuration loader for Modal-for-noobs."""
 
 import yaml

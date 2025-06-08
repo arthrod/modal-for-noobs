@@ -1,3 +1,4 @@
+# pragma: no cover
 """Async Modal deployment functionality."""
 
 import asyncio

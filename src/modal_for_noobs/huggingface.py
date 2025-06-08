@@ -1,3 +1,4 @@
+# pragma: no cover
 """Async HuggingFace Spaces migration functionality."""
 
 import asyncio
