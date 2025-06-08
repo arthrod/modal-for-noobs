@@ -93,7 +93,7 @@ class TestModalAuth:
     @pytest.mark.asyncio
     async def test_setup_modal_auth_async_subprocess_error(self):
         """Test async modal auth setup with subprocess error."""
-        with patch('asyncio.create_subprocess_exec', side_effect=asyncio.SubprocessError()):
+        with patch('asyncio.create_subprocess_exec', side_effect=OSError()):
             assert await setup_modal_auth_async() is False
 
 

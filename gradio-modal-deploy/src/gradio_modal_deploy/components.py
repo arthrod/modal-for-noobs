@@ -1,16 +1,12 @@
 """Core Gradio components for Modal deployment."""
 
-import asyncio
-import subprocess
 from pathlib import Path
-from typing import Any
 
 import gradio as gr
 import uvloop
 from loguru import logger
 
-from .core import ModalAPI, GitHubAPI
-from .themes import create_modal_theme
+from .core import GitHubAPI
 
 
 class ModalDeployButton(gr.HTML):
@@ -129,7 +125,6 @@ class ModalDeployButton(gr.HTML):
         """Set up the deployment event handler."""
         # This would be connected to the actual deployment logic
         # For now, it's a placeholder that shows the concept
-        pass
 
 
 class ModalExplorer(gr.Blocks):
@@ -270,7 +265,7 @@ class ModalExplorer(gr.Blocks):
                 return uvloop.run(self.github_api.get_readme_content(folder_name))
             except Exception as e:
                 logger.error(f"Failed to load README: {e}")
-                return f"❌ Error loading README: {str(e)}"
+                return f"❌ Error loading README: {e!s}"
 
         python_files = sync_load_files()
         readme_content = sync_load_readme()
@@ -305,7 +300,7 @@ class ModalExplorer(gr.Blocks):
                 return uvloop.run(self.github_api.get_file_content(file_path))
             except Exception as e:
                 logger.error(f"Failed to load file content: {e}")
-                return f"❌ Error loading file: {str(e)}"
+                return f"❌ Error loading file: {e!s}"
 
         return sync_load_content()
 

@@ -6,15 +6,14 @@ Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
 """
 
 import gradio as gr
+
 from gradio_modal_deploy import (
     ModalDeployButton,
     ModalExplorer,
     ModalStatusMonitor,
     ModalTheme,
-    modal_auto_deploy,
-    modal_gpu_when_needed,
     get_modal_status,
-    validate_app_file
+    modal_gpu_when_needed,
 )
 
 

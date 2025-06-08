@@ -17,9 +17,9 @@ from .decorators import (
     modal_memory_optimized,
 )
 from .utils import (
-    setup_modal_auth,
-    get_modal_status,
     deploy_to_modal,
+    get_modal_status,
+    setup_modal_auth,
 )
 
 __version__ = "0.1.0"

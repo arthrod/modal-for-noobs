@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-import uvloop
 from loguru import logger
 
 
@@ -14,12 +13,6 @@ from loguru import logger
 def root_dir():
     """Get the project root directory."""
     return Path(__file__).parent.parent.parent
-
-
-@pytest.fixture(scope="session")
-def event_loop_policy():
-    """Use uvloop for all async tests."""
-    return uvloop.EventLoopPolicy()
 
 
 @pytest.fixture(scope="session")

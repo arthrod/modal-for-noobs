@@ -1,10 +1,9 @@
 """Decorators for automatic Modal deployment and resource management."""
 
-import asyncio
 import functools
 import inspect
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
 
 import gradio as gr
 import uvloop

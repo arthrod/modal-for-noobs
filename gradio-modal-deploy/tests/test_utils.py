@@ -1,8 +1,8 @@
 """Tests for utility functions."""
 
-import pytest
-from unittest.mock import patch, AsyncMock
-from gradio_modal_deploy.utils import validate_app_file, get_modal_status
+from unittest.mock import AsyncMock, patch
+
+from gradio_modal_deploy.utils import get_modal_status, validate_app_file
 
 
 def test_validate_app_file_ml_detection(tmp_path):

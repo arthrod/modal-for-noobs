@@ -1,6 +1,5 @@
 """Utility functions for Modal deployment and management."""
 
-import asyncio
 from pathlib import Path
 
 import uvloop
@@ -195,7 +194,7 @@ def validate_app_file(app_file: str | Path) -> dict[str, any]:
     except Exception as e:
         return {
             "valid": False,
-            "error": f"Failed to read file: {str(e)}",
+            "error": f"Failed to read file: {e!s}",
             "recommendations": ["Check file permissions and content"]
         }
 
@@ -204,10 +203,9 @@ def _suggest_deployment_mode(ml_libraries: list[str], jupyter_libraries: list[st
     """Suggest the best deployment mode based on detected libraries."""
     if jupyter_libraries:
         return "gra_jupy"
-    elif ml_libraries:
+    if ml_libraries:
         return "optimized"
-    else:
-        return "minimum"
+    return "minimum"
 
 
 async def _deploy_async(

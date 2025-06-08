@@ -2,11 +2,9 @@
 
 import asyncio
 import base64
-import subprocess
 from pathlib import Path
 
 import httpx
-import uvloop
 from loguru import logger
 
 
@@ -79,12 +77,11 @@ class ModalAPI:
                     "output": output,
                     "deployment_file": deployment_file
                 }
-            else:
-                return {
-                    "success": False,
-                    "error": stderr.decode(),
-                    "deployment_file": deployment_file
-                }
+            return {
+                "success": False,
+                "error": stderr.decode(),
+                "deployment_file": deployment_file
+            }
 
         except Exception as e:
             logger.error(f"Deployment failed: {e}")
@@ -161,14 +158,14 @@ if __name__ == "__main__":
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn"
 )'''
-        elif mode == "gra_jupy":
+        if mode == "gra_jupy":
             return '''
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn", "jupyter", "jupyterlab",
     "notebook", "ipywidgets", "matplotlib", "plotly", "seaborn"
 )'''
-        else:  # optimized
-            return '''
+        # optimized
+        return '''
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn", "torch", "transformers",
     "accelerate", "diffusers", "pillow", "numpy", "pandas"
@@ -208,9 +205,8 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
                             })
 
                 return deployments
-            else:
-                logger.error(f"Failed to list deployments: {stderr.decode()}")
-                return []
+            logger.error(f"Failed to list deployments: {stderr.decode()}")
+            return []
 
         except Exception as e:
             logger.error(f"Error listing deployments: {e}")
@@ -278,8 +274,7 @@ class GitHubAPI:
             if data.get("encoding") == "base64":
                 content = base64.b64decode(data["content"]).decode("utf-8")
                 return content
-            else:
-                return data.get("content", "")
+            return data.get("content", "")
 
         except httpx.HTTPError as e:
             logger.error(f"Failed to fetch file content for '{path}': {e}")

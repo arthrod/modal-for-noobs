@@ -77,7 +77,7 @@ class ModalDeployer:
             logger.error("Modal CLI not found")
             rprint("[red]❌ Modal CLI not found. Please install: pip install modal[/red]")
             return False
-        except asyncio.SubprocessError as e:
+        except OSError as e:
             logger.error(f"Subprocess error during modal setup: {e}")
             rprint(f"[red]❌ Subprocess error: {e}[/red]")
             return False

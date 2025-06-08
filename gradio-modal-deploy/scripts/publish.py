@@ -9,13 +9,12 @@ Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
     print(f"🔥 Running: {cmd}")
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
 
     if check and result.returncode != 0:
         print(f"❌ Command failed: {cmd}")
@@ -111,7 +110,7 @@ def create_git_tag(version: str):
     """Create and push git tag."""
     print(f"🏷️ Creating git tag v{version}...")
 
-    run_command(f"git add pyproject.toml")
+    run_command("git add pyproject.toml")
     run_command(f'git commit -m "Bump version to {version}"')
     run_command(f"git tag v{version}")
     run_command("git push")

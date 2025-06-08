@@ -3,7 +3,7 @@
 import asyncio
 import secrets
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 import uvloop
@@ -266,7 +266,6 @@ def deploy(
         task = progress.add_task("🚀 Deploying to Modal...", total=None)
         
         # Run async deployment
-        uvloop.install()
         deployer = ModalDeployer(
             app_file=app_file,
             mode=deployment_mode,
@@ -274,7 +273,7 @@ def deploy(
         )
         
         try:
-            asyncio.run(deployer.deploy())
+            uvloop.run(deployer.deploy(), debug=False)
             progress.update(task, description="✅ Deployment complete!")
         except Exception as e:
             progress.stop()
@@ -293,7 +292,6 @@ def mn(
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate files without deploying")] = False,
 ) -> None:
     """⚡ Quick deploy (alias for deploy) - because noobs love shortcuts!"""
-    
     print_modal_banner(br_huehuehue)
     
     # Determine mode from flags
@@ -328,7 +326,6 @@ def mn(
         timeout_minutes = 60  # Default 1 hour
     
     # Run deployment using async functionality
-    uvloop.install()
     deployer = ModalDeployer(
         app_file=app_file,
         mode=mode,
@@ -336,7 +333,7 @@ def mn(
     )
     
     try:
-        asyncio.run(deployer.deploy())
+        uvloop.run(deployer.deploy(), debug=False)
     except Exception as e:
         print_error(f"Deployment failed: {e}")
         raise typer.Exit(1) from e
@@ -344,11 +341,10 @@ def mn(
 
 @app.command()
 def auth(
-    token_id: Annotated[Optional[str], typer.Option("--token-id", help="Modal token ID")] = None,
-    token_secret: Annotated[Optional[str], typer.Option("--token-secret", help="Modal token secret")] = None,
+    token_id: Annotated[str | None, typer.Option("--token-id", help="Modal token ID")] = None,
+    token_secret: Annotated[str | None, typer.Option("--token-secret", help="Modal token secret")] = None,
 ) -> None:
     """🔐 Setup Modal authentication - get your keys ready!"""
-    
     print_modal_banner()
     
     auth_text = Text()
@@ -361,8 +357,7 @@ def auth(
         padding=(1, 2)
     ))
     
-    uvloop.install()
-    asyncio.run(_setup_auth_async(token_id, token_secret))
+    uvloop.run(_setup_auth_async(token_id, token_secret), debug=False)
 
 
 @app.command()
@@ -370,7 +365,6 @@ def sanity_check(
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro com muito huehuehue! 🇧🇷")] = False,
 ) -> None:
     """🔍 Check what's deployed in your Modal account - sanity check time!"""
-    
     print_modal_banner(br_huehuehue)
     
     if br_huehuehue:
@@ -388,8 +382,7 @@ def sanity_check(
         padding=(1, 2)
     ))
     
-    uvloop.install()
-    asyncio.run(_sanity_check_async(br_huehuehue))
+    uvloop.run(_sanity_check_async(br_huehuehue), debug=False)
 
 
 @app.command()
@@ -399,7 +392,6 @@ def time_to_get_serious(
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate files without deploying")] = False,
 ) -> None:
     """💪 Time to get SERIOUS! Migrate HuggingFace Spaces to Modal like a PRO!"""
-    
     print_modal_banner()
     
     # Epic migration banner
@@ -416,17 +408,15 @@ def time_to_get_serious(
     ))
     
     # Run async migration
-    uvloop.install()
-    asyncio.run(_migrate_hf_spaces_async(spaces_url, optimized, dry_run))
+    uvloop.run(_migrate_hf_spaces_async(spaces_url, optimized, dry_run), debug=False)
 
 
 @app.command()
 def kill_a_deployment(
-    deployment_id: Annotated[Optional[str], typer.Argument(help="Deployment ID to terminate")] = None,
+    deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to terminate")] = None,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro com muito huehuehue! 🇧🇷")] = False,
 ) -> None:
     """💀 Completely terminate deployments and remove containers from servers!"""
-    
     print_modal_banner(br_huehuehue)
     
     if br_huehuehue:
@@ -444,19 +434,17 @@ def kill_a_deployment(
         padding=(1, 2)
     ))
     
-    uvloop.install()
-    asyncio.run(_kill_deployment_async(deployment_id, br_huehuehue))
+    uvloop.run(_kill_deployment_async(deployment_id, br_huehuehue), debug=False)
 
 
 @app.command()
 def milk_logs(
-    app_name: Annotated[Optional[str], typer.Argument(help="App name to get logs from")] = None,
+    app_name: Annotated[str | None, typer.Argument(help="App name to get logs from")] = None,
     follow: Annotated[bool, typer.Option("--follow", "-f", help="Follow logs in real-time")] = False,
     lines: Annotated[int, typer.Option("--lines", "-n", help="Number of log lines to show")] = 100,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
 ) -> None:
     """🥛 Milk the logs from your Modal deployments - fresh and creamy!"""
-    
     print_modal_banner(br_huehuehue)
     
     if br_huehuehue:
@@ -474,19 +462,17 @@ def milk_logs(
         padding=(1, 2)
     ))
     
-    uvloop.install()
-    asyncio.run(_milk_logs_async(app_name, follow, lines, br_huehuehue))
+    uvloop.run(_milk_logs_async(app_name, follow, lines, br_huehuehue), debug=False)
 
 
 @app.command("run-examples")
 def run_examples(
-    example_name: Annotated[Optional[str], typer.Argument(help="Example to run (leave empty to list all)")] = None,
+    example_name: Annotated[str | None, typer.Argument(help="Example to run (leave empty to list all)")] = None,
     optimized: Annotated[bool, typer.Option("--optimized", help="Deploy with GPU + ML libraries")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate files without deploying")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
 ) -> None:
     """🎯 Run built-in examples - perfect for testing and learning!"""
-    
     print_modal_banner(br_huehuehue)
     
     # Get examples directory
@@ -548,7 +534,7 @@ def run_examples(
         else:
             print_error(f"Example '{example_name}' not found!")
             print_info("Use 'modal-for-noobs run-examples' to see available examples")
-        return
+        raise typer.Exit(1)
     
     # Deploy the example
     example_file = examples_dir / f"{example_name}.py"
@@ -576,7 +562,6 @@ def run_examples(
     mode = "optimized" if optimized else "minimum"
     
     # Run deployment
-    uvloop.install()
     deployer = ModalDeployer(
         app_file=example_file,
         mode=mode,
@@ -584,7 +569,7 @@ def run_examples(
     )
     
     try:
-        asyncio.run(deployer.deploy())
+        uvloop.run(deployer.deploy(), debug=False)
     except Exception as e:
         print_error(f"Deployment failed: {e}")
         raise typer.Exit(1) from e
@@ -650,7 +635,7 @@ def mcp(
         raise typer.Exit(1) from e
 
 
-async def _setup_auth_async(token_id: Optional[str], token_secret: Optional[str]) -> None:
+async def _setup_auth_async(token_id: str | None, token_secret: str | None) -> None:
     """Async authentication setup with progress."""
     import os
     
@@ -680,7 +665,6 @@ async def _setup_auth_async(token_id: Optional[str], token_secret: Optional[str]
 
 async def _sanity_check_async(br_huehuehue: bool = False) -> None:
     """Async sanity check for Modal deployments."""
-    
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
     
     with Progress(
@@ -741,7 +725,6 @@ async def _sanity_check_async(br_huehuehue: bool = False) -> None:
 
 async def _migrate_hf_spaces_async(spaces_url: str, optimized: bool, dry_run: bool) -> None:
     """Async HuggingFace Spaces migration with epic visuals."""
-    
     migrator = HuggingFaceSpacesMigrator()
     
     with Progress(
@@ -840,9 +823,8 @@ def _get_example_description(example_file: Path) -> str:
     return ""
 
 
-async def _kill_deployment_async(deployment_id: Optional[str] = None, br_huehuehue: bool = False) -> None:
+async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:
     """Async kill deployment functionality - completely stops and removes containers."""
-    
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
     
     with Progress(
@@ -955,13 +937,12 @@ async def _kill_deployment_async(deployment_id: Optional[str] = None, br_huehueh
 
 
 async def _milk_logs_async(
-    app_name: Optional[str] = None,
+    app_name: str | None = None,
     follow: bool = False,
     lines: int = 100,
     br_huehuehue: bool = False
 ) -> None:
-    """Async log milking functionality - get those creamy logs! 🥛"""
-    
+    """Async log milking functionality - get those creamy logs! 🥛."""
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
     
     with Progress(

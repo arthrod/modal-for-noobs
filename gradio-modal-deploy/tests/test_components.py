@@ -1,7 +1,9 @@
 """Tests for Gradio components."""
 
-import pytest
 from pathlib import Path
+
+import pytest
+
 from gradio_modal_deploy import ModalDeployButton, ModalTheme
 from gradio_modal_deploy.utils import validate_app_file
 

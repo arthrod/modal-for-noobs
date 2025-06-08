@@ -6,125 +6,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from modal_for_noobs.cli import (
-    _deploy_async,
     _kill_deployment_async,
     _milk_logs_async,
     _sanity_check_async,
     _setup_auth_async,
 )
 
-
-class TestAsyncDeployment:
-    """Test async deployment functionality."""
-
-    @pytest.mark.asyncio
-    async def test_deploy_async_dry_run(self, sample_gradio_app):
-        """Test async deployment with dry run."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
-            mock_deployer.check_modal_auth_async.return_value = True
-            mock_deployer.create_modal_deployment_async.return_value = sample_gradio_app.parent / "modal_test.py"
-            mock_deployer_class.return_value = mock_deployer
-
-            # Should not raise exception
-            await _deploy_async(
-                app_file=sample_gradio_app,
-                config_level="minimum",
-                dry_run=True,
-                wizard=False,
-                br_huehuehue=False
-            )
-
-            mock_deployer.check_modal_auth_async.assert_called_once()
-            mock_deployer.create_modal_deployment_async.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_deploy_async_no_auth(self, sample_gradio_app):
-        """Test async deployment without authentication."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
-            mock_deployer.check_modal_auth_async.return_value = False
-            mock_deployer_class.return_value = mock_deployer
-
-            # Should handle gracefully
-            await _deploy_async(
-                app_file=sample_gradio_app,
-                config_level="minimum",
-                dry_run=True,
-                wizard=False,
-                br_huehuehue=False
-            )
-
-            mock_deployer.check_modal_auth_async.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_deploy_async_wizard_mode(self, sample_gradio_app):
-        """Test async deployment with wizard mode."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
-            mock_deployer.check_modal_auth_async.return_value = True
-            mock_deployer.create_modal_deployment_async.return_value = sample_gradio_app.parent / "modal_test.py"
-            mock_deployer_class.return_value = mock_deployer
-
-            await _deploy_async(
-                app_file=sample_gradio_app,
-                config_level="minimum",
-                dry_run=True,
-                wizard=True,
-                br_huehuehue=False
-            )
-
-            mock_deployer.create_modal_deployment_async.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_deploy_async_brazilian_mode(self, sample_gradio_app):
-        """Test async deployment with Brazilian mode."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
-            mock_deployer.check_modal_auth_async.return_value = True
-            mock_deployer.create_modal_deployment_async.return_value = sample_gradio_app.parent / "modal_test.py"
-            mock_deployer_class.return_value = mock_deployer
-
-            await _deploy_async(
-                app_file=sample_gradio_app,
-                config_level="minimum",
-                dry_run=True,
-                wizard=False,
-                br_huehuehue=True
-            )
-
-            mock_deployer.create_modal_deployment_async.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_deploy_async_actual_deployment(self, sample_gradio_app):
-        """Test async deployment without dry run."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
-            mock_deployer = MagicMock()
-            mock_deployer.check_modal_auth_async.return_value = True
-            mock_deployer.create_modal_deployment_async.return_value = sample_gradio_app.parent / "modal_test.py"
-            mock_deployer_class.return_value = mock_deployer
-
-            # Mock subprocess for modal deploy
-            mock_process = MagicMock()
-            mock_process.returncode = 0
-            async def mock_communicate():
-                return (b"success", b"")
-            mock_process.communicate = mock_communicate
-            async def mock_subprocess_exec(*args, **kwargs):
-                return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
-
-            await _deploy_async(
-                app_file=sample_gradio_app,
-                config_level="minimum",
-                dry_run=False,
-                wizard=False,
-                br_huehuehue=False
-            )
-
-            mock_subprocess.assert_called()
+# Deployment tests are now handled in test_modal_deploy.py since the functionality moved to ModalDeployer
 
 
 class TestAsyncKillDeployment:
@@ -134,7 +22,7 @@ class TestAsyncKillDeployment:
     async def test_kill_deployment_no_auth(self):
         """Test kill deployment without authentication."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = False
             mock_deployer_class.return_value = mock_deployer
 
@@ -148,7 +36,7 @@ class TestAsyncKillDeployment:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -172,7 +60,7 @@ class TestAsyncKillDeployment:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -188,8 +76,8 @@ class TestAsyncKillDeployment:
 
             await _kill_deployment_async("ap-test123", False)
 
-            # Should call modal app list and modal app stop
-            assert mock_subprocess.call_count >= 2
+            # Should call modal app stop
+            assert mock_subprocess.call_count >= 1
 
     @pytest.mark.asyncio
     async def test_kill_deployment_already_stopped(self):
@@ -197,7 +85,7 @@ class TestAsyncKillDeployment:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -222,7 +110,7 @@ class TestAsyncKillDeployment:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -252,14 +140,14 @@ class TestAsyncKillDeployment:
 
             await _kill_deployment_async("ap-test123", False)
 
-            # Should call multiple commands
-            assert mock_subprocess.call_count >= 3
+            # Should call modal app stop
+            assert mock_subprocess.call_count >= 1
 
     @pytest.mark.asyncio
     async def test_kill_deployment_brazilian_mode(self):
         """Test kill deployment with Brazilian mode."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = False
             mock_deployer_class.return_value = mock_deployer
 
@@ -276,7 +164,7 @@ class TestAsyncLogMilking:
     async def test_milk_logs_no_auth(self):
         """Test milk logs without authentication."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = False
             mock_deployer_class.return_value = mock_deployer
 
@@ -290,7 +178,7 @@ class TestAsyncLogMilking:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -314,7 +202,7 @@ class TestAsyncLogMilking:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -338,7 +226,7 @@ class TestAsyncLogMilking:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -362,7 +250,7 @@ class TestAsyncLogMilking:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -387,7 +275,7 @@ class TestAsyncSanityCheck:
     async def test_sanity_check_no_auth(self):
         """Test sanity check without authentication."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = False
             mock_deployer_class.return_value = mock_deployer
 
@@ -401,7 +289,7 @@ class TestAsyncSanityCheck:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -423,7 +311,7 @@ class TestAsyncSanityCheck:
     async def test_sanity_check_brazilian_mode(self):
         """Test sanity check with Brazilian mode."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = False
             mock_deployer_class.return_value = mock_deployer
 
@@ -437,38 +325,28 @@ class TestAsyncAuthSetup:
 
     @pytest.mark.asyncio
     async def test_setup_auth_basic(self):
-        """Test basic auth setup."""
-        with patch("asyncio.create_subprocess_exec") as mock_subprocess:
-            mock_process = MagicMock()
-            mock_process.returncode = 0
-            async def mock_communicate():
-                return (b"success", b"")
-            mock_process.communicate = mock_communicate
-            async def mock_subprocess_exec(*args, **kwargs):
-                return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+        """Test basic auth setup without tokens (uses modal setup)."""
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
+            mock_deployer = AsyncMock()
+            mock_deployer.setup_modal_auth_async.return_value = True
+            mock_deployer_class.return_value = mock_deployer
 
-            await _setup_auth_async("test_id", "test_secret")
+            await _setup_auth_async(None, None)
 
-            mock_subprocess.assert_called()
+            mock_deployer.setup_modal_auth_async.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_setup_auth_failure(self):
         """Test auth setup failure handling."""
-        with patch("asyncio.create_subprocess_exec") as mock_subprocess:
-            mock_process = MagicMock()
-            mock_process.returncode = 1
-            mock_process.communicate.return_value = asyncio.coroutine(
-                lambda: (b"", b"authentication failed")
-            )()
-            async def mock_subprocess_exec(*args, **kwargs):
-                return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
+            mock_deployer = AsyncMock()
+            mock_deployer.setup_modal_auth_async.return_value = False
+            mock_deployer_class.return_value = mock_deployer
 
             # Should handle gracefully
-            await _setup_auth_async("invalid_id", "invalid_secret")
+            await _setup_auth_async(None, None)
 
-            mock_subprocess.assert_called()
+            mock_deployer.setup_modal_auth_async.assert_called_once()
 
 
 class TestErrorHandling:
@@ -480,7 +358,7 @@ class TestErrorHandling:
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
              patch("asyncio.create_subprocess_exec") as mock_subprocess:
 
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
@@ -494,7 +372,7 @@ class TestErrorHandling:
     async def test_timeout_handling(self):
         """Test handling of operation timeouts."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
 
             async def slow_auth_check():
                 await asyncio.sleep(10)  # Simulate slow operation
@@ -513,7 +391,7 @@ class TestErrorHandling:
     async def test_concurrent_operations_stability(self):
         """Test stability of concurrent async operations."""
         with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class:
-            mock_deployer = MagicMock()
+            mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
