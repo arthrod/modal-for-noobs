@@ -245,8 +245,10 @@ def deploy(
             if not setup_modal_auth():
                 print_error("Failed to set up Modal authentication")
                 raise typer.Exit(1)
-            
-            progress.start()
+        
+        # Restart progress with a new task
+        progress.start()
+        task = progress.add_task("🔐 Authentication configured, continuing...", total=None)
         
         progress.update(task, description="✅ Authentication verified!")
         
