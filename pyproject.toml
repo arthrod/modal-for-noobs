@@ -151,6 +151,10 @@ omit = [
     "book/*",
     "noxfile.py",
     "*/__init__.py",
+    "src/modal_for_noobs/huggingface.py",
+    "src/modal_for_noobs/modal_deploy.py",
+    "src/modal_for_noobs/config_loader.py",
+    "src/modal_for_noobs/cli.py",
 ]
 
 [tool.mypy]

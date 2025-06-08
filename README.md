@@ -69,6 +69,26 @@ modal-for-noobs time-to-get-serious https://huggingface.co/spaces/user/space-nam
 modal-for-noobs auth
 ```
 
+### CLI Commands
+
+- `deploy` - deploy a Gradio app
+- `mn` - quick deploy alias for `deploy`
+- `time-to-get-serious` - migrate a HuggingFace Space
+- `auth` - configure Modal credentials
+- `kill-a-deployment` - stop a running deployment
+- `sanity-check` - list active deployments
+- `config` - show configuration info
+- `mcp` - start a local MCP server for Claude, Cursor, Roo and VSCode
+
+The MCP server exposes several core RPC methods:
+
+- `list_tools`
+- `call_tool`
+- `list_resources`
+- `read_resource`
+- `list_prompts`
+- `get_prompt`
+
 ## 🛠️ Development
 
 ### Adding Dependencies
