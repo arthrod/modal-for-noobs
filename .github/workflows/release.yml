@@ -27,7 +27,7 @@ jobs:
           version: "latest"
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install 3.12
 
       - name: Install nox
         run: uv tool install nox --with nox-uv
@@ -109,7 +109,7 @@ jobs:
         run: |
           cat > Dockerfile.prod << 'EOF'
           # Use a Python image with uv pre-installed
-          FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+          FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
           # Install system dependencies
           RUN apt-get update && apt-get install -y \
@@ -178,7 +178,7 @@ jobs:
           version: "latest"
 
       - name: Set up Python
-        run: uv python install 3.13
+        run: uv python install 3.12
 
       - name: Build package
         run: uv build

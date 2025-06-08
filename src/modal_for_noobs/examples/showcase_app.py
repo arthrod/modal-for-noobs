@@ -2,6 +2,7 @@
 """
 
 import json
+import secrets
 import random
 from datetime import datetime
 
@@ -101,7 +102,7 @@ def analyze_sentiment(text):
         confidence = min(0.95, 0.6 + (neg_count * 0.1))
     else:
         sentiment = "😐 Neutral"
-        confidence = 0.5 + random.random() * 0.3
+        confidence = 0.5 + (secrets.randbelow(300) / 1000)
 
     result = f"**Sentiment:** {sentiment}\\n**Confidence:** {confidence:.2f}"
 
@@ -171,12 +172,12 @@ def process_multilingual(text, language):
 def generate_modal_stats():
     """Generate fake but impressive Modal deployment stats."""
     stats = {
-        "🚀 Total Deployments": random.randint(1000, 9999),
-        "⚡ Active Functions": random.randint(100, 999),
-        "💚 Success Rate": f"{random.uniform(98.5, 99.9):.1f}%",
-        "🌍 Global Regions": random.randint(15, 25),
-        "⏱️ Avg Cold Start": f"{random.randint(50, 200)}ms",
-        "📈 Uptime": f"{random.uniform(99.8, 99.99):.2f}%"
+        "🚀 Total Deployments": 1000 + secrets.randbelow(9000),
+        "⚡ Active Functions": 100 + secrets.randbelow(900),
+        "💚 Success Rate": f"{98.5 + (secrets.randbelow(14) / 10):.1f}%",
+        "🌍 Global Regions": 15 + secrets.randbelow(11),
+        "⏱️ Avg Cold Start": f"{50 + secrets.randbelow(151)}ms",
+        "📈 Uptime": f"{99.8 + (secrets.randbelow(19) / 100):.2f}%"
     }
 
     return "\\n".join([f"**{key}:** {value}" for key, value in stats.items()])

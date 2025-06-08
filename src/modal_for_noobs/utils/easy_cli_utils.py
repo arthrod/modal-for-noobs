@@ -15,7 +15,7 @@ import asyncio
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, tuple
 
 from loguru import logger
 
@@ -23,7 +23,7 @@ from loguru import logger
 def check_modal_auth() -> bool:
     """Check if Modal authentication is configured.
 
-    Verifies authentication via environment variables (MODAL_TOKEN_ID and 
+    Verifies authentication via environment variables (MODAL_TOKEN_ID and
     MODAL_TOKEN_SECRET) or the presence of a local .modal.toml file.
 
     Returns:
@@ -41,7 +41,7 @@ def check_modal_auth() -> bool:
         
         logger.debug("No Modal authentication found")
         return False
-    except Exception as e:
+    except OSError as e:
         logger.error(f"Error checking Modal authentication: {e}")
         return False
 
@@ -57,8 +57,10 @@ def setup_modal_auth() -> bool:
     """
     try:
         logger.info("Running modal setup...")
+        # Use the full path to modal executable if available
+        modal_path = subprocess.check_output(["which", "modal"], text=True).strip()
         result = subprocess.run(
-            ["modal", "setup"],
+            [modal_path, "setup"],
             check=True,
             capture_output=True,
             text=True
@@ -72,8 +74,8 @@ def setup_modal_auth() -> bool:
     except FileNotFoundError:
         logger.error("Modal CLI not found. Please install modal: pip install modal")
         return False
-    except Exception as e:
-        logger.error(f"Unexpected error during modal setup: {e}")
+    except OSError as e:
+        logger.error(f"OS error during modal setup: {e}")
         return False
 
 
@@ -88,8 +90,21 @@ async def setup_modal_auth_async() -> bool:
     """
     try:
         logger.info("Running modal setup asynchronously...")
+        # Get the full path to modal executable
+        which_process = await asyncio.create_subprocess_exec(
+            "which", "modal",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        which_stdout, _ = await which_process.communicate()
+        modal_path = which_stdout.decode().strip()
+        
+        if not modal_path:
+            logger.error("Modal CLI not found. Please install modal: pip install modal")
+            return False
+            
         process = await asyncio.create_subprocess_exec(
-            "modal", "setup",
+            modal_path, "setup",
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE
         )
@@ -99,17 +114,17 @@ async def setup_modal_auth_async() -> bool:
             logger.debug(f"Modal setup output: {stdout.decode()}")
             logger.success("Modal setup completed successfully")
             return True
-        else:
-            logger.error(f"Modal setup failed with exit code {process.returncode}: {stderr.decode()}")
-            return False
+            
+        logger.error(f"Modal setup failed with exit code {process.returncode}: {stderr.decode()}")
+        return False
     except FileNotFoundError:
         logger.error("Modal CLI not found. Please install modal: pip install modal")
         return False
     except asyncio.SubprocessError as e:
         logger.error(f"Subprocess error during modal setup: {e}")
         return False
-    except Exception as e:
-        logger.error(f"Unexpected error during modal setup: {e}")
+    except OSError as e:
+        logger.error(f"OS error during modal setup: {e}")
         return False
 
 
