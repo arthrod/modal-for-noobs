@@ -730,11 +730,10 @@ async def _migrate_hf_spaces_async(spaces_url: str, optimized: bool, dry_run: bo
     migrator = HuggingFaceSpacesMigrator()
     
     with Progress(
-        SpinnerColumn(spinner_name="aesthetic", style=f"{MODAL_GREEN}"),
+        SpinnerColumn(spinner_name="dots", style=f"{MODAL_GREEN}"),
         TextColumn("[progress.description]{task.description}", style="bold white"),
         console=console,
     ) as progress:
-        
         # Extract space info
         extract_task = progress.add_task("🔍 Analyzing HuggingFace Space...", total=None)
         space_info = await migrator.extract_space_info_async(spaces_url)
