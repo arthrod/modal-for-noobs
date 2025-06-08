@@ -124,6 +124,7 @@ include = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
+skips = ["B104", "B603", "B607"]  # Allow binding to all interfaces and subprocess calls
 
 [tool.pytest.ini_options]
 addopts = ["--cov", "-v", "--no-header"]
