@@ -1,0 +1,101 @@
+[project]
+name = "gradio-modal-deploy"
+version = "0.1.0"
+description = "🚀💚 Beautiful Gradio components for seamless Modal deployment and management"
+authors = [
+    {name = "Arthur Souza Rodrigues (Neurotic Coder)", email = "arthrod@umich.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+keywords = ["gradio", "modal", "deployment", "serverless", "ml", "ai", "gpu"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+]
+
+dependencies = [
+    "gradio>=5.0.0",
+    "modal>=1.0.0",
+    "httpx>=0.27.0",
+    "uvloop>=0.21.0",
+    "rich>=14.0.0",
+    "pyyaml>=6.0.0",
+    "markdown>=3.5.0",
+    "loguru>=0.7.0",
+    "typer>=0.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.25.0",
+    "pytest-mock>=3.14.0",
+    "pytest-sugar>=1.0.0",
+    "pre-commit>=4.0.0",
+    "ruff>=0.9.0",
+    "mypy>=1.14.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/arthrod/gradio-modal-deploy"
+Repository = "https://github.com/arthrod/gradio-modal-deploy"
+Issues = "https://github.com/arthrod/gradio-modal-deploy/issues"
+Documentation = "https://gradio-modal-deploy.readthedocs.io"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gradio_modal_deploy"]
+
+[tool.hatch.build]
+include = [
+    "LICENSE",
+    "README.md",
+    "src/gradio_modal_deploy",
+]
+
+[tool.ruff]
+line-length = 140
+fix = true
+target-version = "py311"
+exclude = ["build", "dist", "*.egg-info"]
+
+[tool.ruff.lint]
+select = [
+    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE", 
+    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC", 
+    "PLE", "PLW", "PT", "PTH", "RET", "RUF", "S", "SIM", "T", "TRY", "UP", "W"
+]
+ignore = [
+    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191", 
+    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012", 
+    "S311", "SIM108", "SIM300", "T201", "TRY003", "TRY301", "W293"
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["gradio_modal_deploy"]
+
+[tool.pytest.ini_options]
+addopts = ["--cov", "-v", "--no-header"]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.11"
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+strict = false
+warn_unused_configs = true
+ignore_missing_imports = true

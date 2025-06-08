@@ -8,10 +8,12 @@ from modal_for_noobs.config import Config
 
 def test_config_defaults():
     """Test config default values."""
-    config = Config()
-    assert config.environment == "development"
-    assert config.debug is False
-    assert config.log_level == "INFO"
+    # Test with clean environment (no .env file influence)
+    with patch.dict(os.environ, {}, clear=True):
+        config = Config(env_file="nonexistent.env")  # Force no .env loading
+        assert config.environment == "development"
+        assert config.debug is False
+        assert config.log_level == "INFO"
 
 
 def test_config_with_env_vars():
@@ -80,14 +82,16 @@ def test_validate_required_keys():
 
 def test_to_dict():
     """Test config dictionary export."""
-    config = Config()
-    config_dict = config.to_dict()
+    # Test with clean environment
+    with patch.dict(os.environ, {}, clear=True):
+        config = Config(env_file="nonexistent.env")
+        config_dict = config.to_dict()
 
-    assert "environment" in config_dict
-    assert "debug" in config_dict
-    assert "log_level" in config_dict
-    assert "database_url" in config_dict
-    assert "unkey_configured" in config_dict
+        assert "environment" in config_dict
+        assert "debug" in config_dict
+        assert "log_level" in config_dict
+        assert "database_url" in config_dict
+        assert "unkey_configured" in config_dict
 
-    assert config_dict["environment"] == "development"
-    assert config_dict["debug"] is False
+        assert config_dict["environment"] == "development"
+        assert config_dict["debug"] is False

@@ -322,9 +322,15 @@ def time_to_get_serious(  # pragma: no cover - not covered in tests
 
 
 @app.command()
+<<<<<<< HEAD
 def auth(  # pragma: no cover - requires user credentials
     token_id: Annotated[Optional[str], typer.Option("--token-id", help="Modal token ID")] = None,
     token_secret: Annotated[Optional[str], typer.Option("--token-secret", help="Modal token secret")] = None,
+=======
+def auth(
+    token_id: Annotated[str | None, typer.Option("--token-id", help="Modal token ID")] = None,
+    token_secret: Annotated[str | None, typer.Option("--token-secret", help="Modal token secret")] = None,
+>>>>>>> 78decec (feat: add changes)
 ) -> None:
     """🔐 Setup Modal authentication - get your keys ready!"""
     
@@ -344,11 +350,16 @@ def auth(  # pragma: no cover - requires user credentials
 
 
 @app.command()
+<<<<<<< HEAD
 def kill_a_deployment(  # pragma: no cover - interactive helper
     deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to kill")] = None,
+=======
+def kill_a_deployment(
+    deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to terminate")] = None,
+>>>>>>> 78decec (feat: add changes)
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro com muito huehuehue! 🇧🇷")] = False,
 ) -> None:
-    """💀 Kill a specific deployment or list active ones to choose from!"""
+    """💀 Completely terminate deployments and remove containers from servers!"""
     
     print_modal_banner(br_huehuehue)
     
@@ -371,7 +382,40 @@ def kill_a_deployment(  # pragma: no cover - interactive helper
 
 
 @app.command()
+<<<<<<< HEAD
 def sanity_check(  # pragma: no cover - optional helper
+=======
+def milk_logs(
+    app_name: Annotated[str | None, typer.Argument(help="App name to get logs from")] = None,
+    follow: Annotated[bool, typer.Option("--follow", "-f", help="Follow logs in real-time")] = False,
+    lines: Annotated[int, typer.Option("--lines", "-n", help="Number of log lines to show")] = 100,
+    br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
+) -> None:
+    """🥛 Milk the logs from your Modal deployments - fresh and creamy!"""
+    
+    print_modal_banner(br_huehuehue)
+    
+    if br_huehuehue:
+        milk_text = Text()
+        milk_text.append("🥛 ORDENHADOR DE LOGS 🥛", style=f"bold {MODAL_GREEN}")
+        milk_text.append("\n🇧🇷 Hora de ordenhar alguns logs fresquinhos! Huehuehue! 🇧🇷", style="bold white")
+    else:
+        milk_text = Text()
+        milk_text.append("🥛 LOG MILKER 🥛", style=f"bold {MODAL_GREEN}")
+        milk_text.append("\n🧑‍🌾 Time to milk some fresh, creamy logs from Modal!", style="bold white")
+    
+    rprint(Panel(
+        Align.center(milk_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
+    ))
+    
+    uvloop.run(_milk_logs_async(app_name, follow, lines, br_huehuehue))
+
+
+@app.command()
+def sanity_check(
+>>>>>>> 78decec (feat: add changes)
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro com muito huehuehue! 🇧🇷")] = False,
 ) -> None:
     """🔍 Check what's deployed in your Modal account - sanity check time!"""
@@ -434,6 +478,7 @@ def config_info(
     ))
 
 
+<<<<<<< HEAD
 # ---------------------------------------------------------------------------
 # Compatibility alias for the old `config-info` command used in the tests.
 # ---------------------------------------------------------------------------
@@ -457,6 +502,143 @@ def mcp(  # pragma: no cover - not tested
     typer.echo(f"Starting MCP server on port {port} ...")
     server = FastMCP(port=port)
     server.run("sse")
+=======
+@app.command("run-examples")
+def run_examples(
+    example_name: Annotated[str | None, typer.Argument(help="Example to run (leave empty to list all)")] = None,
+    optimized: Annotated[bool, typer.Option("--optimized", help="Deploy with GPU + ML libraries")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate files without deploying")] = False,
+    br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
+) -> None:
+    """🎯 Run built-in examples - perfect for testing and learning!"""
+    
+    print_modal_banner(br_huehuehue)
+    
+    # Get examples directory
+    examples_dir = Path(__file__).parent / "examples"
+    
+    if not examples_dir.exists():
+        print_error("Examples directory not found!")
+        return
+    
+    # Get all Python files in examples directory
+    example_files = list(examples_dir.glob("*.py"))
+    available_examples = [f.stem for f in example_files if not f.name.startswith("__")]
+    
+    if not example_name:
+        # List all available examples
+        if br_huehuehue:
+            examples_text = Text()
+            examples_text.append("🎯 EXEMPLOS DISPONÍVEIS 🎯", style=f"bold {MODAL_GREEN}")
+            examples_text.append("\n🇧🇷 Escolha um exemplo para deployar! Huehuehue! 🇧🇷", style="bold white")
+        else:
+            examples_text = Text()
+            examples_text.append("🎯 AVAILABLE EXAMPLES 🎯", style=f"bold {MODAL_GREEN}")
+            examples_text.append("\n🚀 Choose an example to deploy and learn!", style="bold white")
+        
+        if available_examples:
+            examples_text.append("\n\n📚 Examples:", style="bold")
+            for example in sorted(available_examples):
+                # Try to get description from the file
+                example_file = examples_dir / f"{example}.py"
+                description = _get_example_description(example_file)
+                examples_text.append(f"\n  🎯 {example}", style=f"bold {MODAL_LIGHT_GREEN}")
+                if description:
+                    examples_text.append(f" - {description}", style="white")
+            
+            if br_huehuehue:
+                examples_text.append("\n\n💡 Para rodar um exemplo:", style="bold")
+                examples_text.append(f"\n  modal-for-noobs run-examples <nome-do-exemplo> --br-huehuehue", style=f"{MODAL_GREEN}")
+            else:
+                examples_text.append("\n\n💡 To run an example:", style="bold")
+                examples_text.append(f"\n  modal-for-noobs run-examples <example-name> --optimized", style=f"{MODAL_GREEN}")
+        else:
+            if br_huehuehue:
+                examples_text.append("\n\n❌ Nenhum exemplo encontrado! Huehuehue!", style="red")
+            else:
+                examples_text.append("\n\n❌ No examples found!", style="red")
+        
+        rprint(Panel(
+            examples_text,
+            border_style=f"{MODAL_GREEN}",
+            padding=(1, 2)
+        ))
+        return
+    
+    # Check if example exists
+    if example_name not in available_examples:
+        if br_huehuehue:
+            print_error(f"Exemplo '{example_name}' não encontrado! Huehuehue!")
+            print_info("Use 'modal-for-noobs run-examples' para ver exemplos disponíveis")
+        else:
+            print_error(f"Example '{example_name}' not found!")
+            print_info("Use 'modal-for-noobs run-examples' to see available examples")
+        return
+    
+    # Deploy the example
+    example_file = examples_dir / f"{example_name}.py"
+    
+    if br_huehuehue:
+        deploy_text = Text()
+        deploy_text.append("🚀 DEPLOYANDO EXEMPLO 🚀", style=f"bold {MODAL_GREEN}")
+        deploy_text.append(f"\n🎯 Exemplo: {example_name}", style="bold white")
+        deploy_text.append(f"\n📁 Arquivo: {example_file.name}", style=f"{MODAL_LIGHT_GREEN}")
+        deploy_text.append("\n🇧🇷 Vamos nessa! Huehuehue! 🇧🇷", style="bold white")
+    else:
+        deploy_text = Text()
+        deploy_text.append("🚀 DEPLOYING EXAMPLE 🚀", style=f"bold {MODAL_GREEN}")
+        deploy_text.append(f"\n🎯 Example: {example_name}", style="bold white")
+        deploy_text.append(f"\n📁 File: {example_file.name}", style=f"{MODAL_LIGHT_GREEN}")
+        deploy_text.append("\n⚡ Let's go!", style="bold white")
+    
+    rprint(Panel(
+        Align.center(deploy_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
+    ))
+    
+    # Determine mode
+    mode = "optimized" if optimized else "minimum"
+    
+    # Run deployment
+    uvloop.run(_deploy_async(example_file, mode, dry_run, ".env", None, 60, False, br_huehuehue))
+
+
+def _get_example_description(example_file: Path) -> str:
+    """Extract description from example file docstring."""
+    try:
+        content = example_file.read_text()
+        # Look for module docstring
+        lines = content.split('\n')
+        in_docstring = False
+        description_lines = []
+        
+        for line in lines:
+            line = line.strip()
+            if line.startswith('"""') or line.startswith("'''"):
+                if in_docstring:
+                    break  # End of docstring
+                else:
+                    in_docstring = True
+                    # Check if it's a single line docstring
+                    if line.count('"""') == 2 or line.count("'''") == 2:
+                        desc = line.replace('"""', '').replace("'''", '').strip()
+                        if desc:
+                            return desc
+                    continue
+            elif in_docstring:
+                if line and not line.startswith('#'):
+                    description_lines.append(line)
+                if len(description_lines) >= 1:  # Just get first line
+                    break
+        
+        if description_lines:
+            return description_lines[0]
+    except Exception:
+        pass
+    
+    return ""
+>>>>>>> 78decec (feat: add changes)
 
 
 async def _deploy_async(
@@ -717,8 +899,13 @@ async def _sanity_check_async(br_huehuehue: bool = False) -> None:  # pragma: no
                 print_error(f"Sanity check error: {str(e)}")
 
 
+<<<<<<< HEAD
 async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:  # pragma: no cover - not covered
     """Async kill deployment functionality."""
+=======
+async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:
+    """Async kill deployment functionality - completely stops and removes containers."""
+>>>>>>> 78decec (feat: add changes)
     
     deployer = ModalDeployer()
     
@@ -742,41 +929,110 @@ async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue:
         progress.update(auth_task, description="✅ Authentication verified!")
         
         if deployment_id:
-            # Kill specific deployment
-            kill_task = progress.add_task(f"💀 Killing deployment {deployment_id}...", total=None)
+            # Kill specific deployment with enhanced feedback
+            kill_task = progress.add_task(f"💀 Terminating deployment {deployment_id}...", total=None)
             
             try:
-                process = await asyncio.create_subprocess_exec(
+                # First, check if the app is currently running
+                list_process = await asyncio.create_subprocess_exec(
+                    "modal", "app", "list",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                list_stdout, list_stderr = await list_process.communicate()
+                
+                app_status = "unknown"
+                if list_process.returncode == 0:
+                    list_output = list_stdout.decode().strip()
+                    for line in list_output.split('\n'):
+                        if deployment_id in line:
+                            if "deployed" in line:
+                                app_status = "deployed"
+                            elif "stopped" in line:
+                                app_status = "stopped"
+                            break
+                
+                if app_status == "stopped":
+                    progress.update(kill_task, description=f"ℹ️ Deployment {deployment_id} was already stopped!")
+                    if br_huehuehue:
+                        print_success(f"Deployment {deployment_id} já estava parado! Huehuehue!")
+                        rprint(f"[{MODAL_LIGHT_GREEN}]💡 O app foi completamente removido dos containers ativos![/{MODAL_LIGHT_GREEN}]")
+                    else:
+                        print_success(f"Deployment {deployment_id} was already stopped!")
+                        rprint(f"[{MODAL_LIGHT_GREEN}]💡 App completely removed from active containers![/{MODAL_LIGHT_GREEN}]")
+                    return
+                
+                # Stop the deployment
+                progress.update(kill_task, description=f"🛑 Stopping deployment {deployment_id}...")
+                stop_process = await asyncio.create_subprocess_exec(
                     "modal", "app", "stop", deployment_id,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE
                 )
-                stdout, stderr = await process.communicate()
+                stop_stdout, stop_stderr = await stop_process.communicate()
                 
-                if process.returncode == 0:
-                    progress.update(kill_task, description=f"✅ Deployment {deployment_id} killed!")
+                if stop_process.returncode == 0:
+                    # Also stop any running containers for this app
+                    progress.update(kill_task, description=f"🔄 Checking for running containers...")
+                    
+                    container_process = await asyncio.create_subprocess_exec(
+                        "modal", "container", "list",
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE
+                    )
+                    container_stdout, container_stderr = await container_process.communicate()
+                    
+                    containers_killed = 0
+                    if container_process.returncode == 0:
+                        container_output = container_stdout.decode().strip()
+                        # Look for containers matching our app name
+                        for line in container_output.split('\n'):
+                            if deployment_id in line or "modal-for-noobs" in line:
+                                # Extract container ID and stop it
+                                parts = line.split()
+                                if len(parts) > 0:
+                                    container_id = parts[0]
+                                    if container_id.startswith('ct-'):
+                                        progress.update(kill_task, description=f"💀 Stopping container {container_id}...")
+                                        container_stop_process = await asyncio.create_subprocess_exec(
+                                            "modal", "container", "stop", container_id,
+                                            stdout=asyncio.subprocess.PIPE,
+                                            stderr=asyncio.subprocess.PIPE
+                                        )
+                                        await container_stop_process.communicate()
+                                        if container_stop_process.returncode == 0:
+                                            containers_killed += 1
+                    
+                    progress.update(kill_task, description=f"✅ Deployment {deployment_id} completely terminated!")
+                    
                     if br_huehuehue:
-                        print_success(f"Deployment {deployment_id} foi morto com sucesso! Huehuehue!")
+                        print_success(f"💀 Deployment {deployment_id} foi completamente exterminado! Huehuehue!")
+                        if containers_killed > 0:
+                            rprint(f"[{MODAL_GREEN}]🔥 {containers_killed} containers também foram mortos![/{MODAL_GREEN}]")
+                        rprint(f"[{MODAL_LIGHT_GREEN}]✨ App removido de todos os servidores! Não consome mais recursos![/{MODAL_LIGHT_GREEN}]")
                     else:
-                        print_success(f"Deployment {deployment_id} killed successfully!")
+                        print_success(f"💀 Deployment {deployment_id} completely terminated!")
+                        if containers_killed > 0:
+                            rprint(f"[{MODAL_GREEN}]🔥 {containers_killed} containers also stopped![/{MODAL_GREEN}]")
+                        rprint(f"[{MODAL_LIGHT_GREEN}]✨ App removed from all servers! No longer consuming resources![/{MODAL_LIGHT_GREEN}]")
                 else:
-                    error_msg = stderr.decode().strip()
-                    progress.update(kill_task, description="❌ Failed to kill deployment!")
+                    error_msg = stop_stderr.decode().strip()
+                    progress.update(kill_task, description="❌ Failed to terminate deployment!")
                     if br_huehuehue:
-                        print_error(f"Erro ao matar deployment: {error_msg}")
+                        print_error(f"Erro ao exterminar deployment: {error_msg}")
                     else:
-                        print_error(f"Failed to kill deployment: {error_msg}")
+                        print_error(f"Failed to terminate deployment: {error_msg}")
                         
             except Exception as e:
-                progress.update(kill_task, description="❌ Error during kill operation!")
+                progress.update(kill_task, description="❌ Error during termination operation!")
                 if br_huehuehue:
-                    print_error(f"Erro ao matar deployment: {str(e)}")
+                    print_error(f"Erro ao exterminar deployment: {str(e)}")
                 else:
-                    print_error(f"Error killing deployment: {str(e)}")
+                    print_error(f"Error terminating deployment: {str(e)}")
         
         else:
             # List deployments for user to choose
-            list_task = progress.add_task("📋 Listing active deployments...", total=None)
+            list_task = progress.add_task("📋 Listing deployments to terminate...", total=None)
             
             try:
                 process = await asyncio.create_subprocess_exec(
@@ -792,22 +1048,44 @@ async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue:
                     output = stdout.decode().strip()
                     if output:
                         if br_huehuehue:
-                            rprint(f"\n[{MODAL_GREEN}]🎯 Deployments ativos para matar (huehuehue!):[/{MODAL_GREEN}]")
+                            rprint(f"\n[{MODAL_GREEN}]💀 EXTERMINADOR DE DEPLOYMENTS 💀[/{MODAL_GREEN}]")
+                            rprint(f"[{MODAL_LIGHT_GREEN}]Deployments disponíveis para exterminar (huehuehue!):[/{MODAL_LIGHT_GREEN}]")
                         else:
-                            rprint(f"\n[{MODAL_GREEN}]🎯 Active deployments available to kill:[/{MODAL_GREEN}]")
+                            rprint(f"\n[{MODAL_GREEN}]💀 DEPLOYMENT EXTERMINATOR 💀[/{MODAL_GREEN}]")
+                            rprint(f"[{MODAL_LIGHT_GREEN}]Deployments available to terminate:[/{MODAL_LIGHT_GREEN}]")
+                        
                         rprint(f"```\n{output}\n```")
                         
-                        if br_huehuehue:
-                            rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 Para matar um deployment específico:[/{MODAL_LIGHT_GREEN}]")
-                            rprint("modal-for-noobs kill-a-deployment <deployment-id> --br-huehuehue")
+                        # Count deployed vs stopped
+                        lines = output.split('\n')
+                        deployed_count = sum(1 for line in lines if 'deployed' in line)
+                        stopped_count = sum(1 for line in lines if 'stopped' in line)
+                        
+                        if deployed_count > 0:
+                            if br_huehuehue:
+                                rprint(f"\n[{MODAL_GREEN}]🔥 {deployed_count} deployments ativos consumindo recursos![/{MODAL_GREEN}]")
+                                rprint(f"[{MODAL_LIGHT_GREEN}]💡 Para exterminar um deployment específico:[/{MODAL_LIGHT_GREEN}]")
+                                rprint("./mn.sh --kill-deployment <app-id> --br-huehuehue")
+                            else:
+                                rprint(f"\n[{MODAL_GREEN}]🔥 {deployed_count} active deployments consuming resources![/{MODAL_GREEN}]")
+                                rprint(f"[{MODAL_LIGHT_GREEN}]💡 To terminate a specific deployment:[/{MODAL_LIGHT_GREEN}]")
+                                rprint("./mn.sh --kill-deployment <app-id>")
                         else:
-                            rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 To kill a specific deployment:[/{MODAL_LIGHT_GREEN}]")
-                            rprint("modal-for-noobs kill-a-deployment <deployment-id>")
+                            if br_huehuehue:
+                                rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ Nenhum deployment ativo! Todos exterminados! Huehuehue![/{MODAL_LIGHT_GREEN}]")
+                            else:
+                                rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ No active deployments! Everything terminated![/{MODAL_LIGHT_GREEN}]")
+                        
+                        if stopped_count > 0:
+                            if br_huehuehue:
+                                rprint(f"[{MODAL_LIGHT_GREEN}]ℹ️ {stopped_count} deployments já exterminados (não consomem recursos)[/{MODAL_LIGHT_GREEN}]")
+                            else:
+                                rprint(f"[{MODAL_LIGHT_GREEN}]ℹ️ {stopped_count} deployments already terminated (no resource consumption)[/{MODAL_LIGHT_GREEN}]")
                     else:
                         if br_huehuehue:
-                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ Nenhum deployment ativo para matar! Todos já estão mortos! Huehuehue![/{MODAL_LIGHT_GREEN}]")
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ Nenhum deployment encontrado! Tudo limpo! Huehuehue![/{MODAL_LIGHT_GREEN}]")
                         else:
-                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ No active deployments to kill! Everything is already dead![/{MODAL_LIGHT_GREEN}]")
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ No deployments found! Everything clean![/{MODAL_LIGHT_GREEN}]")
                 else:
                     error_msg = stderr.decode().strip()
                     if br_huehuehue:
@@ -821,6 +1099,177 @@ async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue:
                     print_error(f"Erro ao listar deployments: {str(e)}")
                 else:
                     print_error(f"Error listing deployments: {str(e)}")
+
+
+async def _milk_logs_async(
+    app_name: str | None = None, 
+    follow: bool = False, 
+    lines: int = 100, 
+    br_huehuehue: bool = False
+) -> None:
+    """Async log milking functionality - get those creamy logs! 🥛"""
+    
+    deployer = ModalDeployer()
+    
+    with Progress(
+        SpinnerColumn(spinner_name="dots", style=f"{MODAL_GREEN}"),
+        TextColumn("[progress.description]{task.description}", style="bold white"),
+        console=console,
+    ) as progress:
+        
+        # Check authentication first
+        auth_task = progress.add_task("🔍 Checking Modal authentication...", total=None)
+        
+        if not await deployer.check_modal_auth_async():
+            progress.update(auth_task, description="❌ No Modal authentication found!")
+            if br_huehuehue:
+                print_error("Nenhuma autenticação Modal encontrada! Huehuehue, configure primeiro!")
+            else:
+                print_error("No Modal authentication found! Please run 'modal-for-noobs auth' first!")
+            return
+        
+        progress.update(auth_task, description="✅ Authentication verified!")
+        
+        if not app_name:
+            # List apps for user to choose
+            list_task = progress.add_task("📋 Finding apps to milk logs from...", total=None)
+            
+            try:
+                process = await asyncio.create_subprocess_exec(
+                    "modal", "app", "list",
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE
+                )
+                stdout, stderr = await process.communicate()
+                
+                progress.update(list_task, description="✅ Apps found!")
+                
+                if process.returncode == 0:
+                    output = stdout.decode().strip()
+                    if output:
+                        if br_huehuehue:
+                            rprint(f"\n[{MODAL_GREEN}]🥛 Apps disponíveis para ordenhar logs (huehuehue!):[/{MODAL_GREEN}]")
+                        else:
+                            rprint(f"\n[{MODAL_GREEN}]🥛 Apps available for log milking:[/{MODAL_GREEN}]")
+                        rprint(f"```\n{output}\n```")
+                        
+                        if br_huehuehue:
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 Para ordenhar logs de um app específico:[/{MODAL_LIGHT_GREEN}]")
+                            rprint("modal-for-noobs milk-logs <app-name> --br-huehuehue")
+                        else:
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 To milk logs from a specific app:[/{MODAL_LIGHT_GREEN}]")
+                            rprint("modal-for-noobs milk-logs <app-name> --follow")
+                    else:
+                        if br_huehuehue:
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ Nenhum app para ordenhar! Deploye algo primeiro! Huehuehue![/{MODAL_LIGHT_GREEN}]")
+                        else:
+                            rprint(f"\n[{MODAL_LIGHT_GREEN}]✨ No apps to milk logs from! Deploy something first![/{MODAL_LIGHT_GREEN}]")
+                else:
+                    error_msg = stderr.decode().strip()
+                    if br_huehuehue:
+                        print_error(f"Erro ao listar apps: {error_msg}")
+                    else:
+                        print_error(f"Error listing apps: {error_msg}")
+                        
+            except Exception as e:
+                progress.update(list_task, description="❌ Error listing apps!")
+                if br_huehuehue:
+                    print_error(f"Erro ao listar apps: {str(e)}")
+                else:
+                    print_error(f"Error listing apps: {str(e)}")
+        
+        else:
+            # Milk logs from specific app
+            milk_task = progress.add_task(f"🥛 Milking logs from {app_name}...", total=None)
+            
+            try:
+                # Build modal logs command - Modal CLI uses different syntax
+                cmd = ["modal", "app", "logs", app_name]
+                if follow:
+                    cmd.append("--follow")
+                # Note: Modal CLI doesn't support --lines flag, so we'll get all logs and limit client-side
+                
+                if follow:
+                    # For follow mode, we need to stream the output
+                    process = await asyncio.create_subprocess_exec(
+                        *cmd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE
+                    )
+                    
+                    progress.update(milk_task, description=f"🥛 Streaming fresh logs from {app_name}...")
+                    
+                    if br_huehuehue:
+                        rprint(f"\n[{MODAL_GREEN}]🥛 Logs fresquinhos de {app_name} (huehuehue!):[/{MODAL_GREEN}]")
+                    else:
+                        rprint(f"\n[{MODAL_GREEN}]🥛 Fresh creamy logs from {app_name}:[/{MODAL_GREEN}]")
+                    rprint("=" * 80)
+                    
+                    # Stream output line by line
+                    while True:
+                        line = await process.stdout.readline()
+                        if not line:
+                            break
+                        
+                        log_line = line.decode().strip()
+                        if log_line:
+                            # Add milk emoji to each log line for fun
+                            rprint(f"🥛 {log_line}")
+                    
+                    await process.wait()
+                    
+                else:
+                    # For non-follow mode, get all logs at once
+                    process = await asyncio.create_subprocess_exec(
+                        *cmd,
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.PIPE
+                    )
+                    stdout, stderr = await process.communicate()
+                    
+                    if process.returncode == 0:
+                        progress.update(milk_task, description=f"✅ Logs milked from {app_name}!")
+                        
+                        logs = stdout.decode().strip()
+                        if logs:
+                            if br_huehuehue:
+                                rprint(f"\n[{MODAL_GREEN}]🥛 Logs fresquinhos de {app_name} (huehuehue!):[/{MODAL_GREEN}]")
+                            else:
+                                rprint(f"\n[{MODAL_GREEN}]🥛 Fresh creamy logs from {app_name}:[/{MODAL_GREEN}]")
+                            rprint("=" * 80)
+                            
+                            # Pretty print logs with milk emojis (limit to requested lines)
+                            log_lines = logs.split('\n')
+                            displayed_lines = log_lines[-lines:] if len(log_lines) > lines else log_lines
+                            
+                            for line in displayed_lines:
+                                if line.strip():
+                                    rprint(f"🥛 {line}")
+                            
+                            rprint("=" * 80)
+                            if br_huehuehue:
+                                print_success(f"Logs ordenhados com sucesso de {app_name}! ({len(displayed_lines)} linhas) Huehuehue!")
+                            else:
+                                print_success(f"Successfully milked {len(displayed_lines)} lines of creamy logs from {app_name}!")
+                        else:
+                            if br_huehuehue:
+                                rprint(f"\n[{MODAL_LIGHT_GREEN}]📝 Nenhum log encontrado para {app_name}![/{MODAL_LIGHT_GREEN}]")
+                            else:
+                                rprint(f"\n[{MODAL_LIGHT_GREEN}]📝 No logs found for {app_name}![/{MODAL_LIGHT_GREEN}]")
+                    else:
+                        error_msg = stderr.decode().strip()
+                        progress.update(milk_task, description="❌ Failed to milk logs!")
+                        if br_huehuehue:
+                            print_error(f"Erro ao ordenhar logs: {error_msg}")
+                        else:
+                            print_error(f"Failed to milk logs: {error_msg}")
+                        
+            except Exception as e:
+                progress.update(milk_task, description="❌ Error during log milking!")
+                if br_huehuehue:
+                    print_error(f"Erro ao ordenhar logs: {str(e)}")
+                else:
+                    print_error(f"Error milking logs: {str(e)}")
 
 
 def main() -> None:

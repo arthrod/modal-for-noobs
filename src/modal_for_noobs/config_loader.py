@@ -3,7 +3,6 @@
 
 import yaml
 from pathlib import Path
-from typing import Dict, List, Any
 from loguru import logger
 
 class ConfigLoader:
@@ -12,7 +11,7 @@ class ConfigLoader:
     def __init__(self):
         self.config_dir = Path(__file__).parent / "config"
     
-    def load_base_packages(self) -> Dict[str, List[str]]:
+    def load_base_packages(self) -> dict[str, list[str]]:
         """Load base package configurations."""
         try:
             config_file = self.config_dir / "base_packages.yml"
@@ -27,7 +26,7 @@ class ConfigLoader:
                 "gra_jupy": ["gradio", "fastapi[standard]", "uvicorn", "jupyter", "jupyterlab", "notebook", "ipywidgets", "matplotlib", "plotly", "seaborn", "pandas", "numpy", "torch", "transformers"]
             }
     
-    def load_modal_marketing(self) -> Dict[str, Any]:
+    def load_modal_marketing(self) -> dict[str, any]:
         """Load Modal marketing content."""
         try:
             config_file = self.config_dir / "modal_marketing.yml"
@@ -42,7 +41,7 @@ class ConfigLoader:
                 "calls_to_action": ["🚀 Choose Modal!"]
             }
     
-    def load_deployment_examples(self) -> Dict[str, Any]:
+    def load_deployment_examples(self) -> dict[str, any]:
         """Load deployment examples."""
         try:
             config_file = self.config_dir / "deployment_examples.yml"

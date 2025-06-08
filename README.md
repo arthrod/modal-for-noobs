@@ -13,11 +13,17 @@ Deploy your Gradio apps to Modal with zero configuration. Perfect for noobs who 
 
 - 🚀 **Zero-config deployment** - Just point at your Gradio app and go!
 - ⚡ **--time-to-get-serious** - Migrate HuggingFace Spaces to Modal in seconds
-- 🔄 **Async-first** - Built with modern Python async/await patterns
-- 🎯 **Two modes**: Minimum (CPU) or Optimized (GPU + ML libraries)
+- 🔄 **Async-first** - Built with modern Python async/await patterns using uvloop
+- 🎯 **Three modes**: Minimum (CPU), Optimized (GPU + ML), Gra-Jupy (Jupyter + Gradio)
 - 🔐 **Auto-authentication** - Handles Modal setup automatically
 - 🪝 **Smart detection** - Finds your Gradio interface automatically
-- 📦 **Dependency magic** - Auto-installs requirements from HF Spaces
+- 📦 **Dependency magic** - Auto-installs requirements from HF Spaces or drop folder
+- 🧙‍♂️ **Interactive wizard** - Step-by-step deployment guidance
+- 🥛 **Log milking** - Beautiful log viewing with --milk-logs
+- 💀 **Deployment killer** - Easy cleanup with --kill-a-deployment
+- 🌐 **Modal Examples Explorer** - Browse and deploy Modal's example gallery
+- 💚 **Beautiful UI** - Modal's signature green theme throughout
+- 🇧🇷 **Modo brasileiro** - Brazilian Portuguese support with --br-huehuehue
 
 ## 🚀 Quick Start
 
@@ -36,22 +42,119 @@ pip install modal-for-noobs
 ### 2. Deploy Your Gradio App
 
 ```bash
-# Basic deployment (CPU) - beautiful Modal green UI!
-modal-for-noobs deploy my_app.py
+# 🚀 SUPER EASY MODE - Just use our launcher scripts!
 
-# Quick deploy (for noobs who love shortcuts)
-modal-for-noobs mn my_app.py
+# Unix/Linux/macOS
+./mn.sh app.py                    # Quick deploy (CPU)
+./mn.sh app.py --optimized        # GPU + ML libraries
+./mn.sh                           # Wizard mode (default)
 
-# Optimized deployment (GPU + ML libraries)
-modal-for-noobs deploy my_app.py --optimized
-# or the shortcut:
-modal-for-noobs mn my_app.py -o
+# Windows
+mn.bat app.py                     # Quick deploy (CPU)
+mn.bat app.py --optimized         # GPU + ML libraries
+mn.bat                            # Wizard mode (default)
 
-# Dry run (generate files only)
+# 💡 Install permanent 'mn' alias to use from anywhere!
+./mn.sh --install-alias           # Unix/Linux/macOS
+mn.bat --install-alias            # Windows
+
+# Then just use 'mn' from anywhere:
+mn app.py --optimized
+mn --milk-logs                    # View deployment logs
+
+# Alternative: Direct CLI usage (if installed via pip)
 modal-for-noobs deploy my_app.py --dry-run
+modal-for-noobs deploy my_app.py --wizard          # Interactive wizard
+modal-for-noobs deploy my_app.py --gra-jupy        # Jupyter + Gradio combo
 ```
 
-### 3. Time to Get SERIOUS! 💪
+## 📖 Detailed Examples
+
+### 🎯 Simple Gradio App
+Create a file `my_app.py`:
+```python
+import gradio as gr
+
+def greet(name):
+    return f"Hello {name}! 🚀"
+
+demo = gr.Interface(fn=greet, inputs="text", outputs="text")
+
+if __name__ == "__main__":
+    demo.launch()
+```
+
+Deploy it:
+```bash
+./mn.sh my_app.py --optimized
+```
+
+### 🧠 ML Model App with Custom Requirements
+1. Create `drop-ur-precious-stuff-here/requirements.txt`:
+```
+transformers==4.35.0
+torch>=2.0.0
+accelerate
+```
+
+2. Create your ML app:
+```python
+import gradio as gr
+from transformers import pipeline
+
+# The wizard will automatically detect and include your requirements!
+classifier = pipeline("sentiment-analysis")
+
+def analyze_sentiment(text):
+    result = classifier(text)
+    return f"Sentiment: {result[0]['label']} ({result[0]['score']:.2f})"
+
+demo = gr.Interface(
+    fn=analyze_sentiment,
+    inputs="text",
+    outputs="text",
+    title="🧠 Sentiment Analysis with Modal-for-noobs!"
+)
+
+if __name__ == "__main__":
+    demo.launch()
+```
+
+3. Deploy with wizard:
+```bash
+./mn.sh ml_app.py --wizard
+```
+
+### 🇧🇷 Modo Brasileiro (Brazilian Mode)
+```bash
+./mn.sh meu_app.py --optimized --br-huehuehue
+# Outputs everything in Portuguese with Brazilian humor! 😄
+```
+
+## 🛠️ Advanced Commands
+
+### 🥛 Milk the Logs (View Deployment Logs)
+```bash
+mn --milk-logs                           # List all apps
+mn --milk-logs my-app                    # View logs for specific app
+mn --milk-logs my-app --follow           # Follow logs in real-time
+mn --milk-logs my-app --br-huehuehue     # Brazilian mode logs! 🇧🇷
+```
+
+### 💀 Kill Deployments
+```bash
+mn --kill-a-deployment                   # List active deployments
+mn --kill-a-deployment my-app-id         # Kill specific deployment
+mn --kill-a-deployment --br-huehuehue    # Brazilian terminator mode! 💀
+```
+
+### 🔍 Sanity Check
+```bash
+mn --sanity-check                        # Check what's deployed
+mn --sanity-check --br-huehuehue         # Brazilian sanity check! 🧠
+```
+
+### 💪 Time to Get SERIOUS! (HuggingFace Migration)
 
 ```bash
 # The nuclear option - migrate HuggingFace Spaces! 🚀

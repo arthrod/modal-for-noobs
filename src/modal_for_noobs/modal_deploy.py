@@ -5,7 +5,6 @@ import asyncio
 import os
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 import httpx
 from loguru import logger
@@ -50,7 +49,14 @@ class ModalDeployer:
             rprint("[red]❌ Modal CLI not found. Please install: pip install modal[/red]")
             return False
 
-    async def create_modal_deployment_async(self, app_file: Path, mode: str = "minimum", requirements_path: Optional[Path] = None, timeout_minutes: int = 60, test_deploy: bool = False) -> Path:
+    async def create_modal_deployment_async(
+        self, 
+        app_file: Path, 
+        mode: str = "minimum", 
+        requirements_path: Path | None = None, 
+        timeout_minutes: int = 60, 
+        test_deploy: bool = False
+    ) -> Path:
         """Create Modal deployment file for Gradio app (async)."""
         deployment_file = app_file.parent / f"modal_{app_file.stem}.py"
         
@@ -177,7 +183,7 @@ if __name__ == "__main__":
         rprint(f"[{MODAL_GREEN}]✅ Created deployment file: {deployment_file}[/{MODAL_GREEN}]")
         return deployment_file
 
-    async def deploy_to_modal_async(self, deployment_file: Path) -> Optional[str]:
+    async def deploy_to_modal_async(self, deployment_file: Path) -> str | None:
         """Deploy to Modal and return the URL (async)."""
         try:
             process = await asyncio.create_subprocess_exec(

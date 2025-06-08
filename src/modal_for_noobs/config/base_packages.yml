@@ -5,11 +5,15 @@ minimum:
   - gradio
   - fastapi[standard]
   - uvicorn
+  - httpx
+  - markdown2
 
 optimized:
   - gradio
   - fastapi[standard]
   - uvicorn
+  - httpx
+  - markdown2
   - torch
   - transformers
   - accelerate
@@ -17,11 +21,16 @@ optimized:
   - pillow
   - numpy
   - pandas
+  - matplotlib
+  - seaborn
+  - plotly
 
 gra_jupy:
   - gradio
   - fastapi[standard]
   - uvicorn
+  - httpx
+  - markdown2
   - jupyter
   - jupyterlab
   - notebook
