@@ -322,6 +322,7 @@ def time_to_get_serious(  # pragma: no cover - not covered in tests
 
 
 @app.command()
+<<<<<<< HEAD:old_cli.py
 <<<<<<< HEAD
 def auth(  # pragma: no cover - requires user credentials
     token_id: Annotated[Optional[str], typer.Option("--token-id", help="Modal token ID")] = None,
@@ -331,6 +332,11 @@ def auth(
     token_id: Annotated[str | None, typer.Option("--token-id", help="Modal token ID")] = None,
     token_secret: Annotated[str | None, typer.Option("--token-secret", help="Modal token secret")] = None,
 >>>>>>> 78decec (feat: add changes)
+=======
+def auth(
+    token_id: Annotated[str | None, typer.Option("--token-id", help="Modal token ID")] = None,
+    token_secret: Annotated[str | None, typer.Option("--token-secret", help="Modal token secret")] = None,
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
 ) -> None:
     """🔐 Setup Modal authentication - get your keys ready!"""
     
@@ -350,6 +356,7 @@ def auth(
 
 
 @app.command()
+<<<<<<< HEAD:old_cli.py
 <<<<<<< HEAD
 def kill_a_deployment(  # pragma: no cover - interactive helper
     deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to kill")] = None,
@@ -357,6 +364,10 @@ def kill_a_deployment(  # pragma: no cover - interactive helper
 def kill_a_deployment(
     deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to terminate")] = None,
 >>>>>>> 78decec (feat: add changes)
+=======
+def kill_a_deployment(
+    deployment_id: Annotated[str | None, typer.Argument(help="Deployment ID to terminate")] = None,
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro com muito huehuehue! 🇧🇷")] = False,
 ) -> None:
     """💀 Completely terminate deployments and remove containers from servers!"""
@@ -382,9 +393,12 @@ def kill_a_deployment(
 
 
 @app.command()
+<<<<<<< HEAD:old_cli.py
 <<<<<<< HEAD
 def sanity_check(  # pragma: no cover - optional helper
 =======
+=======
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
 def milk_logs(
     app_name: Annotated[str | None, typer.Argument(help="App name to get logs from")] = None,
     follow: Annotated[bool, typer.Option("--follow", "-f", help="Follow logs in real-time")] = False,
@@ -478,6 +492,7 @@ def config_info(
     ))
 
 
+<<<<<<< HEAD:old_cli.py
 <<<<<<< HEAD
 # ---------------------------------------------------------------------------
 # Compatibility alias for the old `config-info` command used in the tests.
@@ -503,6 +518,8 @@ def mcp(  # pragma: no cover - not tested
     server = FastMCP(port=port)
     server.run("sse")
 =======
+=======
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
 @app.command("run-examples")
 def run_examples(
     example_name: Annotated[str | None, typer.Argument(help="Example to run (leave empty to list all)")] = None,
@@ -638,7 +655,10 @@ def _get_example_description(example_file: Path) -> str:
         pass
     
     return ""
+<<<<<<< HEAD:old_cli.py
 >>>>>>> 78decec (feat: add changes)
+=======
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
 
 
 async def _deploy_async(
@@ -899,6 +919,7 @@ async def _sanity_check_async(br_huehuehue: bool = False) -> None:  # pragma: no
                 print_error(f"Sanity check error: {str(e)}")
 
 
+<<<<<<< HEAD:old_cli.py
 <<<<<<< HEAD
 async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:  # pragma: no cover - not covered
     """Async kill deployment functionality."""
@@ -906,6 +927,10 @@ async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue:
 async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:
     """Async kill deployment functionality - completely stops and removes containers."""
 >>>>>>> 78decec (feat: add changes)
+=======
+async def _kill_deployment_async(deployment_id: str | None = None, br_huehuehue: bool = False) -> None:
+    """Async kill deployment functionality - completely stops and removes containers."""
+>>>>>>> 78decec (feat: add changes):src/modal_for_noobs/cli.py
     
     deployer = ModalDeployer()
     
