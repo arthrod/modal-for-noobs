@@ -21,6 +21,7 @@ import gradio as gr
 import random
 from datetime import datetime
 import json
+import secrets
 
 # Try importing optional dependencies
 try:
@@ -86,7 +87,7 @@ def analyze_sentiment(text):
         confidence = min(0.95, 0.6 + (neg_count * 0.1))
     else:
         sentiment = "😐 Neutral"
-        confidence = 0.5 + random.random() * 0.3
+        confidence = 0.5 + secrets.SystemRandom().random() * 0.3
 
     result = f"**Sentiment:** {sentiment}\\n**Confidence:** {confidence:.2f}"
 
