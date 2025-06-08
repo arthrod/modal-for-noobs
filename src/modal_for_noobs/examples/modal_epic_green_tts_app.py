@@ -1,3 +1,15 @@
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gradio>=4.0.0",
+#     "modal",
+#     "torch>=2.0.0",
+#     "transformers>=4.20.0",
+#     "numpy>=1.21.0",
+# ]
+# ///
+
 import secrets
 
 import gradio as gr
