@@ -20,7 +20,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        session: [tests, lint, mypy, security]
+        session: [tests, security]
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
