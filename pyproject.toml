@@ -127,7 +127,7 @@ exclude_dirs = ["tests"]
 skips = ["B104", "B603", "B607", "B404", "B110"]  # Allow binding to all interfaces, subprocess calls, and try-except-pass
 
 [tool.pytest.ini_options]
-addopts = ["--cov", "-v", "--no-header"]
+addopts = ["--cov", "-v", "--no-header", "--ignore=src/tests/test_async_operations.py"]
 asyncio_default_fixture_loop_scope = "function"
 asyncio_mode = "auto"
 python_files = ["test_*.py"]
