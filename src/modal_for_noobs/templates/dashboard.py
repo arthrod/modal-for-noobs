@@ -19,6 +19,14 @@ from fastapi import FastAPI, HTTPException
 from loguru import logger
 from pydantic import BaseModel
 
+# Import Modal UI components and themes
+try:
+    from modal_for_noobs.ui.themes import MODAL_THEME, MODAL_CSS
+except ImportError:
+    # Fallback if running standalone
+    MODAL_THEME = gr.themes.Soft()
+    MODAL_CSS = ""
+
 
 class LogEntry(BaseModel):
     """Model for log entries."""
@@ -114,7 +122,7 @@ def create_dashboard_interface(app_demo: gr.Interface) -> gr.Blocks:
     Returns:
         gr.Blocks: The complete dashboard interface
     """
-    with gr.Blocks(title="Modal Deployment Dashboard", theme=gr.themes.Soft()) as dashboard:
+    with gr.Blocks(title="Modal Deployment Dashboard", theme=MODAL_THEME, css=MODAL_CSS) as dashboard:
         gr.Markdown("# 🚀 Modal Deployment Dashboard")
         gr.Markdown("Monitor and manage your Modal deployment")
         

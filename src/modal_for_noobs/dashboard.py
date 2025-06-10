@@ -17,6 +17,10 @@ from rich import print as rprint
 # Import Modal color palette from common module
 from .cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN, MODAL_BLACK
 
+# Import new UI components and themes
+from .ui.themes import MODAL_THEME, MODAL_CSS
+from .ui.components import ModalStatusMonitor
+
 # GPU cost estimates (per hour in USD)
 GPU_COSTS = {
     "T4": 0.60,
@@ -240,31 +244,8 @@ class ModalDashboard:
         """Create the Gradio interface for the dashboard."""
         with gr.Blocks(
             title="Modal Monitoring Dashboard",
-            theme=gr.themes.Soft(
-                primary_hue=gr.themes.colors.green,
-                secondary_hue=gr.themes.colors.gray,
-            ),
-            css=f"""
-            .gradio-container {{
-                background-color: {MODAL_BLACK} !important;
-            }}
-            .dark {{
-                --block-background-fill: {MODAL_DARK_GREEN} !important;
-            }}
-            h1, h2, h3 {{
-                color: {MODAL_GREEN} !important;
-            }}
-            .gr-button-primary {{
-                background-color: {MODAL_GREEN} !important;
-                color: {MODAL_BLACK} !important;
-                border: none !important;
-            }}
-            .gr-button-secondary {{
-                background-color: transparent !important;
-                color: {MODAL_GREEN} !important;
-                border: 1px solid {MODAL_GREEN} !important;
-            }}
-            """
+            theme=MODAL_THEME,
+            css=MODAL_CSS
         ) as demo:
             # Header
             gr.Markdown(
