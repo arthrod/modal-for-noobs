@@ -490,7 +490,8 @@ def launch_enhanced_dashboard(port: int = 7860, share: bool = False):
         share=share,
         quiet=False,
         show_error=True,
-        debug=False
+        debug=False,
+        strict_cors=False  # Allow localhost, HuggingFace, and Modal cross-origin requests
     )
 
 
