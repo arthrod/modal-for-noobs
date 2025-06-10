@@ -1,6 +1,6 @@
 [project]
 name = "modal-for-noobs"
-version = "0.2.8"
+version = "0.2.9"
 description = "🚀 Async-first, idiot-proof Gradio deployment CLI for Modal"
 authors = [{ name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu" }]
 readme = "README.md"
@@ -27,6 +27,7 @@ dependencies = [
     "toml>=0.10.2",
     "python-slugify>=8.0.0",
     "questionary>=2.0.0",
+    "typing-inspection>=0.4.1",
 ]
 
 [project.urls]
