@@ -52,7 +52,7 @@ demo = gr.Interface(
 )
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(strict_cors=False)  # Allow localhost, HuggingFace, and Modal cross-origin requests
 
 # Modal Function Configuration
 @app.function(

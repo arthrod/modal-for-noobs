@@ -666,7 +666,13 @@ def launch_dashboard(port: int = 7860, share: bool = False):
     rprint(f"[{MODAL_GREEN}]🚀 Launching Modal Monitoring Dashboard...[/{MODAL_GREEN}]")
     rprint(f"[{MODAL_LIGHT_GREEN}]📊 Dashboard will be available at: http://localhost:{port}[/{MODAL_LIGHT_GREEN}]")
 
-    interface.launch(server_name="0.0.0.0", server_port=port, share=share, quiet=True)
+    interface.launch(
+        server_name="0.0.0.0", 
+        server_port=port, 
+        share=share, 
+        quiet=True,
+        strict_cors=False  # Allow localhost, HuggingFace, and Modal cross-origin requests
+    )
 
 
 if __name__ == "__main__":
