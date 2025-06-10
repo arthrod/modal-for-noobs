@@ -612,7 +612,12 @@ class ModalDeployer:
         # Environment variables
         if config.environment_variables:
             env_items = [f'"{k}": "{v}"' for k, v in config.environment_variables.items()]
-            function_params.append(f"environment={{\n        {',\n        '.join(env_items)}\n    }}")
+            # Fix f-string backslash issue by preprocessing multiline string
+            newline = '\n'
+            indent = '        '
+            env_joined = f',{newline}{indent}'.join(env_items)
+            environment_block = f"environment={{{newline}{indent}{env_joined}{newline}    }}"
+            function_params.append(environment_block)
 
         # Secrets
         if config.secrets:
@@ -624,7 +629,12 @@ class ModalDeployer:
             volume_items = []
             for mount_path, volume_name in config.volume_mounts.items():
                 volume_items.append(f'"{mount_path}": modal.Volume.from_name("{volume_name}")')
-            function_params.append(f"volumes={{\n        {',\n        '.join(volume_items)}\n    }}")
+            # Fix f-string backslash issue by preprocessing multiline string
+            newline = '\n'
+            indent = '        '
+            volumes_joined = f',{newline}{indent}'.join(volume_items)
+            volumes_block = f"volumes={{{newline}{indent}{volumes_joined}{newline}    }}"
+            function_params.append(volumes_block)
 
         # Keep warm
         if config.keep_warm:

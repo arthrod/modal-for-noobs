@@ -1,11 +1,11 @@
 [project]
 name = "modal-for-noobs"
-version = "0.2.0"
+version = "0.2.3"
 description = "🚀 Async-first, idiot-proof Gradio deployment CLI for Modal"
-authors = [{name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu"}]
+authors = [{ name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu" }]
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = { text = "MIT" }
 dependencies = [
     "security==1.3.1",
     "loguru>=0.7.2",
@@ -66,37 +66,88 @@ lint = [
 default-groups = ["test", "dev", "lint"]
 
 [tool.ruff]
-include = [
-    "pyproject.toml",
-    "src/**/*.py",
-    "scripts/**/*.py",
-]
+include = ["pyproject.toml", "src/**/*.py", "scripts/**/*.py"]
 line-length = 140
 fix = true
 target-version = "py311"
 exclude = [
-    "build", 
-    "dist", 
-    "*.egg-info", 
+    "build",
+    "dist",
+    "*.egg-info",
     "src/modal_for_noobs/templates/*/deployment_template.py",
     "src/modal_for_noobs/templates/marimo/deployment_template.py",
     "src/modal_for_noobs/templates/optimized/deployment_template.py",
     "src/modal_for_noobs/templates/minimum/deployment_template.py",
-    "src/modal_for_noobs/templates/gradio-jupyter/deployment_template.py"
+    "src/modal_for_noobs/templates/gradio-jupyter/deployment_template.py",
 ]
 
 [tool.ruff.lint]
 fixable = ["UP", "I", "D"]
 ignore = [
-    "ERA001", "TRY300", "TRY401", "G202", "G004", "ISC001", "W191",
-    "COM812", "W292", "C408", "COM819", "E731", "RET503", "RUF012",
-    "S311", "SIM108", "SIM300", "T201", "TRY003", "TRY301", "W293",
-    "Q000", "Q001", "Q002", "Q003", "D200", "D205", "D400", "D401"
+    "ERA001",
+    "TRY300",
+    "TRY401",
+    "G202",
+    "G004",
+    "ISC001",
+    "W191",
+    "COM812",
+    "W292",
+    "C408",
+    "COM819",
+    "E731",
+    "RET503",
+    "RUF012",
+    "S311",
+    "SIM108",
+    "SIM300",
+    "T201",
+    "TRY003",
+    "TRY301",
+    "W293",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "D200",
+    "D205",
+    "D400",
+    "D401",
 ]
 select = [
-    "A", "ASYNC", "B", "BLE", "C4", "COM", "DTZ", "E", "ERA", "EXE",
-    "F", "FLY", "G", "I", "ICN", "ISC", "LOG", "PERF", "PIE", "PLC",
-    "PLE", "PLW", "PT", "PTH", "RET", "RUF", "S", "SIM", "T", "TRY", "UP", "W", "D"
+    "A",
+    "ASYNC",
+    "B",
+    "BLE",
+    "C4",
+    "COM",
+    "DTZ",
+    "E",
+    "ERA",
+    "EXE",
+    "F",
+    "FLY",
+    "G",
+    "I",
+    "ICN",
+    "ISC",
+    "LOG",
+    "PERF",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLW",
+    "PT",
+    "PTH",
+    "RET",
+    "RUF",
+    "S",
+    "SIM",
+    "T",
+    "TRY",
+    "UP",
+    "W",
+    "D",
 ]
 unfixable = ["B"]
 
@@ -125,15 +176,17 @@ build-backend = "hatchling.build"
 packages = ["src/modal_for_noobs"]
 
 [tool.hatch.build]
-include = [
-    "LICENSE",
-    "README.md",
-    "src/modal_for_noobs"
-]
+include = ["LICENSE", "README.md", "src/modal_for_noobs"]
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B104", "B603", "B607", "B404", "B110"]  # Allow binding to all interfaces, subprocess calls, and try-except-pass
+skips = [
+    "B104",
+    "B603",
+    "B607",
+    "B404",
+    "B110",
+] # Allow binding to all interfaces, subprocess calls, and try-except-pass
 
 [tool.pytest.ini_options]
 addopts = ["-v", "--no-header"]
@@ -178,9 +231,7 @@ disallow_untyped_defs = false
 strict = false
 warn_unused_configs = true
 ignore_missing_imports = true
-exclude = [
-    "src/tests/test_notebooks.py",
-]
+exclude = ["src/tests/test_notebooks.py"]
 
 [tool.pyrefly]
 # Project structure

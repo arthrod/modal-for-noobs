@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'  # Trigger on version tags like v1.0.0
+      - "v*" # Trigger on version tags like v1.0.0
 
 env:
   REGISTRY: ghcr.io
@@ -43,7 +43,7 @@ jobs:
   release:
     needs: test
     runs-on: ubuntu-latest
-    environment: release  # Requires environment protection
+    environment: release # Requires environment protection
     steps:
       - uses: actions/checkout@v4
         with:
@@ -79,7 +79,7 @@ jobs:
   docker:
     needs: test
     runs-on: ubuntu-latest
-    environment: production  # Requires environment protection
+    environment: production # Requires environment protection
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -167,7 +167,7 @@ jobs:
   pypi:
     needs: test
     runs-on: ubuntu-latest
-    environment: pypi  # Requires environment protection
+    environment: pypi # Requires environment protection
     if: ${{ !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'beta') && !contains(github.ref_name, 'rc') }}
     steps:
       - uses: actions/checkout@v4
@@ -185,4 +185,7 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7246747 (🚀 Bump version to 0.2.3 - Fix f-string backslash syntax error)

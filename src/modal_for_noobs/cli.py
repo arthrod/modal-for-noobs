@@ -174,14 +174,16 @@ def deploy(
             try:
                 requirements_content = requirements_file.read_text().strip()
                 if requirements_content:
-                    lines = requirements_content.split("\n")[:5]  # Show first 5 lines
+                    newline_char = "\n"
+                    lines = requirements_content.split(newline_char)[:5]  # Show first 5 lines
                     rprint("  📋 Contents preview:")
                     for line in lines:
                         if line.strip():
                             rprint(f"    - {line.strip()}")
-                    req_lines = requirements_content.split("\n")
+                    req_lines = requirements_content.split(newline_char)
                     if len(req_lines) > 5:
-                        rprint(f"    ... and {len(req_lines) - 5} more packages")
+                        remaining_packages = len(req_lines) - 5
+                        rprint(f"    ... and {remaining_packages} more packages")
                 else:
                     rprint("  📝 File is empty")
             except Exception:
