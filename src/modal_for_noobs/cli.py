@@ -21,9 +21,8 @@ from modal_for_noobs.config_loader import config_loader
 from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
 from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
-from modal_for_noobs.cli_enhanced import enhanced_wizard
-from modal_for_noobs.enhanced_dashboard import launch_enhanced_dashboard
-from modal_for_noobs.auth_manager import auth_manager
+from modal_for_noobs.auth_manager import ModalAuthManager
+from modal_for_noobs.template_generator import generate_from_wizard_input
 
 app = typer.Typer(
     name="modal-for-noobs",
@@ -111,7 +110,6 @@ def deploy(
     gradio_jupyter: Annotated[bool, typer.Option("--gradio-jupyter", help="Deploy with Gradio+Jupyter support")] = False,
     marimo: Annotated[bool, typer.Option("--marimo", help="Deploy with Gradio+Marimo notebook support")] = False,
     wizard: Annotated[bool, typer.Option("--wizard", help="Interactive step-by-step deployment wizard")] = False,
-    enhanced: Annotated[bool, typer.Option("--enhanced", help="Use enhanced wizard with all features")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Brazilian mode 🇧🇷", hidden=True)] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate deployment file without deploying")] = False,
 ):
@@ -129,112 +127,178 @@ def deploy(
         print_error(f"File not found: {app_file}")
         raise typer.Exit(1)
 
-    # Handle enhanced wizard mode
-    if enhanced:
-        deployment_code = enhanced_wizard(app_file, br_huehuehue)
-        if not deployment_code:
-            print_error("Enhanced wizard cancelled!")
-            raise typer.Exit(0)
-        
-        # Write output file
-        output_file = app_file.parent / f"modal_{app_file.name}"
-        output_file.write_text(deployment_code)
-        print_success(f"Enhanced deployment generated: {output_file}")
-        
-        if not dry_run:
-            print_info("You can now deploy with:")
-            print_info(f"  modal deploy {output_file}")
-        
-        return
-
-    # Handle wizard mode
+    # Handle wizard mode with enhanced features
     if wizard:
         wizard_text = Text()
-        wizard_text.append("🧙‍♂️ DEPLOYMENT WIZARD 🧙‍♂️", style=f"bold {MODAL_GREEN}")
-        wizard_text.append("\n✨ Let's walk through your deployment step by step!", style="bold white")
+        if br_huehuehue:
+            wizard_text.append("🧙‍♂️ ASSISTENTE COMPLETO DE DEPLOYMENT 🧙‍♂️", style=f"bold {MODAL_GREEN}")
+            wizard_text.append("\n✨ Vamos criar um deployment completo e poderoso! Huehuehue!", style="bold white")
+        else:
+            wizard_text.append("🧙‍♂️ COMPLETE DEPLOYMENT WIZARD 🧙‍♂️", style=f"bold {MODAL_GREEN}")
+            wizard_text.append("\n✨ Let's create a complete and powerful Modal deployment!", style="bold white")
 
         rprint(Panel(Align.center(wizard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
 
-        # Step 1: Confirm app file
-        rprint(f"\n[{MODAL_GREEN}]📱 Step 1: App File[/{MODAL_GREEN}]")
-        confirmed_file = typer.confirm(f"Deploy this Gradio app: {app_file}?", default=True)
-        if not confirmed_file:
-            print_error("Deployment cancelled!")
-            raise typer.Exit(0)
+        # Read original code
+        try:
+            original_code = app_file.read_text()
+        except Exception as e:
+            print_error(f"Error reading app file: {e}")
+            raise typer.Exit(1)
 
-        # Step 2: Choose deployment mode
-        rprint(f"\n[{MODAL_GREEN}]⚡ Step 2: Deployment Mode[/{MODAL_GREEN}]")
-        rprint("Choose your deployment mode:")
-        rprint(f"  [bold]minimum[/bold] - CPU only, basic packages (faster, cheaper)")
-        rprint(f"  [bold]optimized[/bold] - GPU + ML libraries (more powerful)")
+        # Step 1: App configuration
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]📱 Passo 1: Configuração do App[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]📱 Step 1: App Configuration[/{MODAL_GREEN}]")
+        
+        app_name = typer.prompt("App name", default=app_file.stem)
+        
+        # Step 2: Deployment mode with all options
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]⚡ Passo 2: Modo de Deployment[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]⚡ Step 2: Deployment Mode[/{MODAL_GREEN}]")
+        
+        rprint("Available deployment modes:")
+        rprint("  [bold]minimum[/bold] - 🌱 Fast CPU-only deployment")
+        rprint("  [bold]optimized[/bold] - ⚡ GPU + ML libraries")
+        rprint("  [bold]marimo[/bold] - 📓 Reactive notebooks + Gradio")
+        rprint("  [bold]gradio-jupyter[/bold] - 🪐 Classic notebooks + Gradio")
 
-        mode_choice = typer.prompt("Which mode do you want? [minimum/optimized]", default="minimum")
+        deployment_mode = typer.prompt(
+            "Which mode do you want? [minimum/optimized/marimo/gradio-jupyter]", 
+            default="minimum"
+        )
 
         # Validate choice
-        if mode_choice not in ["minimum", "optimized"]:
-            print_warning(f"Invalid choice '{mode_choice}', defaulting to 'minimum'")
-            mode_choice = "minimum"
+        if deployment_mode not in ["minimum", "optimized", "marimo", "gradio-jupyter"]:
+            print_warning(f"Invalid choice '{deployment_mode}', defaulting to 'minimum'")
+            deployment_mode = "minimum"
 
-        # Step 3: GPU confirmation if optimized
-        if mode_choice == "optimized":
-            rprint(f"\n[{MODAL_GREEN}]🚀 Step 3: GPU Configuration[/{MODAL_GREEN}]")
-            gpu_confirm = typer.confirm("Enable GPU support? (recommended for ML workloads)", default=True)
-            if not gpu_confirm:
-                mode_choice = "minimum"
-                print_warning("Switching to minimum mode (CPU only)")
+        # Step 3: Advanced features
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]🚀 Passo 3: Recursos Avançados[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]🚀 Step 3: Advanced Features[/{MODAL_GREEN}]")
 
-        # Step 4: Check for requirements.txt in drop folder
-        rprint(f"\n[{MODAL_GREEN}]📦 Step 4: Dependencies[/{MODAL_GREEN}]")
+        # GPU configuration
+        enable_gpu = False
+        gpu_type = "any"
+        if deployment_mode in ["optimized", "marimo", "gradio-jupyter"]:
+            enable_gpu = typer.confirm("Enable GPU support?", default=True)
+            if enable_gpu:
+                rprint("Available GPU types: any, T4, L4, A10G, A100, H100")
+                gpu_type = typer.prompt("GPU type", default="any")
+
+        # Infrastructure features
+        provision_nfs = typer.confirm("Add persistent storage (NFS)?", default=False)
+        provision_logging = typer.confirm("Add enhanced logging?", default=False)
+        enable_dashboard = typer.confirm("Enable dashboard monitoring?", default=False)
+
+        # Step 4: Dependencies with enhanced options
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]📦 Passo 4: Dependências[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]📦 Step 4: Dependencies[/{MODAL_GREEN}]")
+
+        # Check for requirements.txt
         drop_folder = Path("drop-ur-precious-stuff-here")
         requirements_file = drop_folder / "requirements.txt"
 
+        requirements_path = None
         if requirements_file.exists():
             print_success(f"Found requirements.txt in {drop_folder}!")
-            rprint(f"  📄 File: {requirements_file}")
-
-            # Show contents preview
-            try:
-                requirements_content = requirements_file.read_text().strip()
-                if requirements_content:
-                    newline_char = "\n"
-                    lines = requirements_content.split(newline_char)[:5]  # Show first 5 lines
-                    rprint("  📋 Contents preview:")
-                    for line in lines:
-                        if line.strip():
-                            rprint(f"    - {line.strip()}")
-                    req_lines = requirements_content.split(newline_char)
-                    if len(req_lines) > 5:
-                        remaining_packages = len(req_lines) - 5
-                        rprint(f"    ... and {remaining_packages} more packages")
-                else:
-                    rprint("  📝 File is empty")
-            except Exception:
-                rprint("  ❌ Could not read file contents")
-
-            use_requirements = typer.confirm("Include these dependencies in your deployment?", default=True)
+            use_requirements = typer.confirm("Include these dependencies?", default=True)
+            if use_requirements:
+                requirements_path = requirements_file
         else:
             rprint(f"  📂 No requirements.txt found in {drop_folder}")
-            rprint("  💡 Pro tip: Drop your requirements.txt there for automatic detection!")
-            use_requirements = False
 
-        # Step 5: Dry run option
-        rprint(f"\n[{MODAL_GREEN}]🏃 Step 5: Deployment Type[/{MODAL_GREEN}]")
-        wizard_dry_run = typer.confirm("Do a dry run first? (generate files without deploying)", default=False)
+        # Additional packages
+        extra_packages = typer.prompt("Extra Python packages (comma-separated, optional)", default="")
+        python_deps = [pkg.strip() for pkg in extra_packages.split(",") if pkg.strip()] if extra_packages else []
 
-        # Summary
-        rprint(f"\n[{MODAL_GREEN}]📋 Deployment Summary[/{MODAL_GREEN}]")
-        rprint(f"  📱 App: {app_file}")
-        rprint(f"  ⚡ Mode: {mode_choice.upper()}")
-        rprint(f"  📦 Requirements: {'INCLUDED' if use_requirements else 'DEFAULT ONLY'}")
-        rprint(f"  🏃 Dry Run: {'YES' if wizard_dry_run else 'NO'}")
+        system_deps = typer.prompt("System dependencies (comma-separated, optional)", default="")
+        system_dependencies = [pkg.strip() for pkg in system_deps.split(",") if pkg.strip()] if system_deps else []
 
-        final_confirm = typer.confirm("\nLooks good? Let's deploy! 🚀", default=True)
+        # Step 5: Environment and secrets
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]🔐 Passo 5: Ambiente e Segredos[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]🔐 Step 5: Environment & Secrets[/{MODAL_GREEN}]")
+
+        env_vars_input = typer.prompt("Environment variables (key=value,key2=value2, optional)", default="")
+        env_vars = {}
+        if env_vars_input:
+            for pair in env_vars_input.split(","):
+                if "=" in pair:
+                    key, value = pair.split("=", 1)
+                    env_vars[key.strip()] = value.strip()
+
+        secrets_input = typer.prompt("Modal secrets (comma-separated names, optional)", default="")
+        secrets = [s.strip() for s in secrets_input.split(",") if s.strip()] if secrets_input else []
+
+        # Step 6: Configuration summary
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]📋 Resumo da Configuração[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]📋 Configuration Summary[/{MODAL_GREEN}]")
+        
+        rprint(f"  📱 App: {app_name}")
+        rprint(f"  ⚡ Mode: {deployment_mode.upper()}")
+        rprint(f"  🚀 GPU: {'YES (' + gpu_type + ')' if enable_gpu else 'NO'}")
+        rprint(f"  💾 Storage: {'YES' if provision_nfs else 'NO'}")
+        rprint(f"  📝 Logging: {'ENHANCED' if provision_logging else 'BASIC'}")
+        rprint(f"  📊 Dashboard: {'YES' if enable_dashboard else 'NO'}")
+        rprint(f"  📦 Extra packages: {len(python_deps)} items")
+        rprint(f"  🔐 Secrets: {len(secrets)} items")
+
+        # Step 7: Deployment option
+        if br_huehuehue:
+            rprint(f"\n[{MODAL_GREEN}]🏃 Passo 7: Tipo de Deployment[/{MODAL_GREEN}]")
+        else:
+            rprint(f"\n[{MODAL_GREEN}]🏃 Step 7: Deployment Type[/{MODAL_GREEN}]")
+        
+        wizard_dry_run = typer.confirm("Generate deployment file only? (no actual deployment)", default=False)
+
+        final_confirm = typer.confirm("\nLooks good? Let's create your deployment! 🚀", default=True)
         if not final_confirm:
             print_error("Deployment cancelled!")
             raise typer.Exit(0)
 
-        deployment_mode = mode_choice
-        dry_run = wizard_dry_run
+        # Generate enhanced deployment using template generator
+        try:
+            deployment_code = generate_from_wizard_input(
+                app_name=app_name,
+                deployment_mode=deployment_mode,
+                original_code=original_code,
+                provision_nfs=provision_nfs,
+                provision_logging=provision_logging,
+                gpu_type=gpu_type if enable_gpu else None,
+                python_dependencies=python_deps,
+                system_dependencies=system_dependencies,
+                requirements_file=requirements_path,
+                environment_variables=env_vars,
+                secrets=secrets
+            )
+
+            # Write output file
+            output_file = app_file.parent / f"modal_{app_file.name}"
+            output_file.write_text(deployment_code)
+            print_success(f"Enhanced deployment generated: {output_file}")
+
+            if wizard_dry_run:
+                print_info("Dry run complete! Review the generated file and deploy with:")
+                print_info(f"  modal deploy {output_file}")
+                return
+            
+            # Continue with deployment
+            dry_run = False
+
+        except Exception as e:
+            print_error(f"Failed to generate deployment: {e}")
+            raise typer.Exit(1)
     else:
         # Determine deployment mode from flags
         deployment_mode = "minimum"
@@ -620,7 +684,6 @@ def dashboard(
     action: Annotated[str, typer.Argument(help="Action to perform: 'open' to launch dashboard")] = "open",
     port: Annotated[int, typer.Option("--port", help="Port for the dashboard server")] = 7860,
     share: Annotated[bool, typer.Option("--share", help="Create a public share link")] = False,
-    enhanced: Annotated[bool, typer.Option("--enhanced", help="Use enhanced dashboard with authentication")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
 ) -> None:
     """🎯 Launch the Modal Dashboard - beautiful UI for managing deployments!
@@ -636,47 +699,30 @@ def dashboard(
 
     print_modal_banner(br_huehuehue)
 
-    if enhanced:
+    if br_huehuehue:
         dashboard_text = Text()
-        if br_huehuehue:
-            dashboard_text.append("🎯 PAINEL AVANÇADO MODAL 🎯", style=f"bold {MODAL_GREEN}")
-            dashboard_text.append("\n🇧🇷 Abrindo o painel completo... Huehuehue! 🇧🇷", style="bold white")
-        else:
-            dashboard_text.append("🎯 ENHANCED MODAL DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
-            dashboard_text.append("\n🚀 Launching complete deployment experience...", style="bold white")
-
-        rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
-
-        try:
-            launch_enhanced_dashboard(port=port, share=share)
-        except Exception as e:
-            print_error(f"Failed to launch enhanced dashboard: {e}")
-            raise typer.Exit(1) from e
+        dashboard_text.append("🎯 PAINEL COMPLETO MODAL 🎯", style=f"bold {MODAL_GREEN}")
+        dashboard_text.append("\n🇧🇷 Abrindo o painel completo com todas as funcionalidades! Huehuehue! 🇧🇷", style="bold white")
     else:
-        if br_huehuehue:
-            dashboard_text = Text()
-            dashboard_text.append("🎯 PAINEL DE MONITORAMENTO MODAL 🎯", style=f"bold {MODAL_GREEN}")
-            dashboard_text.append("\n🇧🇷 Abrindo o painel de controle... Huehuehue! 🇧🇷", style="bold white")
-        else:
-            dashboard_text = Text()
-            dashboard_text.append("🎯 MODAL MONITORING DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
-            dashboard_text.append("\n📊 Launching your deployment control center...", style="bold white")
+        dashboard_text = Text()
+        dashboard_text.append("🎯 COMPLETE MODAL DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
+        dashboard_text.append("\n🚀 Launching complete deployment experience with all authentication options...", style="bold white")
 
-        rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
+    rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
 
-        try:
-            from modal_for_noobs.dashboard import launch_dashboard
+    try:
+        from modal_for_noobs.complete_dashboard import launch_complete_dashboard
 
-            # Run dashboard
-            uvloop.run(_launch_dashboard_async(port, share, br_huehuehue), debug=False)
+        # Launch complete dashboard with all features
+        launch_complete_dashboard(port=port, share=share)
 
-        except ImportError as e:
-            print_error(f"Dashboard dependencies not found: {e}")
-            print_info("Make sure Gradio is installed: pip install gradio")
-            raise typer.Exit(1) from e
-        except Exception as e:
-            print_error(f"Failed to launch dashboard: {e}")
-            raise typer.Exit(1) from e
+    except ImportError as e:
+        print_error(f"Dashboard dependencies not found: {e}")
+        print_info("Make sure Gradio is installed: pip install gradio")
+        raise typer.Exit(1) from e
+    except Exception as e:
+        print_error(f"Failed to launch dashboard: {e}")
+        raise typer.Exit(1) from e
 
 
 @app.command()
