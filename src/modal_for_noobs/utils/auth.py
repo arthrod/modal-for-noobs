@@ -1,11 +1,14 @@
 """Enhanced authentication and key management utilities."""
 
+import asyncio
 import os
+import webbrowser
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from dotenv import find_dotenv, load_dotenv, set_key
 from loguru import logger
+from modal.token_flow import _new_token
 from rich.console import Console
 from rich.prompt import Prompt
 
@@ -123,6 +126,36 @@ DEFAULT_TIMEOUT_MINUTES=60
         except Exception as e:
             logger.error(f"Failed to create .env template: {e}")
             console.print(f"❌ Template creation failed: {e}")
+            return False
+
+    async def setup_token_flow_auth(self, next_url: str | None = None) -> bool:
+        """Run Modal's public token flow to obtain credentials.
+
+        Args:
+            next_url: Optional URL to redirect the browser after auth.
+
+        Returns:
+            bool: True if authentication succeeded.
+        """
+        try:
+            await _new_token(activate=True, next_url=next_url)
+            console.print("✅ Modal authentication completed via public link")
+            return True
+        except Exception as e:
+            logger.error(f"Token flow authentication failed: {e}")
+            console.print(f"❌ Authentication failed: {e}")
+            return False
+
+    def open_signup_page(self) -> bool:
+        """Open Modal's sign-up page in a web browser."""
+        url = "https://modal.com/signup"
+        try:
+            webbrowser.open(url, new=2)
+            console.print(f"🌐 Opening sign-up page: {url}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to open sign-up page: {e}")
+            console.print(f"Visit {url} to create an account. Error: {e}")
             return False
 
     def validate_tokens(self) -> dict[str, Any]:

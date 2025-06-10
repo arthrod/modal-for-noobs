@@ -21,34 +21,18 @@ class ModalAPI:
 
     async def check_auth(self) -> bool:
         """Check if Modal is authenticated."""
-        try:
-            process = await asyncio.create_subprocess_exec(
-                "modal",
-                "auth",
-                "current",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
-            return process.returncode == 0
-        except FileNotFoundError:
-            logger.error("Modal CLI not found. Please install: pip install modal")
-            return False
+        from modal_for_noobs.utils.auth import ModalAuthManager
+
+        auth_mgr = ModalAuthManager()
+        status = auth_mgr.check_auth_status()
+        return bool(status.get("authenticated"))
 
     async def setup_auth(self) -> bool:
-        """Setup Modal authentication."""
-        try:
-            process = await asyncio.create_subprocess_exec(
-                "modal",
-                "setup",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
-            return process.returncode == 0
-        except Exception as e:
-            logger.error(f"Failed to setup Modal auth: {e}")
-            return False
+        """Setup Modal authentication via token flow."""
+        from modal_for_noobs.utils.auth import ModalAuthManager
+
+        auth_mgr = ModalAuthManager()
+        return await auth_mgr.setup_token_flow_auth()
 
     async def deploy_app(
         self,
