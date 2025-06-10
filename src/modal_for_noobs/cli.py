@@ -21,6 +21,9 @@ from modal_for_noobs.config_loader import config_loader
 from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
 from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
+from modal_for_noobs.cli_enhanced import enhanced_wizard
+from modal_for_noobs.enhanced_dashboard import launch_enhanced_dashboard
+from modal_for_noobs.auth_manager import auth_manager
 
 app = typer.Typer(
     name="modal-for-noobs",
@@ -108,6 +111,7 @@ def deploy(
     gradio_jupyter: Annotated[bool, typer.Option("--gradio-jupyter", help="Deploy with Gradio+Jupyter support")] = False,
     marimo: Annotated[bool, typer.Option("--marimo", help="Deploy with Gradio+Marimo notebook support")] = False,
     wizard: Annotated[bool, typer.Option("--wizard", help="Interactive step-by-step deployment wizard")] = False,
+    enhanced: Annotated[bool, typer.Option("--enhanced", help="Use enhanced wizard with all features")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Brazilian mode 🇧🇷", hidden=True)] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate deployment file without deploying")] = False,
 ):
@@ -124,6 +128,24 @@ def deploy(
     if not app_file.exists():
         print_error(f"File not found: {app_file}")
         raise typer.Exit(1)
+
+    # Handle enhanced wizard mode
+    if enhanced:
+        deployment_code = enhanced_wizard(app_file, br_huehuehue)
+        if not deployment_code:
+            print_error("Enhanced wizard cancelled!")
+            raise typer.Exit(0)
+        
+        # Write output file
+        output_file = app_file.parent / f"modal_{app_file.name}"
+        output_file.write_text(deployment_code)
+        print_success(f"Enhanced deployment generated: {output_file}")
+        
+        if not dry_run:
+            print_info("You can now deploy with:")
+            print_info(f"  modal deploy {output_file}")
+        
+        return
 
     # Handle wizard mode
     if wizard:
@@ -598,14 +620,15 @@ def dashboard(
     action: Annotated[str, typer.Argument(help="Action to perform: 'open' to launch dashboard")] = "open",
     port: Annotated[int, typer.Option("--port", help="Port for the dashboard server")] = 7860,
     share: Annotated[bool, typer.Option("--share", help="Create a public share link")] = False,
+    enhanced: Annotated[bool, typer.Option("--enhanced", help="Use enhanced dashboard with authentication")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
 ) -> None:
-    """🎯 Launch the Modal Monitoring Dashboard - beautiful UI for managing deployments!
+    """🎯 Launch the Modal Dashboard - beautiful UI for managing deployments!
 
     Examples:
         modal-for-noobs dashboard open
-        modal-for-noobs dashboard open --port 8080
-        modal-for-noobs dashboard open --share
+        modal-for-noobs dashboard open --enhanced
+        modal-for-noobs dashboard open --port 8080 --share
     """
     if action != "open":
         print_error(f"Unknown action: {action}. Use 'dashboard open' to launch the dashboard.")
@@ -613,30 +636,47 @@ def dashboard(
 
     print_modal_banner(br_huehuehue)
 
-    if br_huehuehue:
+    if enhanced:
         dashboard_text = Text()
-        dashboard_text.append("🎯 PAINEL DE MONITORAMENTO MODAL 🎯", style=f"bold {MODAL_GREEN}")
-        dashboard_text.append("\n🇧🇷 Abrindo o painel de controle... Huehuehue! 🇧🇷", style="bold white")
+        if br_huehuehue:
+            dashboard_text.append("🎯 PAINEL AVANÇADO MODAL 🎯", style=f"bold {MODAL_GREEN}")
+            dashboard_text.append("\n🇧🇷 Abrindo o painel completo... Huehuehue! 🇧🇷", style="bold white")
+        else:
+            dashboard_text.append("🎯 ENHANCED MODAL DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
+            dashboard_text.append("\n🚀 Launching complete deployment experience...", style="bold white")
+
+        rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
+
+        try:
+            launch_enhanced_dashboard(port=port, share=share)
+        except Exception as e:
+            print_error(f"Failed to launch enhanced dashboard: {e}")
+            raise typer.Exit(1) from e
     else:
-        dashboard_text = Text()
-        dashboard_text.append("🎯 MODAL MONITORING DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
-        dashboard_text.append("\n📊 Launching your deployment control center...", style="bold white")
+        if br_huehuehue:
+            dashboard_text = Text()
+            dashboard_text.append("🎯 PAINEL DE MONITORAMENTO MODAL 🎯", style=f"bold {MODAL_GREEN}")
+            dashboard_text.append("\n🇧🇷 Abrindo o painel de controle... Huehuehue! 🇧🇷", style="bold white")
+        else:
+            dashboard_text = Text()
+            dashboard_text.append("🎯 MODAL MONITORING DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
+            dashboard_text.append("\n📊 Launching your deployment control center...", style="bold white")
 
-    rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
+        rprint(Panel(Align.center(dashboard_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
 
-    try:
-        from modal_for_noobs.dashboard import launch_dashboard
+        try:
+            from modal_for_noobs.dashboard import launch_dashboard
 
-        # Run dashboard
-        uvloop.run(_launch_dashboard_async(port, share, br_huehuehue), debug=False)
+            # Run dashboard
+            uvloop.run(_launch_dashboard_async(port, share, br_huehuehue), debug=False)
 
-    except ImportError as e:
-        print_error(f"Dashboard dependencies not found: {e}")
-        print_info("Make sure Gradio is installed: pip install gradio")
-        raise typer.Exit(1) from e
-    except Exception as e:
-        print_error(f"Failed to launch dashboard: {e}")
-        raise typer.Exit(1) from e
+        except ImportError as e:
+            print_error(f"Dashboard dependencies not found: {e}")
+            print_info("Make sure Gradio is installed: pip install gradio")
+            raise typer.Exit(1) from e
+        except Exception as e:
+            print_error(f"Failed to launch dashboard: {e}")
+            raise typer.Exit(1) from e
 
 
 @app.command()

@@ -59,6 +59,11 @@ class ModalAuthManager:
         """Initialize the auth manager."""
         self.config_dir = Path.home() / ".modal-for-noobs"
         self.auth_file = self.config_dir / "auth.json"
+        self._ensure_config_dir()
+    
+    def _ensure_config_dir(self):
+        """Ensure configuration directory exists."""
+        self.config_dir.mkdir(exist_ok=True, parents=True)
     
     def get_auth_from_env(self) -> Optional[ModalAuthConfig]:
         """Get authentication config from environment variables.
