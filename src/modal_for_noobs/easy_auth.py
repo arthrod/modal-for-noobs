@@ -341,7 +341,7 @@ class EasyModalAuth:
                 ]
             )
             
-            # Auto-check authentication status
+            # Auto-check authentication status on load
             easy_auth.load(
                 fn=check_authentication,
                 inputs=[session_id_state, auth_status_state],
@@ -352,8 +352,7 @@ class EasyModalAuth:
                     success_section,
                     workspace_display,
                     progress_bar,
-                ],
-                every=2,  # Check every 2 seconds
+                ]
             )
         
         return easy_auth

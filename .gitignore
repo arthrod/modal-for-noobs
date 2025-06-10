@@ -184,3 +184,14 @@ node_modules/
 # Task files
 tasks.json
 tasks/ 
+
+# Test files and dependencies not part of main package
+package.json
+package-lock.json
+node_modules/
+test_*.py
+test_*.js
+*_test.py
+AUTHENTICATION_TEST_REPORT.md
+test_screenshots/
+*.test.js
