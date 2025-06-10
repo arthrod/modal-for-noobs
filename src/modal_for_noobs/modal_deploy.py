@@ -667,7 +667,7 @@ class ModalDeployer:
         queue_size = config.concurrent_inputs * 10
         
         # Import template constants
-        from .templates.template_constants import APP_EXECUTION, DEMO_QUEUE_CONFIG, GRADIO_DETECTION, MODAL_IMPORTS
+        from modal_for_noobs.templates.template_constants import APP_EXECUTION, DEMO_QUEUE_CONFIG, GRADIO_DETECTION, MODAL_IMPORTS
         
         # Build template using safe string concatenation
         header_section = f"""# 🚀 Enhanced Modal Deployment Script
