@@ -8,6 +8,8 @@ import importlib.util
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from loguru import logger
+
 
 def get_image_config(deployment_mode: str, packages: list[str]) -> str:
     """Get Modal image configuration based on deployment mode.
@@ -121,17 +123,31 @@ def generate_modal_deployment(
 
     # Load dashboard module
     dashboard_content = load_dashboard_module()
+    logger.debug(f"Dashboard content loaded: {len(dashboard_content)} characters")
+    
+    # Encode dashboard content to base64 to avoid quote conflicts
+    import base64
+    dashboard_content_b64 = base64.b64encode(dashboard_content.encode('utf-8')).decode('ascii')
+    logger.debug(f"Dashboard content encoded to base64: {len(dashboard_content_b64)} characters")
 
     # Format the template
     template = template_module.TEMPLATE
-    formatted_code = template.format(
-        app_name=f"modal-for-noobs-{app_file.stem}",
-        original_code=original_code,
-        timeout_seconds=timeout_seconds,
-        scaledown_window=scaledown_window,
-        dashboard_module=dashboard_content,
-        image_config=image_config,
-    )
+    logger.debug(f"Template loaded: {len(template)} characters")
+    
+    try:
+        formatted_code = template.format(
+            app_name=f"modal-for-noobs-{app_file.stem}",
+            original_code=original_code,
+            timeout_seconds=timeout_seconds,
+            scaledown_window=scaledown_window,
+            dashboard_module=dashboard_content,
+            dashboard_module_b64=dashboard_content_b64,
+            image_config=image_config,
+        )
+        logger.debug("Template formatting successful")
+    except Exception as e:
+        logger.error(f"Template formatting failed: {e}")
+        raise
 
     return formatted_code
 

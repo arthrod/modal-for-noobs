@@ -21,16 +21,16 @@ class RemoteFunctionConfig:
     
     name: str
     keep_warm: int = 0
-    gpu: Optional[str] = None
-    num_gpus: Optional[int] = None
+    gpu: str | None = None
+    num_gpus: int | None = None
     timeout: int = 300
     memory: int = 8192
     cpu: float = 2.0
-    secret: Optional[str] = None
-    volume: Optional[Dict[str, str]] = None
-    schedule: Optional[str] = None  # Cron schedule
+    secret: str | None = None
+    volume: dict[str, str] | None = None
+    schedule: str | None = None  # Cron schedule
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for template rendering."""
         return {
             "name": self.name,
@@ -63,12 +63,12 @@ class TemplateConfig:
     concurrent_inputs: int = 100
     
     # Dependencies
-    python_dependencies: List[str] = field(default_factory=list)
-    system_dependencies: List[str] = field(default_factory=list)
-    requirements_file: Optional[Path] = None
+    python_dependencies: list[str] = field(default_factory=list)
+    system_dependencies: list[str] = field(default_factory=list)
+    requirements_file: Path | None = None
     
     # Infrastructure
-    gpu_type: Optional[str] = None
+    gpu_type: str | None = None
     num_gpus: int = 0
     memory_mb: int = 8192
     cpu: float = 2.0
@@ -80,16 +80,16 @@ class TemplateConfig:
     enable_monitoring: bool = True
     
     # Remote functions
-    remote_functions: List[RemoteFunctionConfig] = field(default_factory=list)
+    remote_functions: list[RemoteFunctionConfig] = field(default_factory=list)
     
     # Environment
-    environment_variables: Dict[str, str] = field(default_factory=dict)
-    secrets: List[str] = field(default_factory=list)
+    environment_variables: dict[str, str] = field(default_factory=dict)
+    secrets: list[str] = field(default_factory=list)
     
     # Original code
     original_code: str = ""
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for template rendering."""
         return {
             "app_name": self.app_name,
@@ -179,10 +179,14 @@ class TemplateGenerator:
         # Add image configuration
         image_config = self._generate_image_config(config)
         
+        # Load dashboard module content
+        dashboard_module_content = self._load_dashboard_module()
+        
         # Render template
         rendered = template.render(
             **config.to_dict(),
             image_config=image_config,
+            dashboard_module=dashboard_module_content,
             has_gpu=bool(config.gpu_type),
             has_remote_functions=bool(config.remote_functions),
             has_secrets=bool(config.secrets),
@@ -238,6 +242,15 @@ class TemplateGenerator:
         
         return "image = (\n    " + "\n".join(image_parts) + "\n)"
     
+    def _load_dashboard_module(self) -> str:
+        """Load the dashboard module content from the templates directory."""
+        dashboard_file = Path(__file__).parent / "templates" / "dashboard.py"
+        if not dashboard_file.exists():
+            logger.warning("Dashboard module not found, using minimal placeholder")
+            return '"""Minimal dashboard placeholder."""\nimport gradio as gr\ndef create_dashboard_interface(app): return app'
+        
+        return dashboard_file.read_text()
+    
     def create_gradio_wrapper(self, config: TemplateConfig) -> str:
         """Create a Gradio-specific wrapper for the deployment."""
         template = self.env.get_template("gradio_wrapper.j2")
@@ -255,13 +268,13 @@ def generate_from_wizard_input(
     original_code: str,
     provision_nfs: bool = False,
     provision_logging: bool = True,
-    system_dependencies: Optional[List[str]] = None,
-    python_dependencies: Optional[List[str]] = None,
-    remote_functions: Optional[List[Dict[str, Any]]] = None,
-    gpu_type: Optional[str] = None,
-    secrets: Optional[List[str]] = None,
-    environment_variables: Optional[Dict[str, str]] = None,
-    requirements_file: Optional[Path] = None,
+    system_dependencies: list[str] | None = None,
+    python_dependencies: list[str] | None = None,
+    remote_functions: list[dict[str, Any]] | None = None,
+    gpu_type: str | None = None,
+    secrets: list[str] | None = None,
+    environment_variables: dict[str, str] | None = None,
+    requirements_file: Path | None = None,
 ) -> str:
     """Generate deployment from wizard input.
     
@@ -300,6 +313,24 @@ def generate_from_wizard_input(
         requirements_file=requirements_file,
     )
     
-    # Generate deployment
-    generator = TemplateGenerator()
-    return generator.generate_deployment(config)
+    # Generate deployment using the working old template system
+    from modal_for_noobs.templates.deployment import generate_modal_deployment
+    
+    # Create a fake app file path for the old system
+    fake_app_file = Path(f"{app_name}.py")
+    
+    logger.debug(f"Calling generate_modal_deployment with app_name={app_name}, mode={deployment_mode}")
+    
+    try:
+        result = generate_modal_deployment(
+            app_file=fake_app_file,
+            original_code=original_code,
+            deployment_mode=deployment_mode,
+            timeout_seconds=3600,  # Default timeout
+            scaledown_window=1200,  # Default scaledown
+        )
+        logger.debug("generate_modal_deployment completed successfully")
+        return result
+    except Exception as e:
+        logger.error(f"generate_modal_deployment failed: {e}")
+        raise

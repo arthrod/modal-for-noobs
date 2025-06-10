@@ -261,14 +261,17 @@ def deploy_gradio():
     return mount_gradio_app(fastapi_app, enhanced_dashboard, path="/")
 
 # Import dashboard module
-dashboard_content = """\"\"\"Dashboard module - embedded for deployment.\"\"\"
-{dashboard_module}
-"""
+import os
+import base64
+
+# Dashboard module content (base64 encoded to avoid quote conflicts)
+dashboard_module_encoded = "{dashboard_module_b64}"
+dashboard_module_code = base64.b64decode(dashboard_module_encoded).decode('utf-8')
 
 # Write dashboard module
 dashboard_path = Path(__file__).parent / "dashboard.py"
 if not dashboard_path.exists():
-    dashboard_path.write_text(dashboard_content)
+    dashboard_path.write_text(dashboard_module_code)
 
 if __name__ == "__main__":
     app.run()
