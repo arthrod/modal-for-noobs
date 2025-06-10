@@ -4,7 +4,7 @@ This module contains helper functions and classes for organizing
 the CLI functionality into manageable modules.
 """
 
-from .config_helper import (
+from modal_for_noobs.cli_helpers.config_helper import (
     show_config_info,
     run_config_wizard,
     set_config_value,
@@ -14,12 +14,12 @@ from .config_helper import (
     save_user_config,
 )
 
-from .auth_helper import (
+from modal_for_noobs.cli_helpers.auth_helper import (
     setup_auth_async,
     install_mn_alias,
 )
 
-from .common import (
+from modal_for_noobs.cli_helpers.common import (
     MODAL_GREEN,
     MODAL_LIGHT_GREEN,
     MODAL_DARK_GREEN,

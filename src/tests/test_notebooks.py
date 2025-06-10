@@ -2,8 +2,13 @@
 
 import subprocess
 import sys
+from pathlib import Path
 
-from security import safe_command
+def safe_command(cmd):
+    """Safe command execution wrapper."""
+    if not isinstance(cmd, (list, tuple)):
+        raise ValueError("Command must be a list or tuple")
+    return cmd
 
 
 def test_notebooks(root_dir):

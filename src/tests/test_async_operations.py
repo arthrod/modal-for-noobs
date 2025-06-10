@@ -48,7 +48,7 @@ class TestAsyncKillDeployment:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async(None, False)
 
@@ -72,7 +72,7 @@ class TestAsyncKillDeployment:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
 
@@ -97,7 +97,7 @@ class TestAsyncKillDeployment:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
 
@@ -136,7 +136,7 @@ class TestAsyncKillDeployment:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
 
@@ -190,7 +190,7 @@ class TestAsyncLogMilking:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async(None, False, 100, False)
 
@@ -214,7 +214,7 @@ class TestAsyncLogMilking:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", False, 100, False)
 
@@ -238,7 +238,7 @@ class TestAsyncLogMilking:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", True, 100, False)
 
@@ -261,7 +261,7 @@ class TestAsyncLogMilking:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", False, 500, False)
 
@@ -301,7 +301,7 @@ class TestAsyncSanityCheck:
             mock_process.communicate = mock_communicate
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
-            mock_subprocess.return_value = mock_subprocess_exec()
+            mock_subprocess.side_effect = mock_subprocess_exec
 
             await _sanity_check_async(False)
 

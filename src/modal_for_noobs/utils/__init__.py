@@ -1,7 +1,7 @@
 """Utility functions for modal-for-noobs with advanced deployment features."""
 
-from .auth import ModalAuthManager
-from .deployment import (
+from modal_for_noobs.utils.auth import ModalAuthManager
+from modal_for_noobs.utils.deployment import (
     validate_app_file, 
     get_modal_status, 
     deploy_with_validation,

@@ -9,12 +9,12 @@ from typing import Optional
 from loguru import logger
 from rich import print as rprint
 
-from .common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning
 
 
 async def setup_auth_async(token_id: Optional[str], token_secret: Optional[str], br_huehuehue: bool = False) -> None:
     """Async authentication setup with progress."""
-    from ..modal_deploy import ModalDeployer
+    from modal_for_noobs.modal_deploy import ModalDeployer
     
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
     

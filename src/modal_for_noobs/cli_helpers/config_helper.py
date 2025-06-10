@@ -10,8 +10,8 @@ from rich.align import Align
 from rich.panel import Panel
 from rich.text import Text
 
-from ..config_loader import config_loader
-from .common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning, print_info
+from modal_for_noobs.config_loader import config_loader
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning, print_info
 
 
 def show_config_info(br_huehuehue: bool = False):
@@ -92,7 +92,7 @@ def show_config_info(br_huehuehue: bool = False):
 
 def run_config_wizard(br_huehuehue: bool = False):
     """Run interactive configuration wizard."""
-    from .auth_helper import install_mn_alias
+    from modal_for_noobs.cli_helpers.auth_helper import install_mn_alias
     
     if br_huehuehue:
         wizard_text = Text()

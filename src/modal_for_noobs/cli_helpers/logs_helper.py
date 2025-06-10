@@ -5,7 +5,7 @@ from pathlib import Path
 
 from rich import print as rprint
 
-from .common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning, print_info
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_success, print_error, print_warning, print_info
 
 
 async def milk_logs_async(
@@ -15,7 +15,7 @@ async def milk_logs_async(
     br_huehuehue: bool = False
 ) -> None:
     """Async log milking functionality - get those creamy logs! 🥛."""
-    from ..modal_deploy import ModalDeployer
+    from modal_for_noobs.modal_deploy import ModalDeployer
     
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
     

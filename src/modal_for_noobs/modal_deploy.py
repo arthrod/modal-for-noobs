@@ -22,15 +22,15 @@ import httpx
 from loguru import logger
 from rich import print as rprint
 
-from .config_loader import config_loader
-from .templates.deployment import (
+from modal_for_noobs.config_loader import config_loader
+from modal_for_noobs.templates.deployment import (
     generate_modal_deployment,
     generate_modal_deployment_legacy,
     get_image_config,
 )
 
 # Import Modal's official color palette from common module
-from .cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN
 
 
 @dataclass

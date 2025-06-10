@@ -10,7 +10,7 @@ import uvloop
 from loguru import logger
 from rich import print as rprint
 
-from ..modal_deploy import ModalDeployer, DeploymentConfig, DeploymentResult, ModalAPI
+from modal_for_noobs.modal_deploy import ModalDeployer, DeploymentConfig, DeploymentResult, ModalAPI
 
 
 def validate_app_file(app_file: str | Path) -> Dict[str, Any]:
@@ -95,7 +95,7 @@ def validate_app_file(app_file: str | Path) -> Dict[str, Any]:
 
 
 # Import Modal's color constants from common module
-from ..cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN
 
 
 def create_deployment_config(

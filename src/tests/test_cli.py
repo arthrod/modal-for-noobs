@@ -114,9 +114,9 @@ def test_cli_help(runner):
 
 def test_config_info_command(runner):
     """Test config info command."""
-    result = runner.invoke(app, ["config-info"])
+    result = runner.invoke(app, ["config", "--info"])
     assert result.exit_code == 0
-    assert "Configuration Information" in result.stdout
+    assert "CONFIGURATION INFORMATION" in result.stdout
 
 
 @pytest.mark.asyncio
@@ -132,9 +132,12 @@ async def test_modal_deployer_auth_check():
 @pytest.mark.asyncio
 async def test_create_deployment_file(sample_gradio_app):
     """Test deployment file creation."""
+    from modal_for_noobs.modal_deploy import DeploymentConfig
+    
     deployer = ModalDeployer(sample_gradio_app)
+    config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
 
-    deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
+    deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
 
     assert deployment_file.exists()
     assert deployment_file.name == f"modal_{sample_gradio_app.stem}.py"

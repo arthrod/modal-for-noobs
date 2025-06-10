@@ -35,7 +35,7 @@ def print_modal_banner(br_huehuehue: bool = False):
     from rich.align import Align
     from rich.panel import Panel
     from rich.text import Text
-    from ..config_loader import config_loader
+    from modal_for_noobs.config_loader import config_loader
     
     # Load marketing content
     marketing = config_loader.load_modal_marketing()
