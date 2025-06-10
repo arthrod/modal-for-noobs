@@ -1,6 +1,6 @@
 """Modal-for-noobs: Easy Modal deployment for Gradio apps."""
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 __author__ = "Arthur Souza Rodrigues"
 __email__ = "arthrod@umich.edu"
 
