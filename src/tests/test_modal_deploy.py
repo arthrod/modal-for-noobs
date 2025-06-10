@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from modal_for_noobs.modal_deploy import ModalDeployer
+from modal_for_noobs.modal_deploy import ModalDeployer, DeploymentConfig
 
 
 @pytest.fixture
@@ -122,8 +122,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_create_deployment_minimum_config(self, sample_gradio_app):
         """Test creating deployment with minimum configuration."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_gradio_app)
-        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
+        config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
 
         assert deployment_file.exists()
         assert deployment_file.suffix == ".py"
@@ -149,8 +151,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_create_deployment_optimized_config(self, sample_gradio_app):
         """Test creating deployment with optimized configuration."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_gradio_app)
-        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "optimized")
+        config = DeploymentConfig(mode="optimized", app_name=sample_gradio_app.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
 
         assert deployment_file.exists()
         content = deployment_file.read_text()
@@ -165,8 +169,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_create_deployment_complex_app(self, sample_app_with_dependencies):
         """Test creating deployment for complex app with many dependencies."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_app_with_dependencies)
-        deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, "optimized")
+        config = DeploymentConfig(mode="optimized", app_name=sample_app_with_dependencies.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, config)
 
         assert deployment_file.exists()
         content = deployment_file.read_text()
@@ -185,8 +191,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_create_deployment_preserves_app_structure(self, sample_app_with_dependencies):
         """Test that deployment preserves complex app structure."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_app_with_dependencies)
-        deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, "minimum")
+        config = DeploymentConfig(mode="minimum", app_name=sample_app_with_dependencies.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, config)
 
         content = deployment_file.read_text()
 
@@ -202,8 +210,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_deployment_file_naming(self, sample_gradio_app):
         """Test deployment file naming convention."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_gradio_app)
-        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
+        config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
 
         expected_name = f"modal_{sample_gradio_app.stem}.py"
         assert deployment_file.name == expected_name
@@ -212,8 +222,10 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_deployment_app_naming(self, sample_gradio_app):
         """Test Modal app naming in deployment file."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_gradio_app)
-        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "minimum")
+        config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
+        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
 
         content = deployment_file.read_text()
         expected_app_name = f"modal-for-noobs-{sample_gradio_app.stem}"
@@ -222,19 +234,23 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_deployment_error_handling_invalid_file(self):
         """Test deployment creation with invalid file."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         dummy_app_file = Path("dummy.py")
         deployer = ModalDeployer(dummy_app_file)
+        config = DeploymentConfig(mode="minimum", app_name="nonexistent")
 
         with pytest.raises(FileNotFoundError):
-            await deployer.create_modal_deployment_async(Path("nonexistent.py"), "minimum")
+            await deployer.create_modal_deployment_async(Path("nonexistent.py"), config)
 
     @pytest.mark.asyncio
     async def test_deployment_error_handling_invalid_config(self, sample_gradio_app):
         """Test deployment creation with invalid configuration."""
+        from modal_for_noobs.modal_deploy import DeploymentConfig
         deployer = ModalDeployer(sample_gradio_app)
+        config = DeploymentConfig(mode="invalid_config", app_name=sample_gradio_app.stem)
 
         # Should handle gracefully or raise appropriate error
-        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, "invalid_config")
+        deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
         # Should default to minimum or handle appropriately
         assert deployment_file.exists()
 
