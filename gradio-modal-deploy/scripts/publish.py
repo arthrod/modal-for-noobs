@@ -8,11 +8,12 @@ Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
 import subprocess
 import sys
 from pathlib import Path
+from security import safe_command
 
 
 def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
-    result = subprocess.run(cmd, shell=False, capture_output=True, text=True, check=False)
+    result = safe_command.run(subprocess.run, cmd, shell=False, capture_output=True, text=True, check=False)
 
     if check and result.returncode != 0:
         sys.exit(1)

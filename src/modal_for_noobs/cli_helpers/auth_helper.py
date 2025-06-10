@@ -10,6 +10,7 @@ from loguru import logger
 from rich import print as rprint
 
 from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, print_error, print_success, print_warning
+from security import safe_command
 
 
 async def setup_auth_async(token_id: str | None, token_secret: str | None, br_huehuehue: bool = False) -> None:
@@ -94,8 +95,7 @@ def install_mn_alias(shell: str | None, force: bool, br_huehuehue: bool) -> bool
 
         # Try to find modal-for-noobs in the current environment
         try:
-            result = subprocess.run(
-                [python_executable, "-c", "import modal_for_noobs; print(modal_for_noobs.__file__)"],
+            result = safe_command.run(subprocess.run, [python_executable, "-c", "import modal_for_noobs; print(modal_for_noobs.__file__)"],
                 capture_output=True,
                 text=True,
                 check=True,
