@@ -12,7 +12,7 @@ from pathlib import Path
 
 def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
+    result = subprocess.run(cmd, shell=False, capture_output=True, text=True, check=False)
 
     if check and result.returncode != 0:
         sys.exit(1)
