@@ -14,13 +14,25 @@ optimized:
   - uvicorn
   - httpx
   - markdown2
-  - torch
-  - transformers
+  - loguru
+  - pydantic>=2.0.0
+  - psutil
+  # GPU-optimized ML packages
+  - torch>=2.0.0
+  - transformers>=4.30.0
   - accelerate
+  - vllm>=0.2.0
   - diffusers
+  - bitsandbytes
+  - flash-attn
+  - xformers
   - pillow
+  - opencv-python
+  # Data science packages
   - numpy
   - pandas
+  - scipy
+  - scikit-learn
   - matplotlib
   - seaborn
   - plotly
@@ -31,10 +43,16 @@ gra_jupy:
   - uvicorn
   - httpx
   - markdown2
+  - loguru
+  - pydantic>=2.0.0
+  - psutil
+  # Jupyter ecosystem
   - jupyter
   - jupyterlab
   - notebook
   - ipywidgets
+  - jupyter-server-proxy
+  # Data science packages
   - matplotlib
   - plotly
   - seaborn
@@ -42,3 +60,34 @@ gra_jupy:
   - numpy
   - torch
   - transformers
+
+marimo:
+  - gradio
+  - fastapi[standard]
+  - uvicorn
+  - httpx
+  - markdown2
+  - loguru
+  - pydantic>=2.0.0
+  - psutil
+  # Marimo notebook
+  - marimo>=0.1.0
+  # GPU-optimized ML packages
+  - torch>=2.0.0
+  - transformers>=4.30.0
+  - accelerate
+  - vllm>=0.2.0
+  - diffusers
+  - bitsandbytes
+  - flash-attn
+  - xformers
+  - pillow
+  - opencv-python
+  # Data science packages
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - plotly

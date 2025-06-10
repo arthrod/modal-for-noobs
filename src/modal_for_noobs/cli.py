@@ -20,12 +20,7 @@ from modal_for_noobs.config_loader import config_loader
 from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
 from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
-
-# Modal's official color palette based on their website
-MODAL_GREEN = "#7FEE64"  # Primary brand green (RGB: 127, 238, 100)
-MODAL_LIGHT_GREEN = "#DDFFDC"  # Light green tint (RGB: 221, 255, 220)
-MODAL_DARK_GREEN = "#323835"  # Dark green accent (RGB: 50, 56, 53)
-MODAL_BLACK = "#000000"  # Pure black background
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN, MODAL_BLACK
 
 app = typer.Typer(
     name="modal-for-noobs",
@@ -110,6 +105,7 @@ def deploy(
     minimum: Annotated[bool, typer.Option("--minimum", help="Deploy with minimal dependencies (CPU only)")] = False,
     optimized: Annotated[bool, typer.Option("--optimized", help="Deploy with ML libraries and GPU support")] = False,
     gradio_jupyter: Annotated[bool, typer.Option("--gradio-jupyter", help="Deploy with Gradio+Jupyter support")] = False,
+    marimo: Annotated[bool, typer.Option("--marimo", help="Deploy with Gradio+Marimo notebook support")] = False,
     wizard: Annotated[bool, typer.Option("--wizard", help="Interactive step-by-step deployment wizard")] = False,
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Brazilian mode 🇧🇷", hidden=True)] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate deployment file without deploying")] = False,
@@ -227,6 +223,8 @@ def deploy(
             deployment_mode = "optimized"
         elif gradio_jupyter:
             deployment_mode = "gra_jupy"
+        elif marimo:
+            deployment_mode = "marimo"
     
     # Run the deployment with progress indicator
     with Progress(
@@ -285,7 +283,8 @@ def deploy(
 
 @app.command()
 def mn(
-    app_file: Annotated[Path, typer.Argument(help="Path to your Gradio app file")],
+    app_file: Annotated[Path | None, typer.Argument(help="Path to your Gradio app file")] = None,
+    dashboard: Annotated[bool, typer.Option("--dashboard", help="Open the monitoring dashboard")] = False,
     optimized: Annotated[bool, typer.Option("--optimized", "-o", help="Deploy with GPU + ML libraries")] = False,
     gra_jupy: Annotated[bool, typer.Option("--gra-jupy", help="Deploy with Gradio + Jupyter combo")] = False,
     test_deploy: Annotated[bool, typer.Option("--test-deploy", help="Deploy with immediate kill for testing")] = False,
@@ -293,8 +292,29 @@ def mn(
     br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Generate files without deploying")] = False,
 ) -> None:
-    """⚡ Quick deploy (alias for deploy) - because noobs love shortcuts!"""
+    """⚡ Quick deploy (alias for deploy) - because noobs love shortcuts!
+    
+    Also supports quick access to dashboard with --dashboard flag."""
     print_modal_banner(br_huehuehue)
+    
+    # Handle dashboard mode
+    if dashboard:
+        try:
+            from modal_for_noobs.dashboard import launch_dashboard
+            uvloop.run(_launch_dashboard_async(7860, False, br_huehuehue), debug=False)
+        except ImportError as e:
+            print_error(f"Dashboard dependencies not found: {e}")
+            print_info("Make sure Gradio is installed: pip install gradio")
+            raise typer.Exit(1) from e
+        except Exception as e:
+            print_error(f"Failed to launch dashboard: {e}")
+            raise typer.Exit(1) from e
+        return
+    
+    # Validate app file for deployment
+    if app_file is None:
+        print_error("App file is required for deployment. Use --dashboard to open the monitoring dashboard.")
+        raise typer.Exit(1)
     
     # Determine mode from flags
     if gra_jupy:
@@ -486,7 +506,16 @@ def run_examples(
     
     # Get all Python files in examples directory
     example_files = list(examples_dir.glob("*.py"))
-    available_examples = [f.stem for f in example_files if not f.name.startswith("__")]
+    all_examples = [f.stem for f in example_files if not f.name.startswith("__")]
+    
+    # Filter out non-working examples
+    working_examples = [
+        "modal_simple_hello", 
+        "modal_test_gradio_app",
+        "ultimate_green_app",
+        "modal_ultimate_green_app"
+    ]
+    available_examples = [ex for ex in all_examples if ex in working_examples]
     
     if not example_name:
         # List all available examples
@@ -577,35 +606,146 @@ def run_examples(
         raise typer.Exit(1) from e
 
 
-@app.command(name="config")
-def config_command(
-    show: Annotated[bool, typer.Option("--show", help="Show current configuration")] = True,
+@app.command()
+def config(
+    info: Annotated[bool, typer.Option("--info", help="Show current configuration information")] = False,
+    wizard: Annotated[bool, typer.Option("--wizard", help="Interactive configuration wizard")] = False,
+    set_value: Annotated[str | None, typer.Option("--set", help="Set config value (format: key=value)")] = None,
+    get_value: Annotated[str | None, typer.Option("--get", help="Get config value by key")] = None,
+    list_all: Annotated[bool, typer.Option("--list", help="List all configuration keys")] = False,
+    br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
 ):
-    """Show current configuration (alias for config-info for backward compatibility)."""
-    config_info(show=show)
+    """⚙️ Manage modal-for-noobs configuration - view and modify settings!
+    
+    Examples:
+        modal-for-noobs config --info
+        modal-for-noobs config --wizard
+        modal-for-noobs config --set default_mode=optimized
+        modal-for-noobs config --get default_mode
+        modal-for-noobs config --list
+    """
+    print_modal_banner(br_huehuehue)
+    
+    # If no flags provided, default to showing info
+    if not any([info, wizard, set_value, get_value, list_all]):
+        info = True
+    
+    if info:
+        _show_config_info(br_huehuehue)
+    elif wizard:
+        _run_config_wizard(br_huehuehue)
+    elif set_value:
+        _set_config_value(set_value, br_huehuehue)
+    elif get_value:
+        _get_config_value(get_value, br_huehuehue)
+    elif list_all:
+        _list_config_keys(br_huehuehue)
 
 
 @app.command()
-def config_info(
-    show: Annotated[bool, typer.Option("--show", help="Show current configuration")] = True,
-):
-    """Show current configuration and deployment information."""
-    print_modal_banner()
+def dashboard(
+    action: Annotated[str, typer.Argument(help="Action to perform: 'open' to launch dashboard")] = "open",
+    port: Annotated[int, typer.Option("--port", help="Port for the dashboard server")] = 7860,
+    share: Annotated[bool, typer.Option("--share", help="Create a public share link")] = False,
+    br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
+) -> None:
+    """🎯 Launch the Modal Monitoring Dashboard - beautiful UI for managing deployments!
     
-    # Load configurations
-    packages = config_loader.load_base_packages()
-    examples = config_loader.load_deployment_examples()
+    Examples:
+        modal-for-noobs dashboard open
+        modal-for-noobs dashboard open --port 8080
+        modal-for-noobs dashboard open --share
+    """
+    if action != "open":
+        print_error(f"Unknown action: {action}. Use 'dashboard open' to launch the dashboard.")
+        raise typer.Exit(1)
     
-    rprint(Panel.fit(
-        f"[bold {MODAL_GREEN}]Configuration Information[/bold {MODAL_GREEN}]\n\n"
-        f"[{MODAL_LIGHT_GREEN}]Deployment Modes:[/{MODAL_LIGHT_GREEN}]\n"
-        f"  • minimum: {', '.join(packages.get('minimum', [])[:3])}...\n"
-        f"  • optimized: {', '.join(packages.get('optimized', [])[:3])}... + GPU\n"
-        f"  • gradio-jupyter: {', '.join(packages.get('gra_jupy', [])[:3])}...\n\n"
-        f"[{MODAL_LIGHT_GREEN}]Available Examples:[/{MODAL_LIGHT_GREEN}]\n" +
-        '\n'.join([f"  • {ex['name']}" for ex in examples.get('examples', {}).values()][:3]),
-        border_style=MODAL_GREEN
+    print_modal_banner(br_huehuehue)
+    
+    if br_huehuehue:
+        dashboard_text = Text()
+        dashboard_text.append("🎯 PAINEL DE MONITORAMENTO MODAL 🎯", style=f"bold {MODAL_GREEN}")
+        dashboard_text.append("\n🇧🇷 Abrindo o painel de controle... Huehuehue! 🇧🇷", style="bold white")
+    else:
+        dashboard_text = Text()
+        dashboard_text.append("🎯 MODAL MONITORING DASHBOARD 🎯", style=f"bold {MODAL_GREEN}")
+        dashboard_text.append("\n📊 Launching your deployment control center...", style="bold white")
+    
+    rprint(Panel(
+        Align.center(dashboard_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
     ))
+    
+    try:
+        from modal_for_noobs.dashboard import launch_dashboard
+        
+        # Run dashboard
+        uvloop.run(_launch_dashboard_async(port, share, br_huehuehue), debug=False)
+        
+    except ImportError as e:
+        print_error(f"Dashboard dependencies not found: {e}")
+        print_info("Make sure Gradio is installed: pip install gradio")
+        raise typer.Exit(1) from e
+    except Exception as e:
+        print_error(f"Failed to launch dashboard: {e}")
+        raise typer.Exit(1) from e
+
+
+@app.command()
+def install_alias(
+    shell: Annotated[str | None, typer.Option("--shell", help="Shell type (auto-detect if not specified)")] = None,
+    force: Annotated[bool, typer.Option("--force", help="Force overwrite existing alias")] = False,
+    br_huehuehue: Annotated[bool, typer.Option("--br-huehuehue", help="Modo brasileiro! 🇧🇷")] = False,
+) -> None:
+    """🔗 Install 'mn' alias globally - use modal-for-noobs from anywhere!
+    
+    This command creates a global 'mn' alias that you can use from any directory.
+    
+    Examples:
+        modal-for-noobs install-alias
+        modal-for-noobs install-alias --shell zsh
+        modal-for-noobs install-alias --force
+    """
+    print_modal_banner(br_huehuehue)
+    
+    if br_huehuehue:
+        install_text = Text()
+        install_text.append("🔗 INSTALADOR DE ALIAS GLOBAL 🔗", style=f"bold {MODAL_GREEN}")
+        install_text.append("\n🇧🇷 Configurando o comando 'mn' globalmente! Huehuehue! 🇧🇷", style="bold white")
+    else:
+        install_text = Text()
+        install_text.append("🔗 GLOBAL ALIAS INSTALLER 🔗", style=f"bold {MODAL_GREEN}")
+        install_text.append("\n⚡ Setting up 'mn' command for global access...", style="bold white")
+    
+    rprint(Panel(
+        Align.center(install_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
+    ))
+    
+    try:
+        # Run the alias installation
+        success = _install_mn_alias(shell, force, br_huehuehue)
+        
+        if success:
+            if br_huehuehue:
+                print_success("Função 'mn' instalada com sucesso! Huehuehue!")
+                print_info("Agora você pode usar 'mn' de qualquer lugar!")
+                print_info("Exemplo: mn deploy app.py --optimized")
+            else:
+                print_success("Global 'mn' function installed successfully!")
+                print_info("You can now use 'mn' from anywhere on your system!")
+                print_info("Example: mn deploy app.py --optimized")
+        else:
+            if br_huehuehue:
+                print_error("Falha ao instalar a função 'mn'")
+            else:
+                print_error("Failed to install 'mn' function")
+                
+    except Exception as e:
+        print_error(f"Error during alias installation: {e}")
+        raise typer.Exit(1) from e
 
 
 @app.command()
@@ -635,6 +775,14 @@ def mcp(
     except Exception as e:
         print_error(f"Failed to start MCP server: {e}")
         raise typer.Exit(1) from e
+
+
+async def _launch_dashboard_async(port: int, share: bool, br_huehuehue: bool) -> None:
+    """Async dashboard launcher."""
+    from modal_for_noobs.dashboard import launch_dashboard
+    
+    # Launch dashboard in thread to avoid blocking
+    await asyncio.to_thread(launch_dashboard, port=port, share=share)
 
 
 async def _setup_auth_async(token_id: str | None, token_secret: str | None) -> None:
@@ -786,6 +934,436 @@ async def _migrate_hf_spaces_async(spaces_url: str, optimized: bool, dry_run: bo
         ))
     else:
         print_success("HuggingFace Space migrated successfully!")
+
+
+def _show_config_info(br_huehuehue: bool = False):
+    """Show current configuration information."""
+    from .config import config
+    
+    # Load configurations
+    packages = config_loader.load_base_packages()
+    examples = config_loader.load_deployment_examples()
+    
+    if br_huehuehue:
+        config_text = Text()
+        config_text.append("⚙️ INFORMAÇÕES DE CONFIGURAÇÃO ⚙️", style=f"bold {MODAL_GREEN}")
+        config_text.append("\n🇧🇷 Configurações atuais do modal-for-noobs! Huehuehue! 🇧🇷", style="bold white")
+    else:
+        config_text = Text()
+        config_text.append("⚙️ CONFIGURATION INFORMATION ⚙️", style=f"bold {MODAL_GREEN}")
+        config_text.append("\n📋 Current modal-for-noobs settings and available options", style="bold white")
+    
+    rprint(Panel(
+        Align.center(config_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
+    ))
+    
+    # Show deployment modes
+    if br_huehuehue:
+        rprint(f"\n[bold {MODAL_GREEN}]🚀 Modos de Deployment:[/bold {MODAL_GREEN}]")
+    else:
+        rprint(f"\n[bold {MODAL_GREEN}]🚀 Deployment Modes:[/bold {MODAL_GREEN}]")
+    
+    for mode, pkgs in packages.items():
+        mode_display = {
+            'minimum': '🌱 Minimum (CPU)',
+            'optimized': '⚡ Optimized (GPU + vLLM)',
+            'gra_jupy': '🪐 Gradio + Jupyter',
+            'marimo': '📓 Marimo (Reactive notebooks)'
+        }.get(mode, f'🔧 {mode.title()}')
+        
+        pkg_count = len(pkgs)
+        sample_pkgs = ', '.join(pkgs[:3])
+        if pkg_count > 3:
+            sample_pkgs += f"... (+{pkg_count - 3} more)"
+        
+        rprint(f"  {mode_display}")
+        rprint(f"    Packages: {sample_pkgs}")
+    
+    # Show current user config
+    if br_huehuehue:
+        rprint(f"\n[bold {MODAL_GREEN}]🛠️ Configurações do Usuário:[/bold {MODAL_GREEN}]")
+    else:
+        rprint(f"\n[bold {MODAL_GREEN}]🛠️ User Configuration:[/bold {MODAL_GREEN}]")
+    
+    user_config = _get_user_config()
+    if user_config:
+        for key, value in user_config.items():
+            rprint(f"  • {key}: [bold]{value}[/bold]")
+    else:
+        if br_huehuehue:
+            rprint("  Nenhuma configuração personalizada definida")
+        else:
+            rprint("  No custom configuration set")
+    
+    # Show examples
+    if br_huehuehue:
+        rprint(f"\n[bold {MODAL_GREEN}]🎯 Exemplos Disponíveis:[/bold {MODAL_GREEN}]")
+    else:
+        rprint(f"\n[bold {MODAL_GREEN}]🎯 Available Examples:[/bold {MODAL_GREEN}]")
+    
+    if examples and 'examples' in examples:
+        for name, example in list(examples['examples'].items())[:5]:
+            rprint(f"  • {example.get('name', name)}")
+    
+    if br_huehuehue:
+        rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 Use 'config --wizard' para configurar interativamente![/{MODAL_LIGHT_GREEN}]")
+    else:
+        rprint(f"\n[{MODAL_LIGHT_GREEN}]💡 Use 'config --wizard' for interactive configuration![/{MODAL_LIGHT_GREEN}]")
+
+
+def _run_config_wizard(br_huehuehue: bool = False):
+    """Run interactive configuration wizard."""
+    if br_huehuehue:
+        wizard_text = Text()
+        wizard_text.append("🧙‍♂️ ASSISTENTE DE CONFIGURAÇÃO 🧙‍♂️", style=f"bold {MODAL_GREEN}")
+        wizard_text.append("\n🇧🇷 Vamos configurar tudo juntinhos! Huehuehue! 🇧🇷", style="bold white")
+    else:
+        wizard_text = Text()
+        wizard_text.append("🧙‍♂️ CONFIGURATION WIZARD 🧙‍♂️", style=f"bold {MODAL_GREEN}")
+        wizard_text.append("\n⚡ Let's set up your modal-for-noobs preferences!", style="bold white")
+    
+    rprint(Panel(
+        Align.center(wizard_text),
+        border_style=f"{MODAL_GREEN}",
+        padding=(1, 2)
+    ))
+    
+    user_config = _get_user_config()
+    
+    # Step 1: Default deployment mode
+    if br_huehuehue:
+        rprint(f"\n[{MODAL_GREEN}]🚀 Passo 1: Modo de Deployment Padrão[/{MODAL_GREEN}]")
+        rprint("Qual modo você quer usar por padrão?")
+    else:
+        rprint(f"\n[{MODAL_GREEN}]🚀 Step 1: Default Deployment Mode[/{MODAL_GREEN}]")
+        rprint("Which deployment mode do you want to use by default?")
+    
+    modes = {
+        "1": ("minimum", "🌱 Minimum - Fast, CPU-only, basic packages"),
+        "2": ("optimized", "⚡ Optimized - GPU support, vLLM, ML libraries"),
+        "3": ("gra_jupy", "🪐 Gradio + Jupyter - Interactive notebooks"),
+        "4": ("marimo", "📓 Marimo - Reactive Python notebooks")
+    }
+    
+    for key, (mode, desc) in modes.items():
+        rprint(f"  [{key}] {desc}")
+    
+    current_default = user_config.get('default_mode', 'minimum')
+    current_num = next((k for k, (m, _) in modes.items() if m == current_default), "1")
+    
+    if br_huehuehue:
+        choice = typer.prompt(f"Escolha [1-4] (atual: {current_num})", default=current_num)
+    else:
+        choice = typer.prompt(f"Choose [1-4] (current: {current_num})", default=current_num)
+    
+    if choice in modes:
+        user_config['default_mode'] = modes[choice][0]
+        print_success(f"Default mode set to: {modes[choice][1]}")
+    
+    # Step 2: Default timeout
+    if br_huehuehue:
+        rprint(f"\n[{MODAL_GREEN}]⏱️ Passo 2: Timeout Padrão (minutos)[/{MODAL_GREEN}]")
+        current_timeout = user_config.get('default_timeout', 60)
+        timeout = typer.prompt(f"Timeout em minutos (atual: {current_timeout})", default=current_timeout, type=int)
+    else:
+        rprint(f"\n[{MODAL_GREEN}]⏱️ Step 2: Default Timeout (minutes)[/{MODAL_GREEN}]")
+        current_timeout = user_config.get('default_timeout', 60)
+        timeout = typer.prompt(f"Timeout in minutes (current: {current_timeout})", default=current_timeout, type=int)
+    
+    user_config['default_timeout'] = timeout
+    print_success(f"Default timeout set to: {timeout} minutes")
+    
+    # Step 3: Auto-install mn alias
+    if br_huehuehue:
+        rprint(f"\n[{MODAL_GREEN}]🔗 Passo 3: Comando Global 'mn'[/{MODAL_GREEN}]")
+        install_mn = typer.confirm("Instalar o comando global 'mn' agora?", default=True)
+    else:
+        rprint(f"\n[{MODAL_GREEN}]🔗 Step 3: Global 'mn' Command[/{MODAL_GREEN}]")
+        install_mn = typer.confirm("Install global 'mn' command now?", default=True)
+    
+    if install_mn:
+        success = _install_mn_alias(None, True, br_huehuehue)
+        if success:
+            print_success("Global 'mn' command installed!")
+        else:
+            print_warning("Failed to install global 'mn' command")
+    
+    # Save configuration
+    _save_user_config(user_config)
+    
+    if br_huehuehue:
+        print_success("Configuração salva com sucesso! Huehuehue!")
+        print_info("Use 'config --info' para ver suas configurações")
+    else:
+        print_success("Configuration saved successfully!")
+        print_info("Use 'config --info' to view your settings")
+
+
+def _set_config_value(set_value: str, br_huehuehue: bool = False):
+    """Set a configuration value."""
+    if '=' not in set_value:
+        if br_huehuehue:
+            print_error("Formato inválido! Use: chave=valor")
+        else:
+            print_error("Invalid format! Use: key=value")
+        return
+    
+    key, value = set_value.split('=', 1)
+    key = key.strip()
+    value = value.strip()
+    
+    # Validate key
+    valid_keys = ['default_mode', 'default_timeout', 'auto_install_deps', 'preferred_gpu']
+    if key not in valid_keys:
+        if br_huehuehue:
+            print_error(f"Chave inválida: {key}")
+            print_info(f"Chaves válidas: {', '.join(valid_keys)}")
+        else:
+            print_error(f"Invalid key: {key}")
+            print_info(f"Valid keys: {', '.join(valid_keys)}")
+        return
+    
+    # Type conversion
+    if key == 'default_timeout':
+        try:
+            value = int(value)
+        except ValueError:
+            print_error("Timeout must be an integer (minutes)")
+            return
+    elif key == 'auto_install_deps':
+        value = value.lower() in ('true', '1', 'yes', 'on')
+    
+    user_config = _get_user_config()
+    user_config[key] = value
+    _save_user_config(user_config)
+    
+    if br_huehuehue:
+        print_success(f"Configuração salva: {key} = {value}")
+    else:
+        print_success(f"Configuration set: {key} = {value}")
+
+
+def _get_config_value(get_value: str, br_huehuehue: bool = False):
+    """Get a configuration value."""
+    user_config = _get_user_config()
+    
+    if get_value in user_config:
+        rprint(f"[bold]{get_value}[/bold]: {user_config[get_value]}")
+    else:
+        if br_huehuehue:
+            print_warning(f"Configuração '{get_value}' não encontrada")
+        else:
+            print_warning(f"Configuration '{get_value}' not found")
+
+
+def _list_config_keys(br_huehuehue: bool = False):
+    """List all configuration keys."""
+    if br_huehuehue:
+        rprint(f"[bold {MODAL_GREEN}]🔧 Chaves de Configuração Disponíveis:[/bold {MODAL_GREEN}]")
+    else:
+        rprint(f"[bold {MODAL_GREEN}]🔧 Available Configuration Keys:[/bold {MODAL_GREEN}]")
+    
+    config_keys = {
+        'default_mode': 'Default deployment mode (minimum, optimized, gra_jupy, marimo)',
+        'default_timeout': 'Default timeout in minutes (integer)',
+        'auto_install_deps': 'Auto-install dependencies (true/false)',
+        'preferred_gpu': 'Preferred GPU type (any, a100, t4, etc.)'
+    }
+    
+    user_config = _get_user_config()
+    
+    for key, description in config_keys.items():
+        current_value = user_config.get(key, "not set")
+        rprint(f"  • [bold]{key}[/bold]: {description}")
+        rprint(f"    Current value: [dim]{current_value}[/dim]")
+
+
+def _get_user_config() -> dict:
+    """Get user configuration from file."""
+    from pathlib import Path
+    import json
+    
+    config_file = Path.home() / '.modal-for-noobs' / 'config.json'
+    
+    if config_file.exists():
+        try:
+            return json.loads(config_file.read_text())
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_user_config(config_data: dict):
+    """Save user configuration to file."""
+    from pathlib import Path
+    import json
+    
+    config_dir = Path.home() / '.modal-for-noobs'
+    config_dir.mkdir(exist_ok=True)
+    config_file = config_dir / 'config.json'
+    
+    config_file.write_text(json.dumps(config_data, indent=2))
+
+
+def _install_mn_alias(shell: str | None, force: bool, br_huehuehue: bool) -> bool:
+    """Install the 'mn' alias globally for the current shell.
+    
+    Args:
+        shell: Shell type (bash, zsh, fish) or None for auto-detect
+        force: Whether to force overwrite existing alias
+        br_huehuehue: Brazilian mode
+        
+    Returns:
+        bool: True if installation succeeded, False otherwise
+    """
+    import os
+    import shutil
+    import subprocess
+    from pathlib import Path
+    
+    try:
+        # Detect current shell if not specified
+        if shell is None:
+            shell_env = os.environ.get('SHELL', '')
+            if 'zsh' in shell_env:
+                shell = 'zsh'
+            elif 'bash' in shell_env:
+                shell = 'bash'
+            elif 'fish' in shell_env:
+                shell = 'fish'
+            else:
+                shell = 'bash'  # Default fallback
+        
+        if br_huehuehue:
+            rprint(f"[{MODAL_LIGHT_GREEN}]🐚 Shell detectado: {shell}[/{MODAL_LIGHT_GREEN}]")
+        else:
+            rprint(f"[{MODAL_LIGHT_GREEN}]🐚 Detected shell: {shell}[/{MODAL_LIGHT_GREEN}]")
+        
+        # Get the current Python executable and modal-for-noobs module path
+        python_executable = shutil.which('python') or shutil.which('python3')
+        if not python_executable:
+            print_error("Python executable not found in PATH")
+            return False
+            
+        # Try to find modal-for-noobs in the current environment
+        try:
+            result = subprocess.run([
+                python_executable, '-c', 
+                'import modal_for_noobs; print(modal_for_noobs.__file__)'
+            ], capture_output=True, text=True, check=True)
+            module_path = Path(result.stdout.strip()).parent
+        except subprocess.CalledProcessError:
+            # Fallback: use the current source path if we're in development
+            module_path = Path(__file__).parent
+            
+        # Create the mn command script content
+        mn_command = f'''#!/bin/bash
+# mn - Modal-for-noobs global alias
+# Generated by modal-for-noobs install-alias
+
+if command -v uv >/dev/null 2>&1; then
+    # Use uv if available (development mode)
+    cd "{module_path.parent.parent}" && uv run python -m modal_for_noobs.cli "$@"
+elif command -v python >/dev/null 2>&1; then
+    # Use system python
+    python -m modal_for_noobs.cli "$@"
+elif command -v python3 >/dev/null 2>&1; then
+    # Use python3
+    python3 -m modal_for_noobs.cli "$@"
+else
+    echo "Error: Python not found in PATH"
+    exit 1
+fi
+'''
+        
+        # Determine shell configuration file
+        home = Path.home()
+        
+        if shell == 'zsh':
+            shell_config = home / '.zshrc'
+            alias_line = f'''# mn - Modal-for-noobs global function
+mn() {{
+    "{python_executable}" -m modal_for_noobs.cli "$@"
+}}'''
+        elif shell == 'bash':
+            # Try .bashrc first, then .bash_profile
+            shell_config = home / '.bashrc'
+            if not shell_config.exists():
+                shell_config = home / '.bash_profile'
+            alias_line = f'''# mn - Modal-for-noobs global function
+mn() {{
+    "{python_executable}" -m modal_for_noobs.cli "$@"
+}}'''
+        elif shell == 'fish':
+            shell_config = home / '.config' / 'fish' / 'config.fish'
+            shell_config.parent.mkdir(parents=True, exist_ok=True)
+            alias_line = f'''# mn - Modal-for-noobs global function
+function mn
+    "{python_executable}" -m modal_for_noobs.cli $argv
+end'''
+        else:
+            print_error(f"Unsupported shell: {shell}")
+            return False
+        
+        # Check if alias/function already exists
+        if shell_config.exists():
+            content = shell_config.read_text()
+            if ('alias mn=' in content or "alias mn '" in content or 
+                'mn()' in content or 'function mn' in content):
+                if not force:
+                    if br_huehuehue:
+                        print_warning("Comando 'mn' já existe! Use --force para sobrescrever.")
+                    else:
+                        print_warning("Command 'mn' already exists! Use --force to overwrite.")
+                    return False
+                
+                # Remove existing mn alias/function lines
+                lines = content.split('\n')
+                new_lines = []
+                in_mn_function = False
+                for line in lines:
+                    if ('# mn - Modal-for-noobs' in line or 
+                        line.strip().startswith('alias mn=') or 
+                        line.strip().startswith("alias mn '") or
+                        line.strip().startswith('mn()') or
+                        line.strip().startswith('function mn')):
+                        in_mn_function = True
+                        continue
+                    elif in_mn_function and (line.strip() == '}' or line.strip() == 'end'):
+                        in_mn_function = False
+                        continue
+                    elif not in_mn_function:
+                        new_lines.append(line)
+                content = '\n'.join(new_lines)
+        else:
+            content = ""
+        
+        # Add the new function
+        if content and not content.endswith('\n'):
+            content += '\n'
+        
+        content += f'''
+# mn - Modal-for-noobs global function (added by modal-for-noobs install-alias)
+{alias_line}
+'''
+        
+        # Write the updated configuration
+        shell_config.write_text(content)
+        
+        if br_huehuehue:
+            rprint(f"[{MODAL_GREEN}]✅ Função 'mn' adicionada a {shell_config}[/{MODAL_GREEN}]")
+            rprint(f"[{MODAL_LIGHT_GREEN}]💡 Execute 'source {shell_config}' ou abra um novo terminal[/{MODAL_LIGHT_GREEN}]")
+        else:
+            rprint(f"[{MODAL_GREEN}]✅ Function 'mn' added to {shell_config}[/{MODAL_GREEN}]")
+            rprint(f"[{MODAL_LIGHT_GREEN}]💡 Run 'source {shell_config}' or open a new terminal[/{MODAL_LIGHT_GREEN}]")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error installing mn alias: {e}")
+        return False
 
 
 def _get_example_description(example_file: Path) -> str:

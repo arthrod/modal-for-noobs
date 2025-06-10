@@ -69,13 +69,6 @@ if [[ "$1" == "--install-alias" ]]; then
     install_alias
 fi
 
-echo -e "${MODAL_GREEN}${BOLD}"
-echo "🚀💚 MODAL-FOR-NOOBS INSTANT LAUNCHER 💚🚀"
-echo "=========================================="
-echo -e "${RESET}"
-echo -e "${MODAL_LIGHT_GREEN}Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨${RESET}"
-echo -e "${MODAL_GREEN}💡 Tip: Run './mn.sh --install-alias' to create permanent 'mn' command!${RESET}"
-echo ""
 
 # Function to check if command exists
 command_exists() {
@@ -121,17 +114,6 @@ fi
 # Unified command handling
 if [ $# -eq 0 ]; then
     # No arguments - show available examples
-    echo -e "${MODAL_GREEN}🎯 MODAL-FOR-NOOBS UNIFIED INTERFACE 🎯${RESET}"
-    echo -e "${MODAL_LIGHT_GREEN}💡 Use --run-examples to see available examples!${RESET}"
-    echo ""
-    echo -e "${MODAL_GREEN}Examples:${RESET}"
-    echo -e "${MODAL_LIGHT_GREEN}  ./mn.sh --run-examples              ${RESET}# List all examples"
-    echo -e "${MODAL_LIGHT_GREEN}  ./mn.sh --run-examples simple_hello ${RESET}# Run simple hello example"
-    echo -e "${MODAL_LIGHT_GREEN}  ./mn.sh deploy app.py --wizard      ${RESET}# Deploy with wizard"
-    echo -e "${MODAL_LIGHT_GREEN}  ./mn.sh milk-logs                   ${RESET}# View deployment logs"
-    echo ""
-
-    # Show examples
     $RUN_CMD python -m modal_for_noobs.cli run-examples
 
 elif [[ "$1" == "--run-examples" ]]; then
@@ -144,7 +126,6 @@ elif [[ "$1" == "--run-examples" ]]; then
         # Run specific example
         EXAMPLE_NAME="$1"
         shift
-        echo -e "${MODAL_GREEN}🎯 Running example: ${BOLD}$EXAMPLE_NAME${RESET}"
         $RUN_CMD python -m modal_for_noobs.cli run-examples "$EXAMPLE_NAME" "$@"
     fi
 
@@ -179,18 +160,12 @@ elif [[ "$1" == "--"* ]]; then
 
 elif [[ "$1" == "deploy" ]] || [[ "$1" == "mn" ]] || [[ "$1" == "run-examples" ]] || [[ "$1" == "milk-logs" ]] || [[ "$1" == "sanity-check" ]] || [[ "$1" == "kill-a-deployment" ]] || [[ "$1" == "config" ]] || [[ "$1" == "auth" ]] || [[ "$1" == "time-to-get-serious" ]]; then
     # Direct CLI command
-    echo -e "${MODAL_GREEN}⚡ EXECUTING COMMAND: ${BOLD}$1${RESET}"
     $RUN_CMD python -m modal_for_noobs.cli "$@"
 
 else
     # Legacy mode: treat first argument as app file
     APP_FILE="$1"
     shift # Remove first argument
-
-    echo -e "${MODAL_GREEN}⚡ LEGACY MODE - QUICK DEPLOY ⚡${RESET}"
-    echo -e "${MODAL_LIGHT_GREEN}🚀 Deploying: ${BOLD}$APP_FILE${RESET}"
-    echo -e "${MODAL_LIGHT_GREEN}💡 Consider using: ./mn.sh deploy $APP_FILE${RESET}"
-
     $RUN_CMD python -m modal_for_noobs.cli deploy "$APP_FILE" "$@"
 fi
 
