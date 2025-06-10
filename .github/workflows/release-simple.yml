@@ -1,0 +1,96 @@
+name: 🏷️ Simple Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  # Build and create release
+  release:
+    name: 🚀 Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚡ Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: 🐍 Set up Python
+        run: uv python install 3.12
+
+      - name: 📦 Build package
+        run: |
+          uv build
+
+      - name: 🔍 Verify package
+        run: |
+          uv tool install twine
+          uv tool run twine check dist/*
+
+      - name: 📋 Generate changelog
+        id: changelog
+        run: |
+          echo "## 🚀 Modal-for-noobs Release ${GITHUB_REF_NAME}" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### ✨ What's New" >> CHANGELOG.md
+          
+          # Get commits since last tag
+          PREV_TAG=$(git describe --abbrev=0 --tags HEAD^ 2>/dev/null || echo "")
+          if [[ -n "$PREV_TAG" ]]; then
+            echo "Changes since $PREV_TAG:" >> CHANGELOG.md
+            git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD >> CHANGELOG.md
+          else
+            echo "- Initial release of modal-for-noobs! 🎉" >> CHANGELOG.md
+            echo "- Zero-config Gradio app deployment to Modal" >> CHANGELOG.md
+            echo "- Beautiful CLI with Modal's official green theme 💚" >> CHANGELOG.md
+            echo "- Multiple deployment modes (minimum, optimized, jupyter, marimo)" >> CHANGELOG.md
+            echo "- Comprehensive dashboard and monitoring" >> CHANGELOG.md
+          fi
+          
+          echo "" >> CHANGELOG.md
+          echo "### 📦 Installation" >> CHANGELOG.md
+          echo "\`\`\`bash" >> CHANGELOG.md
+          echo "pip install modal-for-noobs" >> CHANGELOG.md
+          echo "\`\`\`" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### 🚀 Quick Start" >> CHANGELOG.md
+          echo "\`\`\`bash" >> CHANGELOG.md
+          echo "modal-for-noobs deploy your_gradio_app.py" >> CHANGELOG.md
+          echo "\`\`\`" >> CHANGELOG.md
+          
+          # Set output for GitHub release
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          cat CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📢 Release Summary
+        run: |
+          echo "🎉 Release ${{ github.ref_name }} created successfully!"
+          echo ""
+          echo "📦 Artifacts uploaded:"
+          ls -la dist/
+          echo ""
+          echo "🚀 Manual PyPI publishing:"
+          echo "To publish to PyPI, download the artifacts and run:"
+          echo "  uv tool run twine upload dist/*"
+          echo ""
+          echo "📋 Release URL:"
+          echo "  https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"

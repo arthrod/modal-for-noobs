@@ -137,10 +137,10 @@ class MyModalComponent(gr.Blocks):
     def __init__(self, **kwargs):
         # Initialize with Modal theming
         super().__init__(**kwargs)
-        
+
         with self:
             self._create_interface()
-    
+
     def _create_interface(self):
         # Build the component UI
         pass

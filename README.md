@@ -66,6 +66,14 @@ mn --milk-logs                    # View deployment logs
 modal-for-noobs deploy my_app.py --dry-run
 modal-for-noobs deploy my_app.py --wizard          # Interactive wizard
 modal-for-noobs deploy my_app.py --gra-jupy        # Jupyter + Gradio combo
+
+# Configuration commands
+modal-for-noobs config               # Show configuration (new command)
+modal-for-noobs config-info          # Legacy alias (backward compatible)
+
+# MCP Server for IDE integration
+modal-for-noobs mcp                  # Start MCP server on port 8000
+modal-for-noobs mcp --port 9000      # Use custom port
 ```
 
 ## 📖 Detailed Examples
@@ -167,7 +175,7 @@ modal-for-noobs time-to-get-serious https://huggingface.co/spaces/user/space-nam
 ### 4. Authentication (auto-setup!)
 
 ```bash
-# If no Modal keys found, it automatically starts auth setup! 
+# If no Modal keys found, it automatically starts auth setup!
 # But you can also manually trigger it:
 modal-for-noobs auth
 ```

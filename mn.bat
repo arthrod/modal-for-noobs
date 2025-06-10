@@ -67,7 +67,7 @@ if "%1"=="" (
     echo 🧙‍♂️ Starting deployment wizard (default mode)...
     echo 💡 Pro tip: mn.bat app.py for quick deploy!
     echo.
-    
+
     :: Check for examples in the current directory
     if exist "src\modal_for_noobs\examples\ultimate_voice_green_app.py" (
         set APP_FILE=src\modal_for_noobs\examples\ultimate_voice_green_app.py
@@ -80,17 +80,17 @@ if "%1"=="" (
             set APP_FILE=!APP_INPUT!
         )
     )
-    
+
     echo 🧙‍♂️ Launching wizard for: !APP_FILE!
     %RUN_CMD% python -m modal_for_noobs.cli deploy "!APP_FILE!" --wizard
-    
+
 ) else (
     :: Quick deploy mode with provided app file
     set APP_FILE=%1
-    
+
     echo ⚡ QUICK DEPLOY MODE ⚡
     echo 🚀 Deploying: %APP_FILE%
-    
+
     :: Pass all arguments except the first one
     set ARGS=
     :loop
@@ -99,7 +99,7 @@ if "%1"=="" (
     set ARGS=%ARGS% %1
     goto :loop
     :continue
-    
+
     %RUN_CMD% python -m modal_for_noobs.cli mn "%APP_FILE%" %ARGS%
 )
 

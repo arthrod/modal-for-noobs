@@ -50,7 +50,7 @@ pip install -e .
 - Essential dependencies: gradio, fastapi, uvicorn
 - Fast deployment, minimal resource usage
 
-#### Optimized Mode  
+#### Optimized Mode
 - GPU-enabled deployment
 - ML libraries: torch, transformers, accelerate, diffusers
 - Enhanced for machine learning workloads
@@ -145,7 +145,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "click>=8.0.0",
-    "modal>=0.57.0", 
+    "modal>=0.57.0",
     "gradio>=4.0.0",
     "fastapi>=0.100.0",
     "pyyaml>=6.0",
@@ -227,18 +227,18 @@ from typing import Dict, Any
 
 class EasyModalConfig:
     """Configuration management for Easy Modal"""
-    
+
     def __init__(self):
         self.config_dir = Path.home() / ".easy-modal"
         self.config_file = self.config_dir / "config.yaml"
         self.config_dir.mkdir(exist_ok=True)
-    
+
     def load_config(self) -> Dict[str, Any]:
         if self.config_file.exists():
             with open(self.config_file, 'r') as f:
                 return yaml.safe_load(f) or {}
         return {}
-    
+
     def save_config(self, config: Dict[str, Any]):
         with open(self.config_file, 'w') as f:
             yaml.dump(config, f, default_flow_style=False)
@@ -254,21 +254,21 @@ from typing import Optional
 
 class ModalAuthenticator:
     """Handle Modal authentication"""
-    
+
     def check_authentication(self) -> bool:
         """Check if Modal is authenticated"""
         try:
             if os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET"):
                 return True
-            
+
             modal_config = Path.home() / ".modal.toml"
             if modal_config.exists():
                 return True
-                
+
             return False
         except Exception:
             return False
-    
+
     def setup_authentication(self, token_id: Optional[str] = None, token_secret: Optional[str] = None):
         """Setup Modal authentication"""
         if token_id and token_secret:
@@ -290,12 +290,12 @@ from pathlib import Path
 
 class GradioAppWrapper:
     """Wrap and prepare Gradio apps for Modal deployment"""
-    
+
     def __init__(self, app_file: Path, mode: str = "minimum"):
         self.app_file = app_file
         self.mode = mode
         self.deployment_file = self.app_file.parent / f"modal_{self.app_file.stem}.py"
-    
+
     def get_image_config(self) -> str:
         """Get Modal image configuration based on mode"""
         if self.mode == "minimum":
@@ -309,7 +309,7 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
             return '''
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio>=4.0.0",
-    "fastapi[standard]>=0.100.0", 
+    "fastapi[standard]>=0.100.0",
     "uvicorn>=0.20.0",
     "torch>=2.0.0",
     "transformers>=4.20.0",
@@ -319,12 +319,12 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "numpy>=1.21.0",
     "pandas>=1.3.0"
 )'''
-    
+
     def create_deployment_file(self):
         """Create Modal deployment file"""
         gpu_config = 'gpu="any",' if self.mode == "optimized" else ""
         module_name = self.app_file.stem
-        
+
         deployment_code = f'''
 import modal
 from fastapi import FastAPI
@@ -349,18 +349,18 @@ app = modal.App("easy-modal-gradio-{self.app_file.stem}")
 @modal.asgi_app()
 def deploy_gradio():
     """Deploy Gradio app with Modal"""
-    
+
     import sys
     from pathlib import Path
-    
+
     # Add current directory to path
     current_dir = Path(__file__).parent
     if str(current_dir) not in sys.path:
         sys.path.insert(0, str(current_dir))
-    
+
     # Import the original gradio app
     import {module_name}
-    
+
     # Try to find the demo object
     demo = None
     for attr_name in dir({module_name}):
@@ -368,13 +368,13 @@ def deploy_gradio():
         if hasattr(attr, 'queue') and hasattr(attr, 'launch'):
             demo = attr
             break
-    
+
     if demo is None:
         raise ValueError("Could not find Gradio interface in {module_name}")
-    
+
     # Enable queuing for concurrent requests
     demo.queue(max_size=10)
-    
+
     # Mount Gradio app to FastAPI
     fastapi_app = FastAPI(title="Easy Modal Gradio App")
     return mount_gradio_app(fastapi_app, demo, path="/")
@@ -382,10 +382,10 @@ def deploy_gradio():
 if __name__ == "__main__":
     app.run()
 '''
-        
+
         with open(self.deployment_file, 'w') as f:
             f.write(deployment_code)
-        
+
         print(f"✓ Created deployment file: {self.deployment_file}")
         return self.deployment_file
 ```
@@ -428,39 +428,39 @@ def process_image(image, enhancement_level, apply_filter):
         img_array = np.array(image)
     else:
         img_array = image
-        
+
     # Apply enhancement (brightness adjustment)
     enhanced = img_array * (enhancement_level / 5.0)
     enhanced = np.clip(enhanced, 0, 255).astype(np.uint8)
-    
+
     # Apply filter if requested
     if apply_filter:
         # Simple edge detection simulation
         gray = np.mean(enhanced, axis=2).astype(np.uint8)
         # Convert back to RGB
         enhanced = np.stack([gray, gray, gray], axis=2)
-    
+
     return enhanced
 
 # Create Blocks interface
 with gr.Blocks(title="Image Processor") as demo:
     gr.Markdown("# Advanced Image Processing Demo")
-    
+
     with gr.Row():
         with gr.Column():
             input_image = gr.Image(label="Input Image", type="numpy")
             enhancement = gr.Slider(minimum=1, maximum=10, value=5, step=0.1, label="Enhancement Level")
             filter_checkbox = gr.Checkbox(label="Apply Edge Detection")
             process_btn = gr.Button("Process Image")
-        
+
         with gr.Column():
             output_image = gr.Image(label="Processed Image")
             info_text = gr.Textbox(label="Processing Info", interactive=False)
-    
+
     def process_with_info(image, level, apply_filter):
         if image is None:
             return None, "Please upload an image first"
-        
+
         try:
             result = process_image(image, level, apply_filter)
             info = f"Processed with enhancement level {level}"
@@ -469,7 +469,7 @@ with gr.Blocks(title="Image Processor") as demo:
             return result, info
         except Exception as e:
             return None, f"Error: {str(e)}"
-    
+
     # Set up event handler
     process_btn.click(
         fn=process_with_info,

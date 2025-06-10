@@ -176,7 +176,7 @@ modal-for-noobs time-to-get-serious https://huggingface.co/spaces/usuario/nome -
 - **Pacotes ML**: torch, transformers, accelerate, diffusers, pillow, numpy, pandas
 - **Perfeito para**: Modelos de ML, IA generativa, processamento pesado
 
-### 🔬 Gra-Jupy 
+### 🔬 Gra-Jupy
 - **Jupyter + Gradio** - Notebooks interativos
 - **Pacotes científicos**: jupyter, matplotlib, plotly, seaborn, pandas, numpy
 - **Perfeito para**: Análise de dados, pesquisa, experimentação
@@ -210,11 +210,11 @@ mn --kill-a-deployment --br-huehuehue
 
 ```
 modal-for-noobs/
-├── 🚀 mn.sh                    # Launcher Unix/Linux/macOS  
+├── 🚀 mn.sh                    # Launcher Unix/Linux/macOS
 ├── 🪟 mn.bat                   # Launcher Windows
 ├── 📁 drop-ur-precious-stuff-here/  # Pasta para seus arquivos
 │   ├── requirements.txt       # Suas dependências
-│   └── README.md              
+│   └── README.md
 ├── 📦 src/modal_for_noobs/     # Código principal
 │   ├── cli.py                 # Interface de linha de comando
 │   ├── modal_deploy.py        # Lógica de deploy

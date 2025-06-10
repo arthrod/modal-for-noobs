@@ -35,14 +35,14 @@ from gradio_modal_deploy import ModalDeployButton, ModalExplorer
 # Create your Gradio app
 with gr.Blocks() as demo:
     gr.Markdown("# My Amazing App")
-    
+
     # Add one-click Modal deployment
     deploy_btn = ModalDeployButton(
         app_file="app.py",
         mode="optimized",  # GPU + ML libraries
         auto_auth=True
     )
-    
+
     # Explore Modal examples
     explorer = ModalExplorer()
 
@@ -182,7 +182,7 @@ theme = ModalTheme()
 
 with gr.Blocks(theme=theme, title="🚀 Sentiment Analyzer") as demo:
     gr.Markdown("# 🤖💚 AI Sentiment Analyzer")
-    
+
     with gr.Row():
         with gr.Column():
             text_input = gr.Textbox(
@@ -190,17 +190,17 @@ with gr.Blocks(theme=theme, title="🚀 Sentiment Analyzer") as demo:
                 placeholder="Type something here..."
             )
             analyze_btn = gr.Button("🔍 Analyze", variant="primary")
-        
+
         with gr.Column():
             result_output = gr.Textbox(label="Result")
-    
+
     # Connect the interface
     analyze_btn.click(
         fn=analyze_sentiment,
         inputs=text_input,
         outputs=result_output
     )
-    
+
     # Add Modal deployment
     gr.Markdown("### 🚀 Deploy to Modal")
     deploy_btn = ModalDeployButton(

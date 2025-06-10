@@ -3,7 +3,7 @@
 import nox
 
 
-@nox.session(python=["3.13"])
+@nox.session(python=["3.12"])
 def tests(session):
     """Run the test suite with pytest and coverage."""
     session.install("uv")

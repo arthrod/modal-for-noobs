@@ -1,0 +1,104 @@
+name: 📦 Publish to PyPI
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'pyproject.toml'
+      - 'src/**'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Publish target'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - test
+          - pypi
+
+jobs:
+  publish:
+    name: 🚀 Build and Publish Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: ⚡ Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: 🐍 Set up Python
+        run: uv python install 3.12
+
+      - name: 📦 Install build tools
+        run: |
+          uv tool install build
+          uv tool install twine
+
+      - name: 🧹 Clean previous builds
+        run: |
+          rm -rf dist/ build/ *.egg-info/
+
+      - name: 🏗️ Build package
+        run: |
+          uv build
+
+      - name: 🔍 Check package
+        run: |
+          uv tool run twine check dist/*
+
+      - name: 📋 Show package info
+        run: |
+          echo "📦 Built packages:"
+          ls -la dist/
+          echo ""
+          echo "📊 Package details:"
+          uv tool run twine check dist/* --strict
+
+      - name: 🧪 Publish to Test PyPI
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'test')
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          echo "🧪 Publishing to Test PyPI..."
+          uv tool run twine upload --repository testpypi dist/* --verbose
+          echo "✅ Published to Test PyPI!"
+
+      - name: 🚀 Publish to PyPI
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'pypi'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          echo "🚀 Publishing to PyPI..."
+          uv tool run twine upload dist/* --verbose
+          echo "✅ Published to PyPI!"
+
+      - name: 📢 Publish Summary
+        run: |
+          echo "🎉 Package publishing completed!"
+          echo ""
+          if [[ "${{ github.event_name }}" == "push" ]] || [[ "${{ github.event.inputs.target }}" == "test" ]]; then
+            echo "🧪 Published to Test PyPI"
+            echo "🔗 Test PyPI: https://test.pypi.org/project/modal-for-noobs/"
+            echo ""
+            echo "🧪 To test install:"
+            echo "pip install --index-url https://test.pypi.org/simple/ modal-for-noobs"
+          fi
+          
+          if [[ "${{ github.event.inputs.target }}" == "pypi" ]]; then
+            echo "🚀 Published to PyPI"
+            echo "🔗 PyPI: https://pypi.org/project/modal-for-noobs/"
+            echo ""
+            echo "📦 To install:"
+            echo "pip install modal-for-noobs"
+          fi
+
+      - name: 📋 Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/
+          retention-days: 30
