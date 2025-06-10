@@ -1,6 +1,6 @@
 [project]
 name = "modal-for-noobs"
-version = "0.2.4"
+version = "0.2.5"
 description = "🚀 Async-first, idiot-proof Gradio deployment CLI for Modal"
 authors = [{ name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu" }]
 readme = "README.md"
@@ -23,6 +23,8 @@ dependencies = [
     "httpx>=0.27.2",
     "markdown2>=2.4.0",
     "uvicorn>=0.34.3",
+    "jinja2>=3.1.0",
+    "toml>=0.10.2",
 ]
 
 [project.urls]
