@@ -15,11 +15,11 @@ from loguru import logger
 from rich import print as rprint
 
 # Import Modal color palette from common module
-from .cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN, MODAL_BLACK
+from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN, MODAL_BLACK
 
 # Import new UI components and themes
-from .ui.themes import MODAL_THEME, MODAL_CSS
-from .ui.components import ModalStatusMonitor
+from modal_for_noobs.ui.themes import MODAL_THEME, MODAL_CSS
+from modal_for_noobs.ui.components import ModalStatusMonitor
 
 # GPU cost estimates (per hour in USD)
 GPU_COSTS = {

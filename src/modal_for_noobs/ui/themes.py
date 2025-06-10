@@ -22,7 +22,6 @@ def create_modal_theme() -> gr.Theme:
     modal_light_green = MODAL_LIGHT_GREEN  # "#DDFFDC"
     modal_dark_green = MODAL_DARK_GREEN  # "#323835"
     modal_black = MODAL_BLACK  # "#000000"
-    modal_gray = "#f8f9fa"
 
     try:
         theme = gr.themes.Soft()
@@ -30,71 +29,48 @@ def create_modal_theme() -> gr.Theme:
         # Fallback to default theme if soft theme not available
         theme = gr.themes.Default()
 
-    # Customize with Modal colors
-    theme = theme.set(
-        # Primary button styling
-        button_primary_background_fill=modal_green,
-        button_primary_background_fill_hover=modal_light_green,
-        button_primary_background_fill_dark=modal_dark_green,
-        button_primary_text_color=modal_black,
-        button_primary_text_color_hover=modal_black,
-        button_primary_text_color_dark="white",
+    # Customize with Modal colors - only use supported parameters
+    try:
+        theme = theme.set(
+            # Primary button styling
+            button_primary_background_fill=modal_green,
+            button_primary_background_fill_hover=modal_light_green,
+            button_primary_text_color=modal_black,
 
-        # Secondary button styling
-        button_secondary_background_fill=f"rgba(127, 238, 100, 0.1)",  # MODAL_GREEN with alpha
-        button_secondary_background_fill_hover=f"rgba(127, 238, 100, 0.2)",
-        button_secondary_text_color=modal_dark_green,
-        button_secondary_text_color_hover=modal_dark_green,
-        button_secondary_border_color=modal_green,
-        button_secondary_border_color_hover=modal_light_green,
+            # Secondary button styling
+            button_secondary_background_fill=f"rgba(127, 238, 100, 0.1)",  # MODAL_GREEN with alpha
+            button_secondary_background_fill_hover=f"rgba(127, 238, 100, 0.2)",
+            button_secondary_text_color=modal_dark_green,
+            button_secondary_border_color=modal_green,
 
-        # Input and form styling
-        input_background_fill="white",
-        input_background_fill_focus="white",
-        input_border_color=modal_green,
-        input_border_color_focus=modal_light_green,
-        input_border_width="2px",
-        input_border_width_focus="2px",
+            # Input and form styling
+            input_background_fill="white",
+            input_border_color=modal_green,
 
-        # Slider styling
-        slider_color=modal_green,
-        slider_color_dark=modal_green,
+            # General panel styling
+            panel_background_fill="white",
+            panel_border_color=f"rgba(127, 238, 100, 0.2)",  # MODAL_GREEN with alpha
 
-        # Checkbox and radio styling
-        checkbox_background_color=modal_green,
-        checkbox_background_color_selected=modal_green,
-        checkbox_background_color_focus=modal_light_green,
+            # Body background with subtle Modal green gradient
+            body_background_fill=f"rgba(127, 238, 100, 0.02)",
 
-        # General panel styling
-        panel_background_fill="white",
-        panel_background_fill_dark=modal_gray,
-        panel_border_color=f"rgba(127, 238, 100, 0.2)",  # MODAL_GREEN with alpha
-        panel_border_width="1px",
+            # Text colors
+            body_text_color="#1f2937",
 
-        # Body background with subtle Modal green gradient
-        body_background_fill=f"linear-gradient(135deg, rgba(127, 238, 100, 0.05) 0%, rgba(221, 255, 220, 0.05) 100%)",
-        body_background_fill_dark=f"linear-gradient(135deg, rgba(127, 238, 100, 0.1) 0%, rgba(221, 255, 220, 0.1) 100%)",
+            # Link colors
+            link_text_color=modal_green,
+            link_text_color_hover=modal_light_green,
 
-        # Text colors
-        body_text_color="#1f2937",
-        body_text_color_subdued="#6b7280",
+            # Block styling
+            block_background_fill="white",
+            block_border_color=f"rgba(127, 238, 100, 0.15)",  # MODAL_GREEN with alpha
 
-        # Link colors
-        link_text_color=modal_green,
-        link_text_color_hover=modal_light_green,
-        link_text_color_visited=modal_dark_green,
-
-        # Block styling
-        block_background_fill="white",
-        block_border_color=f"rgba(127, 238, 100, 0.15)",  # MODAL_GREEN with alpha
-        block_border_width="1px",
-        block_radius="12px",
-        block_shadow=f"0 2px 8px rgba(127, 238, 100, 0.1)",  # MODAL_GREEN with alpha
-
-        # Font family
-        font=("SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"),
-        font_mono=("SF Mono", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"),
-    )
+            # Font family
+            font=("SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"),
+        )
+    except Exception as e:
+        # If theme customization fails, just return the base theme
+        print(f"Warning: Could not fully customize theme: {e}")
 
     return theme
 
@@ -124,6 +100,7 @@ def get_modal_css() -> str:
     .gr-textbox:focus-within,
     .gr-dropdown:focus-within {{
         box-shadow: 0 0 0 3px rgba(127, 238, 100, 0.2) !important;
+        border-color: {modal_green} !important;
     }}
 
     /* Beautiful tab styling */
@@ -150,81 +127,12 @@ def get_modal_css() -> str:
         color: {modal_green} !important;
     }}
 
-    /* Code block enhancements */
-    .gr-code {{
-        border: 1px solid rgba(127, 238, 100, 0.2) !important;
-        border-radius: 8px !important;
-        background: #f8fffe !important;
-    }}
-
     /* Markdown enhancements */
     .gr-markdown h1,
     .gr-markdown h2,
     .gr-markdown h3 {{
         color: {modal_green} !important;
         font-weight: 700 !important;
-    }}
-
-    .gr-markdown code {{
-        background: rgba(127, 238, 100, 0.1) !important;
-        color: {modal_dark_green} !important;
-        padding: 2px 6px !important;
-        border-radius: 4px !important;
-        font-weight: 600 !important;
-    }}
-
-    .gr-markdown pre {{
-        background: #f8fffe !important;
-        border: 1px solid rgba(127, 238, 100, 0.2) !important;
-        border-radius: 8px !important;
-        box-shadow: 0 2px 4px rgba(127, 238, 100, 0.1) !important;
-    }}
-
-    /* Enhanced progress bars */
-    .gr-progress {{
-        background: {modal_green} !important;
-    }}
-
-    /* Beautiful file upload styling */
-    .gr-file-upload {{
-        border: 2px dashed rgba(127, 238, 100, 0.4) !important;
-        border-radius: 12px !important;
-        background: rgba(127, 238, 100, 0.02) !important;
-    }}
-
-    .gr-file-upload:hover {{
-        border-color: {modal_green} !important;
-        background: rgba(127, 238, 100, 0.05) !important;
-    }}
-
-    /* Enhanced dropdown styling */
-    .gr-dropdown-arrow {{
-        color: {modal_green} !important;
-    }}
-
-    /* Beautiful checkbox styling */
-    .gr-checkbox input[type="checkbox"]:checked {{
-        background-color: {modal_green} !important;
-        border-color: {modal_green} !important;
-    }}
-
-    /* Enhanced radio button styling */
-    .gr-radio input[type="radio"]:checked {{
-        background-color: {modal_green} !important;
-        border-color: {modal_green} !important;
-    }}
-
-    /* Slider enhancements */
-    .gr-slider input[type="range"]::-webkit-slider-thumb {{
-        background: {modal_green} !important;
-        border: 2px solid white !important;
-        box-shadow: 0 2px 6px rgba(127, 238, 100, 0.3) !important;
-    }}
-
-    .gr-slider input[type="range"]::-moz-range-thumb {{
-        background: {modal_green} !important;
-        border: 2px solid white !important;
-        box-shadow: 0 2px 6px rgba(127, 238, 100, 0.3) !important;
     }}
 
     /* Modal deployment button special styling */
@@ -247,61 +155,7 @@ def get_modal_css() -> str:
         background: linear-gradient(135deg, {modal_light_green} 0%, {modal_green} 100%) !important;
     }}
 
-    /* Loading spinner in Modal colors */
-    .gr-loading {{
-        border-top-color: {modal_green} !important;
-    }}
-
-    /* Enhanced error styling */
-    .gr-error {{
-        border-left: 4px solid #ef4444 !important;
-        background: rgba(239, 68, 68, 0.1) !important;
-    }}
-
-    /* Enhanced success styling */
-    .gr-success {{
-        border-left: 4px solid {modal_green} !important;
-        background: rgba(127, 238, 100, 0.1) !important;
-    }}
-
-    /* Beautiful tooltips */
-    .gr-tooltip {{
-        background: {modal_dark_green} !important;
-        color: white !important;
-        border-radius: 6px !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-    }}
-
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {{
-        width: 8px;
-        height: 8px;
-    }}
-
-    ::-webkit-scrollbar-track {{
-        background: rgba(127, 238, 100, 0.1);
-        border-radius: 4px;
-    }}
-
-    ::-webkit-scrollbar-thumb {{
-        background: rgba(127, 238, 100, 0.5);
-        border-radius: 4px;
-    }}
-
-    ::-webkit-scrollbar-thumb:hover {{
-        background: {modal_green};
-    }}
-
-    /* Gradio container dark mode styling */
-    .gradio-container {{
-        background-color: {modal_black} !important;
-    }}
-    
-    .dark {{
-        --block-background-fill: {modal_dark_green} !important;
-    }}
-    
+    /* Primary button styling */
     .gr-button-primary {{
         background-color: {modal_green} !important;
         color: {modal_black} !important;
@@ -317,5 +171,10 @@ def get_modal_css() -> str:
 
 
 # Pre-built themes for quick use
-MODAL_THEME = create_modal_theme()
-MODAL_CSS = get_modal_css()
+try:
+    MODAL_THEME = create_modal_theme()
+    MODAL_CSS = get_modal_css()
+except Exception as e:
+    print(f"Warning: Could not create Modal theme: {e}")
+    MODAL_THEME = gr.themes.Default()
+    MODAL_CSS = ""
