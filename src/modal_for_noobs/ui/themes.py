@@ -7,12 +7,11 @@ using the official Modal color palette from cli_helpers.common.
 import gradio as gr
 
 # Import Modal's official color palette
-from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN, MODAL_BLACK
+from modal_for_noobs.cli_helpers.common import MODAL_BLACK, MODAL_DARK_GREEN, MODAL_GREEN, MODAL_LIGHT_GREEN
 
 
 def create_modal_theme() -> gr.Theme:
-    """
-    Create a beautiful Modal-themed Gradio theme using official Modal colors.
+    """Create a beautiful Modal-themed Gradio theme using official Modal colors.
 
     Returns:
         gr.Theme: Modal-themed Gradio theme with signature green colors
@@ -36,37 +35,29 @@ def create_modal_theme() -> gr.Theme:
             button_primary_background_fill=modal_green,
             button_primary_background_fill_hover=modal_light_green,
             button_primary_text_color=modal_black,
-
             # Secondary button styling
             button_secondary_background_fill=f"rgba(127, 238, 100, 0.1)",  # MODAL_GREEN with alpha
             button_secondary_background_fill_hover=f"rgba(127, 238, 100, 0.2)",
             button_secondary_text_color=modal_dark_green,
             button_secondary_border_color=modal_green,
-
             # Input and form styling
             input_background_fill="white",
             input_border_color=modal_green,
-
             # General panel styling
             panel_background_fill="white",
             panel_border_color=f"rgba(127, 238, 100, 0.2)",  # MODAL_GREEN with alpha
-
             # Body background with subtle Modal green gradient
             body_background_fill=f"rgba(127, 238, 100, 0.02)",
-
             # Text colors
             body_text_color="#1f2937",
-
             # Link colors
             link_text_color=modal_green,
             link_text_color_hover=modal_light_green,
-
             # Block styling
             block_background_fill="white",
             block_border_color=f"rgba(127, 238, 100, 0.15)",  # MODAL_GREEN with alpha
-
-            # Font family
-            font=("SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"),
+            # Font family - removed font parameter due to compatibility issues
+            # font=("SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"),
         )
     except Exception as e:
         # If theme customization fails, just return the base theme
@@ -76,8 +67,7 @@ def create_modal_theme() -> gr.Theme:
 
 
 def get_modal_css() -> str:
-    """
-    Get additional CSS for enhanced Modal styling using official Modal colors.
+    """Get additional CSS for enhanced Modal styling using official Modal colors.
 
     Returns:
         str: CSS string with Modal-specific enhancements
@@ -89,6 +79,11 @@ def get_modal_css() -> str:
 
     return f"""
     /* MODAL ENHANCED STYLING */
+
+    /* Font family styling for better compatibility */
+    body, .gr-app {{
+        font-family: "SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", sans-serif !important;
+    }}
 
     /* Custom button hover effects */
     .gr-button:hover {{

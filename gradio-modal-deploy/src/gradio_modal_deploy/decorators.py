@@ -16,10 +16,9 @@ def modal_auto_deploy(
     mode: str = "optimized",
     timeout_minutes: int = 60,
     auto_auth: bool = True,
-    deploy_on_run: bool = True
+    deploy_on_run: bool = True,
 ):
-    """
-    Decorator for automatic Modal deployment of Gradio apps.
+    """Decorator for automatic Modal deployment of Gradio apps.
 
     Args:
         mode: Deployment mode (minimum, optimized, gra_jupy)
@@ -33,7 +32,9 @@ def modal_auto_deploy(
             with gr.Blocks() as demo:
                 gr.Markdown("# My Amazing App")
             return demo
+
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -41,19 +42,25 @@ def modal_auto_deploy(
             demo = func(*args, **kwargs)
 
             if not isinstance(demo, gr.Blocks):
-                raise ValueError(f"Function {func.__name__} must return a gr.Blocks instance")
+                msg = f"Function {func.__name__} must return a gr.Blocks instance"
+                raise ValueError(msg)
 
             if deploy_on_run:
                 # Get the file path of the function
                 frame = inspect.currentframe().f_back
-                file_path = Path(frame.f_globals.get('__file__', 'unknown.py'))
+                file_path = Path(frame.f_globals.get("__file__", "unknown.py"))
 
                 # Deploy to Modal
                 def sync_deploy():
                     try:
-                        return uvloop.run(_deploy_to_modal_async(
-                            file_path, mode, timeout_minutes, auto_auth
-                        ))
+                        return uvloop.run(
+                            _deploy_to_modal_async(
+                                file_path,
+                                mode,
+                                timeout_minutes,
+                                auto_auth,
+                            ),
+                        )
                     except Exception as e:
                         logger.error(f"Auto-deployment failed: {e}")
                         return None
@@ -67,7 +74,7 @@ def modal_auto_deploy(
                     with demo:
                         gr.Markdown(f"""
                         ### 🚀 Deployed to Modal!
-                        **URL:** {deployment_result.get('url')}
+                        **URL:** {deployment_result.get("url")}
                         **Mode:** {mode.upper()}
                         **Timeout:** {timeout_minutes} minutes
                         """)
@@ -77,12 +84,12 @@ def modal_auto_deploy(
             return demo
 
         return wrapper
+
     return decorator
 
 
 def modal_gpu_when_needed(func: Callable) -> Callable:
-    """
-    Decorator that automatically scales to GPU when ML operations are detected.
+    """Decorator that automatically scales to GPU when ML operations are detected.
 
     This decorator analyzes the function for common ML library imports
     and automatically requests GPU resources when needed.
@@ -93,14 +100,22 @@ def modal_gpu_when_needed(func: Callable) -> Callable:
             import torch  # GPU detected automatically
             # Your ML processing here
             return processed_image
+
     """
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # Analyze function source for ML libraries
         source = inspect.getsource(func)
         gpu_libraries = [
-            'torch', 'tensorflow', 'transformers', 'diffusers',
-            'accelerate', 'cuda', 'cupy', 'jax'
+            "torch",
+            "tensorflow",
+            "transformers",
+            "diffusers",
+            "accelerate",
+            "cuda",
+            "cupy",
+            "jax",
         ]
 
         needs_gpu = any(lib in source for lib in gpu_libraries)
@@ -117,10 +132,9 @@ def modal_gpu_when_needed(func: Callable) -> Callable:
 
 def modal_memory_optimized(
     max_memory_gb: int = 8,
-    auto_scale: bool = True
+    auto_scale: bool = True,
 ):
-    """
-    Decorator for memory-optimized Modal functions.
+    """Decorator for memory-optimized Modal functions.
 
     Args:
         max_memory_gb: Maximum memory to allocate (GB)
@@ -131,7 +145,9 @@ def modal_memory_optimized(
         def process_large_dataset(data):
             # Automatically handles large data processing
             return analyze_data(data)
+
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -151,15 +167,15 @@ def modal_memory_optimized(
                 raise
 
         return wrapper
+
     return decorator
 
 
 def modal_persistent_storage(
     storage_path: str = "/tmp/modal_storage",
-    auto_backup: bool = True
+    auto_backup: bool = True,
 ):
-    """
-    Decorator for functions that need persistent storage.
+    """Decorator for functions that need persistent storage.
 
     Args:
         storage_path: Path for persistent storage
@@ -170,7 +186,9 @@ def modal_persistent_storage(
         def save_model(model, name):
             # Automatically handles persistent storage
             model.save(f"/data/{name}")
+
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -182,6 +200,7 @@ def modal_persistent_storage(
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
@@ -189,7 +208,7 @@ async def _deploy_to_modal_async(
     file_path: Path,
     mode: str,
     timeout_minutes: int,
-    auto_auth: bool
+    auto_auth: bool,
 ) -> dict[str, any]:
     """Internal async deployment function."""
     try:
@@ -202,9 +221,7 @@ async def _deploy_to_modal_async(
 
         # Deploy the app
         logger.info(f"🚀 Deploying {file_path.name} to Modal...")
-        result = await modal_api.deploy_app(file_path, mode, timeout_minutes)
-
-        return result
+        return await modal_api.deploy_app(file_path, mode, timeout_minutes)
 
     except Exception as e:
         logger.error(f"Deployment error: {e}")

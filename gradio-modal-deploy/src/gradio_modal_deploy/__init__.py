@@ -1,5 +1,4 @@
-"""
-🚀💚 Gradio Modal Deploy 💚🚀
+"""🚀💚 Gradio Modal Deploy 💚🚀
 Beautiful Gradio components for seamless Modal deployment and management.
 
 Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
@@ -32,12 +31,12 @@ __all__ = [
     "ModalExplorer",
     "ModalStatusMonitor",
     "ModalTheme",
+    "deploy_to_modal",
+    "get_modal_status",
     # Decorators
     "modal_auto_deploy",
     "modal_gpu_when_needed",
     "modal_memory_optimized",
     # Utilities
     "setup_modal_auth",
-    "get_modal_status",
-    "deploy_to_modal",
 ]

@@ -1,5 +1,4 @@
-"""
-🚀💚 Complete Gradio Modal Deploy Example 💚🚀
+"""🚀💚 Complete Gradio Modal Deploy Example 💚🚀
 Shows all features of the gradio-modal-deploy package.
 
 Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
@@ -23,6 +22,7 @@ def process_with_ai(text: str) -> str:
     """Example AI processing function."""
     # Simulated ML processing
     import time
+
     time.sleep(1)  # Simulate processing
 
     return f"🤖 AI processed: '{text}' with Modal magic! ✨"
@@ -30,7 +30,6 @@ def process_with_ai(text: str) -> str:
 
 def create_complete_demo():
     """Create a complete demo showcasing all features."""
-
     # Use the beautiful Modal theme
     theme = ModalTheme()
 
@@ -45,9 +44,8 @@ def create_complete_demo():
             margin: 10px 0;
             border: 1px solid rgba(0, 210, 106, 0.2);
         }
-        """
+        """,
     ) as demo:
-
         # Header
         gr.Markdown("""
         # 🚀💚 Complete Gradio Modal Deploy Demo 💚🚀
@@ -58,51 +56,50 @@ def create_complete_demo():
 
         with gr.Tabs():
             # Tab 1: Basic App with Deploy Button
-            with gr.TabItem("🚀 Deploy Demo"):
-                with gr.Column(elem_classes=["demo-section"]):
-                    gr.Markdown("### 🎯 AI Text Processing with Auto-Deploy")
+            with gr.TabItem("🚀 Deploy Demo"), gr.Column(elem_classes=["demo-section"]):
+                gr.Markdown("### 🎯 AI Text Processing with Auto-Deploy")
 
-                    with gr.Row():
-                        with gr.Column():
-                            text_input = gr.Textbox(
-                                label="📝 Enter text to process",
-                                placeholder="Type something amazing...",
-                                value="Hello Modal!"
-                            )
-                            process_btn = gr.Button("🤖 Process with AI", variant="primary")
+                with gr.Row():
+                    with gr.Column():
+                        text_input = gr.Textbox(
+                            label="📝 Enter text to process",
+                            placeholder="Type something amazing...",
+                            value="Hello Modal!",
+                        )
+                        process_btn = gr.Button("🤖 Process with AI", variant="primary")
 
-                        with gr.Column():
-                            output_text = gr.Textbox(
-                                label="🎉 AI Result",
-                                interactive=False
-                            )
+                    with gr.Column():
+                        output_text = gr.Textbox(
+                            label="🎉 AI Result",
+                            interactive=False,
+                        )
 
-                    # Connect the processing
-                    process_btn.click(
-                        fn=process_with_ai,
-                        inputs=text_input,
-                        outputs=output_text
-                    )
+                # Connect the processing
+                process_btn.click(
+                    fn=process_with_ai,
+                    inputs=text_input,
+                    outputs=output_text,
+                )
 
-                    gr.Markdown("### 🚀 One-Click Modal Deployment")
+                gr.Markdown("### 🚀 One-Click Modal Deployment")
 
-                    # Modal deployment button
-                    deploy_button = ModalDeployButton(
-                        app_file=__file__,
-                        mode="optimized",  # GPU + ML libraries
-                        timeout_minutes=60,
-                        auto_auth=True
-                    )
+                # Modal deployment button
+                ModalDeployButton(
+                    app_file=__file__,
+                    mode="optimized",  # GPU + ML libraries
+                    timeout_minutes=60,
+                    auto_auth=True,
+                )
 
             # Tab 2: Modal Explorer
             with gr.TabItem("📁 Examples Explorer"):
                 gr.Markdown("### 📚 Explore Modal's Official Examples")
 
                 # Modal examples explorer
-                explorer = ModalExplorer(
+                ModalExplorer(
                     github_repo="modal-labs/modal-examples",
                     auto_refresh=True,
-                    show_deploy_button=True
+                    show_deploy_button=True,
                 )
 
             # Tab 3: Status Monitor
@@ -110,10 +107,10 @@ def create_complete_demo():
                 gr.Markdown("### 📈 Modal Deployment Monitoring")
 
                 # Status monitor
-                monitor = ModalStatusMonitor(
+                ModalStatusMonitor(
                     refresh_interval=5,
                     show_logs=True,
-                    show_costs=True
+                    show_costs=True,
                 )
 
             # Tab 4: Package Info
@@ -186,13 +183,13 @@ def create_complete_demo():
                 """)
 
                 # Show current status
-                def show_status():
+                def show_status() -> str:
                     status = get_modal_status()
                     return f"""
                     ### 📊 Current Modal Status
-                    - **Authenticated:** {'✅ Yes' if status.get('authenticated') else '❌ No'}
-                    - **Total Deployments:** {status.get('total_deployments', 0)}
-                    - **Active Deployments:** {status.get('active_deployments', 0)}
+                    - **Authenticated:** {"✅ Yes" if status.get("authenticated") else "❌ No"}
+                    - **Total Deployments:** {status.get("total_deployments", 0)}
+                    - **Active Deployments:** {status.get("active_deployments", 0)}
                     """
 
                 status_display = gr.Markdown()
@@ -223,13 +220,9 @@ def create_auto_deploy_demo():
 
 
 if __name__ == "__main__":
-    print("🚀💚 COMPLETE GRADIO MODAL DEPLOY DEMO STARTING! 💚🚀")
-    print("📦 Showcasing all package features...")
-    print("💚 Made with <3 by Neurotic Coder and assisted by Beloved Claude!")
-
     demo = create_complete_demo()
     demo.launch(
         server_name="0.0.0.0",
         server_port=7860,
-        share=False
+        share=False,
     )

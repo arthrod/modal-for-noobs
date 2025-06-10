@@ -9,13 +9,13 @@
 This module provides helper functions extracted from the legacy easy_modal_cli
 module for Modal authentication verification, setup, and deployment script generation.
 """
+
 from __future__ import annotations
 
 import asyncio
 import os
 import subprocess
 from pathlib import Path
-
 
 from loguru import logger
 
@@ -33,12 +33,12 @@ def check_modal_auth() -> bool:
         if os.getenv("MODAL_TOKEN_ID") and os.getenv("MODAL_TOKEN_SECRET"):
             logger.debug("Modal authentication found via environment variables")
             return True
-        
+
         modal_config_path = Path.home() / ".modal.toml"
         if modal_config_path.exists():
             logger.debug(f"Modal authentication found at {modal_config_path}")
             return True
-        
+
         logger.debug("No Modal authentication found")
         return False
     except OSError as e:
@@ -59,12 +59,7 @@ def setup_modal_auth() -> bool:
         logger.info("Running modal setup...")
         # Use the full path to modal executable if available
         modal_path = subprocess.check_output(["which", "modal"], text=True).strip()
-        result = subprocess.run(
-            [modal_path, "setup"],
-            check=True,
-            capture_output=True,
-            text=True
-        )
+        result = subprocess.run([modal_path, "setup"], check=True, capture_output=True, text=True)
         logger.debug(f"Modal setup output: {result.stdout}")
         logger.success("Modal setup completed successfully")
         return True
@@ -92,29 +87,23 @@ async def setup_modal_auth_async() -> bool:
         logger.info("Running modal setup asynchronously...")
         # Get the full path to modal executable
         which_process = await asyncio.create_subprocess_exec(
-            "which", "modal",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
+            "which", "modal", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
         which_stdout, _ = await which_process.communicate()
         modal_path = which_stdout.decode().strip()
-        
+
         if not modal_path:
             logger.error("Modal CLI not found. Please install modal: pip install modal")
             return False
-            
-        process = await asyncio.create_subprocess_exec(
-            modal_path, "setup",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
+
+        process = await asyncio.create_subprocess_exec(modal_path, "setup", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         stdout, stderr = await process.communicate()
-        
+
         if process.returncode == 0:
             logger.debug(f"Modal setup output: {stdout.decode()}")
             logger.success("Modal setup completed successfully")
             return True
-            
+
         logger.error(f"Modal setup failed with exit code {process.returncode}: {stderr.decode()}")
         return False
     except FileNotFoundError:

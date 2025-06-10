@@ -68,13 +68,22 @@ default-groups = ["test", "dev", "lint"]
 [tool.ruff]
 include = [
     "pyproject.toml",
-    "src/**/*.{py,js,jsx,ts,tsx,css,scss,html,sh,yaml,yml}",
-    "scripts/**/*.{py,js,jsx,ts,tsx,css,scss,html,sh,yaml,yml}",
+    "src/**/*.py",
+    "scripts/**/*.py",
 ]
 line-length = 140
 fix = true
 target-version = "py311"
-exclude = ["build", "dist", "*.egg-info"]
+exclude = [
+    "build", 
+    "dist", 
+    "*.egg-info", 
+    "src/modal_for_noobs/templates/*/deployment_template.py",
+    "src/modal_for_noobs/templates/marimo/deployment_template.py",
+    "src/modal_for_noobs/templates/optimized/deployment_template.py",
+    "src/modal_for_noobs/templates/minimum/deployment_template.py",
+    "src/modal_for_noobs/templates/gradio-jupyter/deployment_template.py"
+]
 
 [tool.ruff.lint]
 fixable = ["UP", "I", "D"]

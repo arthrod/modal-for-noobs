@@ -2,20 +2,20 @@
 
 from modal_for_noobs.utils.auth import ModalAuthManager
 from modal_for_noobs.utils.deployment import (
-    validate_app_file, 
-    get_modal_status, 
-    deploy_with_validation,
     create_deployment_config,
-    validate_deployment_config,
-    setup_modal_secrets,
-    list_modal_deployments,
+    deploy_with_validation,
+    get_deployment_logs,
+    get_modal_status,
     kill_modal_deployment,
-    get_deployment_logs
+    list_modal_deployments,
+    setup_modal_secrets,
+    validate_app_file,
+    validate_deployment_config,
 )
 
 __all__ = [
     "ModalAuthManager",
-    "validate_app_file", 
+    "validate_app_file",
     "get_modal_status",
     "deploy_with_validation",
     "create_deployment_config",

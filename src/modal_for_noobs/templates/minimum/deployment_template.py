@@ -43,7 +43,7 @@ app = modal.App("{app_name}")
 @modal.asgi_app()
 def deploy_gradio():
     """Deploy Gradio app with dashboard on Modal."""
-    
+
     # Initialize deployment info
     deployment_info = DeploymentInfo(
         app_name="{app_name}",
@@ -57,34 +57,34 @@ def deploy_gradio():
         environment={{k: v for k, v in os.environ.items() if k.startswith("MODAL_")}}
     )
     dashboard_state.set_deployment_info(deployment_info)
-    
+
     logger.info("Starting Modal deployment in minimum mode")
-    
+
     # 🔍 Detect Gradio Interface
     demo = None
     interface_names = ['demo', 'app', 'interface', 'iface']
-    
+
     for name in interface_names:
         if name in globals() and hasattr(globals()[name], 'launch'):
             demo = globals()[name]
             logger.info(f"Found Gradio interface: {{name}}")
             break
-    
+
     if demo is None:
         for var_name, var_value in globals().items():
             if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
                 demo = var_value
                 logger.info(f"Found Gradio interface through scanning: {{var_name}}")
                 break
-    
+
     if demo is None:
         logger.error("No Gradio interface found")
         raise ValueError("Could not find Gradio interface")
-    
+
     # 🎨 Create Dashboard
     dashboard = create_dashboard_interface(demo)
     dashboard.queue(max_size=10)
-    
+
     # 🔗 FastAPI Setup
     fastapi_app = FastAPI(
         title="{app_name} - Modal Dashboard",
@@ -93,12 +93,12 @@ def deploy_gradio():
         docs_url="/docs",
         redoc_url="/redoc"
     )
-    
+
     # Add dashboard API endpoints
     fastapi_app = create_dashboard_api(fastapi_app)
-    
+
     logger.info("Dashboard configured successfully")
-    
+
     # Mount Gradio app
     return mount_gradio_app(fastapi_app, dashboard, path="/")
 

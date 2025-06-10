@@ -4,9 +4,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def safe_command(cmd):
     """Safe command execution wrapper."""
-    if not isinstance(cmd, (list, tuple)):
+    if not isinstance(cmd, list | tuple):
         raise ValueError("Command must be a list or tuple")
     return cmd
 

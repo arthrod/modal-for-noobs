@@ -7,7 +7,7 @@ GitHub repository interaction, deployment history, and repository management.
 import asyncio
 import base64
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import httpx
 from loguru import logger
@@ -16,30 +16,29 @@ from loguru import logger
 class GitHubAPI:
     """Enhanced async GitHub API client for Modal examples with advanced functionality."""
 
-    def __init__(self, repo: str = "modal-labs/modal-examples", token: Optional[str] = None):
-        """
-        Initialize GitHub API client.
-        
+    def __init__(self, repo: str = "modal-labs/modal-examples", token: str | None = None):
+        """Initialize GitHub API client.
+
         Args:
             repo: GitHub repository in format "owner/repo"
             token: Optional GitHub API token for authenticated requests
         """
         self.repo = repo
-        self.owner, self.repo_name = repo.split('/')
+        self.owner, self.repo_name = repo.split("/")
         self.base_url = "https://api.github.com"
-        
+
         # Set up HTTP client with authentication if provided
         headers = {"Accept": "application/vnd.github.v3+json"}
         if token:
             headers["Authorization"] = f"Bearer {token}"
-            
+
         self.client = httpx.AsyncClient(timeout=30.0, headers=headers)
 
     async def close(self) -> None:
         """Close the HTTP client."""
         await self.client.aclose()
 
-    async def get_repo_contents(self, path: str = "") -> List[Dict[str, Any]]:
+    async def get_repo_contents(self, path: str = "") -> list[dict[str, Any]]:
         """Get repository contents for a specific path."""
         url = f"{self.base_url}/repos/{self.owner}/{self.repo_name}/contents/{path}"
 
@@ -69,37 +68,41 @@ class GitHubAPI:
             logger.error(f"Failed to fetch file content for '{path}': {e}")
             return ""
 
-    async def get_all_folders(self) -> List[Dict[str, str]]:
+    async def get_all_folders(self) -> list[dict[str, str]]:
         """Get all folders in the repository root with enhanced metadata."""
         contents = await self.get_repo_contents()
 
         folders = []
         for item in contents:
             if item.get("type") == "dir":
-                folders.append({
-                    "name": item["name"],
-                    "path": item["path"],
-                    "url": item.get("html_url", ""),
-                    "download_url": item.get("download_url"),
-                })
+                folders.append(
+                    {
+                        "name": item["name"],
+                        "path": item["path"],
+                        "url": item.get("html_url", ""),
+                        "download_url": item.get("download_url"),
+                    }
+                )
 
         return sorted(folders, key=lambda x: x["name"])
 
-    async def get_python_files_in_folder(self, folder_path: str) -> List[Dict[str, str]]:
+    async def get_python_files_in_folder(self, folder_path: str) -> list[dict[str, str]]:
         """Get all Python files in a specific folder with enhanced metadata."""
         contents = await self.get_repo_contents(folder_path)
 
         python_files = []
         for item in contents:
             if item.get("type") == "file" and item["name"].endswith(".py"):
-                python_files.append({
-                    "name": item["name"],
-                    "path": item["path"],
-                    "size": item.get("size", 0),
-                    "url": item.get("html_url", ""),
-                    "download_url": item.get("download_url"),
-                    "sha": item.get("sha", ""),
-                })
+                python_files.append(
+                    {
+                        "name": item["name"],
+                        "path": item["path"],
+                        "size": item.get("size", 0),
+                        "url": item.get("html_url", ""),
+                        "download_url": item.get("download_url"),
+                        "sha": item.get("sha", ""),
+                    }
+                )
 
         return sorted(python_files, key=lambda x: x["name"])
 
@@ -116,20 +119,22 @@ class GitHubAPI:
         root_readme_content = await self.get_file_content("README.md")
         return root_readme_content
 
-    async def search_files_by_extension(self, extension: str, folder_path: str = "") -> List[Dict[str, str]]:
+    async def search_files_by_extension(self, extension: str, folder_path: str = "") -> list[dict[str, str]]:
         """Search for files with specific extension in a folder."""
         contents = await self.get_repo_contents(folder_path)
 
         files = []
         for item in contents:
             if item.get("type") == "file" and item["name"].endswith(extension):
-                files.append({
-                    "name": item["name"],
-                    "path": item["path"],
-                    "size": item.get("size", 0),
-                    "url": item.get("html_url", ""),
-                    "download_url": item.get("download_url"),
-                })
+                files.append(
+                    {
+                        "name": item["name"],
+                        "path": item["path"],
+                        "size": item.get("size", 0),
+                        "url": item.get("html_url", ""),
+                        "download_url": item.get("download_url"),
+                    }
+                )
             elif item.get("type") == "dir" and folder_path == "":
                 # Recursively search in subdirectories (only one level deep for performance)
                 subfolder_files = await self.search_files_by_extension(extension, item["path"])
@@ -137,14 +142,14 @@ class GitHubAPI:
 
         return sorted(files, key=lambda x: x["name"])
 
-    async def get_repository_info(self) -> Dict[str, Any]:
+    async def get_repository_info(self) -> dict[str, Any]:
         """Get general repository information."""
         url = f"{self.base_url}/repos/{self.owner}/{self.repo_name}"
 
         try:
             response = await self.client.get(url)
             response.raise_for_status()
-            
+
             data = response.json()
             return {
                 "name": data.get("name", ""),
@@ -163,7 +168,7 @@ class GitHubAPI:
             logger.error(f"Failed to fetch repository info: {e}")
             return {}
 
-    async def get_recent_commits(self, limit: int = 10, path: str = "") -> List[Dict[str, Any]]:
+    async def get_recent_commits(self, limit: int = 10, path: str = "") -> list[dict[str, Any]]:
         """Get recent commits for the repository or specific path."""
         url = f"{self.base_url}/repos/{self.owner}/{self.repo_name}/commits"
         params = {"per_page": limit}
@@ -173,24 +178,26 @@ class GitHubAPI:
         try:
             response = await self.client.get(url, params=params)
             response.raise_for_status()
-            
+
             commits = []
             for commit_data in response.json():
                 commit = commit_data.get("commit", {})
-                commits.append({
-                    "sha": commit_data.get("sha", "")[:7],  # Short SHA
-                    "message": commit.get("message", ""),
-                    "author": commit.get("author", {}).get("name", ""),
-                    "date": commit.get("author", {}).get("date", ""),
-                    "url": commit_data.get("html_url", ""),
-                })
-            
+                commits.append(
+                    {
+                        "sha": commit_data.get("sha", "")[:7],  # Short SHA
+                        "message": commit.get("message", ""),
+                        "author": commit.get("author", {}).get("name", ""),
+                        "date": commit.get("author", {}).get("date", ""),
+                        "url": commit_data.get("html_url", ""),
+                    }
+                )
+
             return commits
         except httpx.HTTPError as e:
             logger.error(f"Failed to fetch recent commits: {e}")
             return []
 
-    async def get_file_history(self, file_path: str, limit: int = 5) -> List[Dict[str, Any]]:
+    async def get_file_history(self, file_path: str, limit: int = 5) -> list[dict[str, Any]]:
         """Get commit history for a specific file."""
         return await self.get_recent_commits(limit=limit, path=file_path)
 
@@ -209,61 +216,59 @@ class GitHubAPI:
             logger.error(f"Failed to download {file_path}: {e}")
             return False
 
-    async def get_repository_stats(self) -> Dict[str, Any]:
+    async def get_repository_stats(self) -> dict[str, Any]:
         """Get repository statistics including language breakdown."""
         # Get languages
         languages_url = f"{self.base_url}/repos/{self.owner}/{self.repo_name}/languages"
-        
+
         try:
             response = await self.client.get(languages_url)
             response.raise_for_status()
             languages = response.json()
-            
+
             # Calculate language percentages
             total_bytes = sum(languages.values())
             language_stats = []
-            
+
             for lang, bytes_count in sorted(languages.items(), key=lambda x: x[1], reverse=True):
                 percentage = (bytes_count / total_bytes * 100) if total_bytes > 0 else 0
-                language_stats.append({
-                    "language": lang,
-                    "bytes": bytes_count,
-                    "percentage": round(percentage, 1)
-                })
-            
+                language_stats.append({"language": lang, "bytes": bytes_count, "percentage": round(percentage, 1)})
+
             return {
                 "languages": language_stats,
                 "total_bytes": total_bytes,
-                "primary_language": language_stats[0]["language"] if language_stats else "Unknown"
+                "primary_language": language_stats[0]["language"] if language_stats else "Unknown",
             }
-            
+
         except httpx.HTTPError as e:
             logger.error(f"Failed to fetch repository stats: {e}")
             return {"languages": [], "total_bytes": 0, "primary_language": "Unknown"}
 
-    async def search_code(self, query: str, file_extension: str = "") -> List[Dict[str, Any]]:
+    async def search_code(self, query: str, file_extension: str = "") -> list[dict[str, Any]]:
         """Search for code within the repository."""
         search_query = f"{query} repo:{self.owner}/{self.repo_name}"
         if file_extension:
             search_query += f" extension:{file_extension}"
-            
+
         url = f"{self.base_url}/search/code"
         params = {"q": search_query, "per_page": 20}
 
         try:
             response = await self.client.get(url, params=params)
             response.raise_for_status()
-            
+
             results = []
             for item in response.json().get("items", []):
-                results.append({
-                    "name": item.get("name", ""),
-                    "path": item.get("path", ""),
-                    "url": item.get("html_url", ""),
-                    "repository": item.get("repository", {}).get("full_name", ""),
-                    "score": item.get("score", 0),
-                })
-            
+                results.append(
+                    {
+                        "name": item.get("name", ""),
+                        "path": item.get("path", ""),
+                        "url": item.get("html_url", ""),
+                        "repository": item.get("repository", {}).get("full_name", ""),
+                        "score": item.get("score", 0),
+                    }
+                )
+
             return results
         except httpx.HTTPError as e:
             logger.error(f"Failed to search code: {e}")
@@ -272,80 +277,82 @@ class GitHubAPI:
 
 class ModalExamplesAPI(GitHubAPI):
     """Specialized GitHub API client for Modal examples with additional features."""
-    
-    def __init__(self, token: Optional[str] = None):
+
+    def __init__(self, token: str | None = None):
         """Initialize with Modal examples repository."""
         super().__init__(repo="modal-labs/modal-examples", token=token)
-    
-    async def get_example_categories(self) -> List[Dict[str, Any]]:
+
+    async def get_example_categories(self) -> list[dict[str, Any]]:
         """Get example categories with metadata."""
         folders = await self.get_all_folders()
-        
+
         categories = []
         for folder in folders:
             # Get README for category description
             readme_content = await self.get_readme_content(folder["path"])
-            
+
             # Get Python files count
             python_files = await self.get_python_files_in_folder(folder["path"])
-            
-            categories.append({
-                "name": folder["name"],
-                "path": folder["path"],
-                "description": self._extract_description_from_readme(readme_content),
-                "file_count": len(python_files),
-                "files": python_files,
-                "readme": readme_content,
-            })
-        
+
+            categories.append(
+                {
+                    "name": folder["name"],
+                    "path": folder["path"],
+                    "description": self._extract_description_from_readme(readme_content),
+                    "file_count": len(python_files),
+                    "files": python_files,
+                    "readme": readme_content,
+                }
+            )
+
         return categories
-    
+
     def _extract_description_from_readme(self, readme_content: str) -> str:
         """Extract description from README content."""
         if not readme_content:
             return "No description available"
-        
-        lines = readme_content.split('\n')
+
+        lines = readme_content.split("\n")
         for line in lines:
             line = line.strip()
-            if line and not line.startswith('#') and len(line) > 20:
+            if line and not line.startswith("#") and len(line) > 20:
                 return line[:200] + "..." if len(line) > 200 else line
-        
+
         return "No description available"
-    
-    async def get_popular_examples(self, limit: int = 10) -> List[Dict[str, Any]]:
+
+    async def get_popular_examples(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get popular examples based on file size and recency."""
         all_files = await self.search_files_by_extension(".py")
-        
+
         # Sort by size (assuming larger files are more comprehensive examples)
         popular = sorted(all_files, key=lambda x: x.get("size", 0), reverse=True)[:limit]
-        
+
         # Add additional metadata
         for example in popular:
             # Get recent commits for this file
             commits = await self.get_file_history(example["path"], limit=3)
             example["recent_commits"] = commits
             example["last_updated"] = commits[0]["date"] if commits else ""
-        
+
         return popular
-    
-    async def validate_example_for_modal(self, file_path: str) -> Dict[str, Any]:
+
+    async def validate_example_for_modal(self, file_path: str) -> dict[str, Any]:
         """Validate if an example is suitable for Modal deployment."""
         content = await self.get_file_content(file_path)
-        
+
         if not content:
             return {"valid": False, "reason": "Could not fetch file content"}
-        
+
         # Check for Modal-specific patterns
         has_gradio = "import gradio" in content or "from gradio" in content
         has_modal = "import modal" in content or "from modal" in content
         has_main_block = "if __name__" in content
         has_fastapi = "FastAPI" in content or "from fastapi" in content
-        
+
         # Check for ML libraries
         ml_libraries = ["torch", "tensorflow", "transformers", "sklearn", "numpy", "pandas"]
         detected_ml = [lib for lib in ml_libraries if lib in content]
-        
+
         # Determine deployment compatibility
         if has_modal:
             deployment_ready = True
@@ -359,7 +366,7 @@ class ModalExamplesAPI(GitHubAPI):
             deployment_ready = False
             reason = "Not a Gradio app - requires modification"
             suggested_mode = "minimum"
-        
+
         return {
             "valid": deployment_ready,
             "reason": reason,
@@ -370,7 +377,7 @@ class ModalExamplesAPI(GitHubAPI):
             "has_main_block": has_main_block,
             "detected_ml_libraries": detected_ml,
             "file_size": len(content),
-            "line_count": len(content.split('\n')),
+            "line_count": len(content.split("\n")),
         }
 
 

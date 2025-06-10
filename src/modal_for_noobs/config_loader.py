@@ -23,8 +23,34 @@ class ConfigLoader:
             # Fallback to hardcoded defaults
             return {
                 "minimum": ["gradio", "fastapi[standard]", "uvicorn"],
-                "optimized": ["gradio", "fastapi[standard]", "uvicorn", "torch", "transformers", "accelerate", "diffusers", "pillow", "numpy", "pandas"],
-                "gra_jupy": ["gradio", "fastapi[standard]", "uvicorn", "jupyter", "jupyterlab", "notebook", "ipywidgets", "matplotlib", "plotly", "seaborn", "pandas", "numpy", "torch", "transformers"]
+                "optimized": [
+                    "gradio",
+                    "fastapi[standard]",
+                    "uvicorn",
+                    "torch",
+                    "transformers",
+                    "accelerate",
+                    "diffusers",
+                    "pillow",
+                    "numpy",
+                    "pandas",
+                ],
+                "gra_jupy": [
+                    "gradio",
+                    "fastapi[standard]",
+                    "uvicorn",
+                    "jupyter",
+                    "jupyterlab",
+                    "notebook",
+                    "ipywidgets",
+                    "matplotlib",
+                    "plotly",
+                    "seaborn",
+                    "pandas",
+                    "numpy",
+                    "torch",
+                    "transformers",
+                ],
             }
 
     def load_modal_marketing(self) -> dict[str, any]:
@@ -39,7 +65,7 @@ class ConfigLoader:
                 "banners": {"hero": "🚀💚 POWERED BY MODAL 💚🚀"},
                 "features": ["⚡ BLAZING FAST", "🌍 GLOBAL SCALE"],
                 "testimonials": ["Modal is amazing!"],
-                "calls_to_action": ["🚀 Choose Modal!"]
+                "calls_to_action": ["🚀 Choose Modal!"],
             }
 
     def load_deployment_examples(self) -> dict[str, any]:
@@ -55,10 +81,11 @@ class ConfigLoader:
                     "voice_app": {
                         "name": "🎤 Ultimate Voice Green App",
                         "path": "src/modal_for_noobs/examples/ultimate_voice_green_app.py",
-                        "mode": "optimized"
+                        "mode": "optimized",
                     }
                 }
             }
+
 
 # Global config loader instance
 config_loader = ConfigLoader()

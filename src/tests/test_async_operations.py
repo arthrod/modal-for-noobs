@@ -33,9 +33,7 @@ class TestAsyncKillDeployment:
     @pytest.mark.asyncio
     async def test_kill_deployment_list_mode(self):
         """Test kill deployment in list mode."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -43,11 +41,15 @@ class TestAsyncKillDeployment:
             # Mock modal app list
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"ap-test123 | app-name | deployed | 1", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async(None, False)
@@ -57,9 +59,7 @@ class TestAsyncKillDeployment:
     @pytest.mark.asyncio
     async def test_kill_specific_deployment(self):
         """Test killing specific deployment."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -67,11 +67,15 @@ class TestAsyncKillDeployment:
             # Mock modal app list and stop
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"ap-test123 | app-name | deployed | 1", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
@@ -82,9 +86,7 @@ class TestAsyncKillDeployment:
     @pytest.mark.asyncio
     async def test_kill_deployment_already_stopped(self):
         """Test killing deployment that's already stopped."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -92,11 +94,15 @@ class TestAsyncKillDeployment:
             # Mock modal app list showing stopped app
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"ap-test123 | app-name | stopped | 0", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
@@ -107,9 +113,7 @@ class TestAsyncKillDeployment:
     @pytest.mark.asyncio
     async def test_kill_deployment_with_containers(self):
         """Test killing deployment with running containers."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -134,8 +138,10 @@ class TestAsyncKillDeployment:
             mock_process = MagicMock()
             mock_process.returncode = 0
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _kill_deployment_async("ap-test123", False)
@@ -175,9 +181,7 @@ class TestAsyncLogMilking:
     @pytest.mark.asyncio
     async def test_milk_logs_list_apps(self):
         """Test milk logs in list apps mode."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -185,11 +189,15 @@ class TestAsyncLogMilking:
             # Mock modal app list
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"ap-test123 | app-name | deployed | 1", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async(None, False, 100, False)
@@ -199,9 +207,7 @@ class TestAsyncLogMilking:
     @pytest.mark.asyncio
     async def test_milk_logs_specific_app(self):
         """Test milking logs for specific app."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -209,11 +215,15 @@ class TestAsyncLogMilking:
             # Mock modal app logs
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"2023-01-01 12:00:00 INFO: App started", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", False, 100, False)
@@ -223,9 +233,7 @@ class TestAsyncLogMilking:
     @pytest.mark.asyncio
     async def test_milk_logs_follow_mode(self):
         """Test milking logs in follow mode."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -233,11 +241,15 @@ class TestAsyncLogMilking:
             # Mock modal app logs with follow
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"2023-01-01 12:00:00 INFO: App started", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", True, 100, False)
@@ -247,20 +259,22 @@ class TestAsyncLogMilking:
     @pytest.mark.asyncio
     async def test_milk_logs_custom_lines(self):
         """Test milking logs with custom line count."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
 
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"logs", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _milk_logs_async("test-app", False, 500, False)
@@ -286,9 +300,7 @@ class TestAsyncSanityCheck:
     @pytest.mark.asyncio
     async def test_sanity_check_with_auth(self):
         """Test sanity check with authentication."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer
@@ -296,11 +308,15 @@ class TestAsyncSanityCheck:
             # Mock modal app list
             mock_process = MagicMock()
             mock_process.returncode = 0
+
             async def mock_communicate():
                 return (b"ap-test123 | app-name | deployed | 1", b"")
+
             mock_process.communicate = mock_communicate
+
             async def mock_subprocess_exec(*args, **kwargs):
                 return mock_process
+
             mock_subprocess.side_effect = mock_subprocess_exec
 
             await _sanity_check_async(False)
@@ -355,9 +371,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_subprocess_exception_handling(self):
         """Test handling of subprocess exceptions."""
-        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, \
-             patch("asyncio.create_subprocess_exec") as mock_subprocess:
-
+        with patch("modal_for_noobs.cli.ModalDeployer") as mock_deployer_class, patch("asyncio.create_subprocess_exec") as mock_subprocess:
             mock_deployer = AsyncMock()
             mock_deployer.check_modal_auth_async.return_value = True
             mock_deployer_class.return_value = mock_deployer

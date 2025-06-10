@@ -4,9 +4,9 @@
 # Following Modal's technical design philosophy for high-performance cloud computing
 # Timeout: 3600s | Scaledown: 1200s
 
+import gradio as gr
 import modal
 from fastapi import FastAPI
-import gradio as gr
 from gradio.routes import mount_gradio_app
 
 # 🎯 Create Modal App with semantic naming
@@ -14,13 +14,7 @@ app = modal.App("modal-for-noobs-ultimate_green_app")
 
 # 🐳 Container Image Configuration
 # Optimized for minimum workloads with performance-tuned dependencies
-image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "gradio",
-    "fastapi[standard]",
-    "uvicorn",
-    "httpx",
-    "markdown2"
-)
+image = modal.Image.debian_slim(python_version="3.11").pip_install("gradio", "fastapi[standard]", "uvicorn", "httpx", "markdown2")
 
 # 📦 Original Gradio Application Code
 # Embedded for seamless execution in Modal's cloud infrastructure
@@ -85,8 +79,9 @@ h1 {{
 }}
 """
 
+
 def generate_epic_greeting(name, enthusiasm, style):
-    """Generate the most EPIC Modal-green greetings! 🎉💚"""
+    """Generate the most EPIC Modal-green greetings! 🎉💚."""
     if not name.strip():
         name = "Amazing Modal User"
 
@@ -95,23 +90,23 @@ def generate_epic_greeting(name, enthusiasm, style):
             f"🚀 BEHOLD! The legendary {name} has arrived in Modal-green glory!",
             f"💚 Epic greetings, {name}! Your presence makes our containers scale with joy!",
             f"🌟 Welcome, mighty {name}! Modal's green power flows through you!",
-            f"⚡ Incredible {name}! You've just made this deployment 1000x more awesome!"
+            f"⚡ Incredible {name}! You've just made this deployment 1000x more awesome!",
         ],
         "poetic": [
             f"🌹 Oh beautiful {name}, like Modal green so bright,\nYour presence fills our servers with pure delight!",
             f"🎭 In realms of cloud where containers dance free,\n{name} appears like Modal's green harmony!",
-            f"✨ Like emerald code that flows through the cloud,\n{name} makes our infrastructure proud!"
+            f"✨ Like emerald code that flows through the cloud,\n{name} makes our infrastructure proud!",
         ],
         "funny": [
             f"🤖 BEEP BOOP! {name} detected! Switching to MAXIMUM GREEN MODE! 💚",
             f"🎪 *drumroll* Ladies and gentlemen, {name} the Container Whisperer!",
-            f"🦸‍♀️ It's a bird! It's a plane! No, it's {name} deploying at Modal speed!"
+            f"🦸‍♀️ It's a bird! It's a plane! No, it's {name} deploying at Modal speed!",
         ],
         "professional": [
             f"👔 Welcome to Modal's premium infrastructure, {name}. GPU acceleration: ENABLED.",
             f"📊 Greetings {name}. Your Modal-green deployment environment is optimized and ready.",
-            f"🎯 Hello {name}. Modal's distributed computing platform welcomes you."
-        ]
+            f"🎯 Hello {name}. Modal's distributed computing platform welcomes you.",
+        ],
     }
 
     greetings = modal_greetings.get(style, modal_greetings["epic"])
@@ -130,20 +125,31 @@ def generate_epic_greeting(name, enthusiasm, style):
 
     return selected_greeting + excitement + modal_fact
 
+
 def create_modal_poem(topic, lines):
-    """Create beautiful Modal-themed poetry! 🎭💚"""
+    """Create beautiful Modal-themed poetry! 🎭💚."""
     modal_words = [
-        "serverless", "containers", "GPU", "scaling", "distributed",
-        "deployment", "functions", "endpoints", "infrastructure", "Modal",
-        "green", "beautiful", "elegant", "powerful", "magical"
+        "serverless",
+        "containers",
+        "GPU",
+        "scaling",
+        "distributed",
+        "deployment",
+        "functions",
+        "endpoints",
+        "infrastructure",
+        "Modal",
+        "green",
+        "beautiful",
+        "elegant",
+        "powerful",
+        "magical",
     ]
 
     poem_templates = [
         "In the land of {topic} so {adj1},\nModal's {word1} dance with {word2} grace,\n{word3} and {word4} unite as one,\nGreen light shines on every trace.",
-
         "🌟 {topic} dreams in Modal green,\nThe most {adj1} sight I've ever seen,\n{word1} flowing like a {adj2} stream,\nMaking real what once was dream.",
-
-        "Code and {topic} intertwine,\nWith {word1} power so divine,\n{word2} servers, {word3} bright,\nModal magic through the night!"
+        "Code and {topic} intertwine,\nWith {word1} power so divine,\n{word2} servers, {word3} bright,\nModal magic through the night!",
     ]
 
     poems = []
@@ -156,14 +162,15 @@ def create_modal_poem(topic, lines):
             word1=secrets.choice(modal_words),
             word2=secrets.choice(modal_words),
             word3=secrets.choice(modal_words),
-            word4=secrets.choice(modal_words)
+            word4=secrets.choice(modal_words),
         )
-        poems.append(f"Verse {i+1}:\n{poem}")
+        poems.append(f"Verse {i + 1}:\n{poem}")
 
     return "\n\n".join(poems)
 
+
 def generate_modal_wisdom():
-    """Generate epic Modal wisdom! 🧠💚"""
+    """Generate epic Modal wisdom! 🧠💚."""
     wisdom_quotes = [
         "🚀 'In Modal we trust, for it makes the impossible, possible!' - Ancient DevOps Proverb",
         "💚 'A deployment a day keeps the server crashes away!' - Modal Sage",
@@ -174,15 +181,15 @@ def generate_modal_wisdom():
         "✨ 'Modal transforms complexity into simplicity, chaos into green harmony.' - DevOps Buddha",
         "🎨 'Beautiful code deserves beautiful infrastructure.' - Modal Artist",
         "🦸‍♀️ 'With great GPU power comes great Modal responsibility!' - Serverless Hero",
-        "🌍 'Modal connects your ideas to the world, one green container at a time.' - Global Thinker"
+        "🌍 'Modal connects your ideas to the world, one green container at a time.' - Global Thinker",
     ]
 
     return secrets.choice(wisdom_quotes)
 
-def create_ultimate_interface():
-    """Create the ULTIMATE Modal-green interface! 🎨💚"""
-    with gr.Blocks(css=modal_css, title="🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO 💚🎤") as demo:
 
+def create_ultimate_interface():
+    """Create the ULTIMATE Modal-green interface! 🎨💚."""
+    with gr.Blocks(css=modal_css, title="🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO 💚🎤") as demo:
         # Epic header
         gr.Markdown("""
         # 🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO 💚🎤
@@ -199,26 +206,17 @@ def create_ultimate_interface():
                 with gr.Row():
                     with gr.Column():
                         name_input = gr.Textbox(
-                            label="👤 Your Epic Name",
-                            placeholder="Enter your name for an epic greeting!",
-                            value="Modal Hero"
+                            label="👤 Your Epic Name", placeholder="Enter your name for an epic greeting!", value="Modal Hero"
                         )
-                        enthusiasm_slider = gr.Slider(
-                            minimum=1, maximum=10, value=7, step=1,
-                            label="🔥 Enthusiasm Level"
-                        )
+                        enthusiasm_slider = gr.Slider(minimum=1, maximum=10, value=7, step=1, label="🔥 Enthusiasm Level")
                         style_dropdown = gr.Dropdown(
-                            choices=["epic", "poetic", "funny", "professional"],
-                            value="epic",
-                            label="🎭 Greeting Style"
+                            choices=["epic", "poetic", "funny", "professional"], value="epic", label="🎭 Greeting Style"
                         )
                         greet_btn = gr.Button("🎉 GENERATE EPIC GREETING! 🎉", variant="primary")
 
                     with gr.Column():
                         greeting_output = gr.Textbox(
-                            label="🌟 Your Epic Modal Greeting!",
-                            lines=6,
-                            placeholder="Your epic greeting will appear here! ✨"
+                            label="🌟 Your Epic Modal Greeting!", lines=6, placeholder="Your epic greeting will appear here! ✨"
                         )
 
             # Poetry Tab
@@ -228,21 +226,14 @@ def create_ultimate_interface():
                 with gr.Row():
                     with gr.Column():
                         topic_input = gr.Textbox(
-                            label="📝 Poetry Topic",
-                            placeholder="What should your poem be about?",
-                            value="serverless dreams"
+                            label="📝 Poetry Topic", placeholder="What should your poem be about?", value="serverless dreams"
                         )
-                        lines_slider = gr.Slider(
-                            minimum=1, maximum=5, value=3, step=1,
-                            label="📏 Number of Verses"
-                        )
+                        lines_slider = gr.Slider(minimum=1, maximum=5, value=3, step=1, label="📏 Number of Verses")
                         poem_btn = gr.Button("🎭 CREATE MODAL POETRY! 🎭", variant="primary")
 
                     with gr.Column():
                         poem_output = gr.Textbox(
-                            label="📜 Your Modal Poetry!",
-                            lines=12,
-                            placeholder="Your beautiful poetry will appear here! 🎨"
+                            label="📜 Your Modal Poetry!", lines=12, placeholder="Your beautiful poetry will appear here! 🎨"
                         )
 
             # Wisdom Tab
@@ -251,11 +242,7 @@ def create_ultimate_interface():
 
                 with gr.Column():
                     wisdom_btn = gr.Button("🧠 GIVE ME MODAL WISDOM! 🧠", variant="primary", size="lg")
-                    wisdom_output = gr.Textbox(
-                        label="💎 Modal Wisdom",
-                        lines=4,
-                        value="Click the button above to receive Modal wisdom! ✨"
-                    )
+                    wisdom_output = gr.Textbox(label="💎 Modal Wisdom", lines=4, value="Click the button above to receive Modal wisdom! ✨")
 
                     # Fun wisdom buttons
                     gr.Markdown("### Quick Wisdom Categories:")
@@ -274,17 +261,9 @@ def create_ultimate_interface():
         """)
 
         # Event handlers
-        greet_btn.click(
-            fn=generate_epic_greeting,
-            inputs=[name_input, enthusiasm_slider, style_dropdown],
-            outputs=greeting_output
-        )
+        greet_btn.click(fn=generate_epic_greeting, inputs=[name_input, enthusiasm_slider, style_dropdown], outputs=greeting_output)
 
-        poem_btn.click(
-            fn=create_modal_poem,
-            inputs=[topic_input, lines_slider],
-            outputs=poem_output
-        )
+        poem_btn.click(fn=create_modal_poem, inputs=[topic_input, lines_slider], outputs=poem_output)
 
         # Wisdom button handlers
         wisdom_btn.click(fn=lambda: generate_modal_wisdom(), outputs=wisdom_output)
@@ -295,6 +274,7 @@ def create_ultimate_interface():
 
     return demo
 
+
 # Create the ultimate demo
 demo = create_ultimate_interface()
 
@@ -302,11 +282,7 @@ if __name__ == "__main__":
     print("🎤💚 ULTIMATE MODAL-GREEN CREATIVE STUDIO STARTING! 💚🎤")
     print("🌟 Ready to create epic greetings, poetry, and wisdom! 🌟")
 
-    demo.launch(
-        server_name="0.0.0.0",
-        server_port=7860,
-        share=False
-    )
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
 
 
 # ⚡ Modal Function Configuration
@@ -321,34 +297,32 @@ if __name__ == "__main__":
 @modal.concurrent(max_inputs=100)  # High concurrency for production-grade performance
 @modal.asgi_app()
 def deploy_gradio():
-    """
-    Deploy Gradio app with Modal's high-performance infrastructure.
-    
+    """Deploy Gradio app with Modal's high-performance infrastructure.
+
     This deployment function implements:
     - Smart Gradio interface detection using global scope analysis
     - FastAPI integration following Modal's ASGI architecture patterns
     - Performance optimization for concurrent request handling
     - Error handling and fallback mechanisms for production reliability
     """
-
     # 🔍 Smart Gradio Interface Detection
     # Using global scope analysis for maximum compatibility
     demo = None
 
     # Primary detection: Check common Gradio interface names
-    if 'demo' in globals():
-        demo = globals()['demo']
-    elif 'app' in globals() and hasattr(globals()['app'], 'queue'):
-        demo = globals()['app']
-    elif 'interface' in globals():
-        demo = globals()['interface']
-    elif 'iface' in globals():
-        demo = globals()['iface']
+    if "demo" in globals():
+        demo = globals()["demo"]
+    elif "app" in globals() and hasattr(globals()["app"], "queue"):
+        demo = globals()["app"]
+    elif "interface" in globals():
+        demo = globals()["interface"]
+    elif "iface" in globals():
+        demo = globals()["iface"]
 
     # Fallback detection: Comprehensive global scope scan
     if demo is None:
         for var_name, var_value in globals().items():
-            if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
+            if hasattr(var_value, "queue") and hasattr(var_value, "launch"):
                 demo = var_value
                 break
 
@@ -370,10 +344,11 @@ def deploy_gradio():
         description="High-performance Gradio deployment on Modal cloud infrastructure",
         version="1.0.0",
         docs_url="/docs",  # Enable API documentation
-        redoc_url="/redoc"  # Enable alternative API documentation
+        redoc_url="/redoc",  # Enable alternative API documentation
     )
-    
+
     return mount_gradio_app(fastapi_app, demo, path="/")
+
 
 # 🏃‍♂️ Direct execution support for local testing
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ def runner():
 @pytest.fixture
 def sample_gradio_app(tmp_path):
     """Create a sample Gradio app for testing."""
-    app_content = '''
+    app_content = """
 import gradio as gr
 
 def greet(name):
@@ -33,7 +33,7 @@ demo = gr.Interface(fn=greet, inputs="text", outputs="text")
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
     app_file = tmp_path / "test_app.py"
     app_file.write_text(app_content)
     return app_file
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 @pytest.fixture
 def complex_gradio_app(tmp_path):
     """Create a complex Gradio app for testing."""
-    app_content = '''
+    app_content = """
 import gradio as gr
 import matplotlib.pyplot as plt
 import numpy as np
@@ -77,7 +77,7 @@ with gr.Blocks() as demo:
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
     app_file = tmp_path / "complex_app.py"
     app_file.write_text(app_content)
     return app_file
@@ -96,11 +96,15 @@ def mock_subprocess():
     with patch("asyncio.create_subprocess_exec") as mock:
         mock_process = MagicMock()
         mock_process.returncode = 0
+
         async def mock_communicate():
             return (b"success", b"")
+
         mock_process.communicate = mock_communicate
+
         async def mock_subprocess_exec(*args, **kwargs):
             return mock_process
+
         mock.return_value = mock_subprocess_exec()
         yield mock
 
@@ -133,7 +137,7 @@ async def test_modal_deployer_auth_check():
 async def test_create_deployment_file(sample_gradio_app):
     """Test deployment file creation."""
     from modal_for_noobs.modal_deploy import DeploymentConfig
-    
+
     deployer = ModalDeployer(sample_gradio_app)
     config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
 
@@ -162,6 +166,7 @@ def test_time_to_get_serious_help(runner):
 
 
 # === NEW COMPREHENSIVE TESTS ===
+
 
 class TestCLICommands:
     """Test all CLI commands comprehensively."""
@@ -204,9 +209,7 @@ class TestCLICommands:
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--br-huehuehue", "--dry-run"])
         assert result.exit_code == 0
         # Check for Portuguese content in Brazilian mode
-        assert ("computação" in result.stdout.lower() or 
-                "escalonamento" in result.stdout.lower() or 
-                "huehuehue" in result.stdout.lower())
+        assert "computação" in result.stdout.lower() or "escalonamento" in result.stdout.lower() or "huehuehue" in result.stdout.lower()
 
     def test_deploy_complex_app(self, runner, complex_gradio_app):
         """Test deploy with complex Gradio app."""
@@ -244,8 +247,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_deployment_list(self, mock_kill, runner):
         """Test listing deployments to kill."""
+
         async def mock_kill_async(*args, **kwargs):
             return None
+
         mock_kill.return_value = mock_kill_async()
         result = runner.invoke(app, ["kill-a-deployment"])
         assert result.exit_code == 0
@@ -254,8 +259,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_specific_deployment(self, mock_kill, runner):
         """Test killing specific deployment."""
+
         async def mock_kill_async(*args, **kwargs):
             return None
+
         mock_kill.return_value = mock_kill_async()
         result = runner.invoke(app, ["kill-a-deployment", "ap-test123"])
         assert result.exit_code == 0
@@ -264,8 +271,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._kill_deployment_async")
     def test_kill_deployment_brazilian(self, mock_kill, runner):
         """Test kill deployment with Brazilian mode."""
+
         async def mock_kill_async(*args, **kwargs):
             return None
+
         mock_kill.return_value = mock_kill_async()
         result = runner.invoke(app, ["kill-a-deployment", "ap-test123", "--br-huehuehue"])
         assert result.exit_code == 0
@@ -280,8 +289,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_basic(self, mock_milk, runner):
         """Test basic log milking."""
+
         async def mock_milk_async(*args, **kwargs):
             return None
+
         mock_milk.return_value = mock_milk_async()
         result = runner.invoke(app, ["milk-logs"])
         assert result.exit_code == 0
@@ -290,8 +301,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_specific_app(self, mock_milk, runner):
         """Test milking logs for specific app."""
+
         async def mock_milk_async(*args, **kwargs):
             return None
+
         mock_milk.return_value = mock_milk_async()
         result = runner.invoke(app, ["milk-logs", "test-app"])
         assert result.exit_code == 0
@@ -300,8 +313,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._milk_logs_async")
     def test_milk_logs_follow(self, mock_milk, runner):
         """Test following logs."""
+
         async def mock_milk_async(*args, **kwargs):
             return None
+
         mock_milk.return_value = mock_milk_async()
         result = runner.invoke(app, ["milk-logs", "test-app", "--follow"])
         assert result.exit_code == 0
@@ -316,8 +331,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._sanity_check_async")
     def test_sanity_check_basic(self, mock_sanity, runner):
         """Test basic sanity check."""
+
         async def mock_sanity_async(*args, **kwargs):
             return None
+
         mock_sanity.return_value = mock_sanity_async()
         result = runner.invoke(app, ["sanity-check"])
         assert result.exit_code == 0
@@ -338,8 +355,10 @@ class TestCLICommands:
     @patch("modal_for_noobs.cli._setup_auth_async")
     def test_auth_setup(self, mock_auth, runner):
         """Test authentication setup."""
+
         async def mock_auth_async(*args, **kwargs):
             return None
+
         mock_auth.return_value = mock_auth_async()
         result = runner.invoke(app, ["auth", "--token-id", "test_id", "--token-secret", "test_secret"])
         assert result.exit_code == 0
@@ -367,8 +386,7 @@ class TestAsyncFunctions:
     @pytest.mark.asyncio
     async def test_modal_auth_check_without_tokens(self):
         """Test Modal auth check without tokens."""
-        with patch.dict("os.environ", {}, clear=True), \
-             patch("pathlib.Path.exists", return_value=False):
+        with patch.dict("os.environ", {}, clear=True), patch("pathlib.Path.exists", return_value=False):
             dummy_app_file = Path("dummy.py")
             deployer = ModalDeployer(dummy_app_file)
             result = await deployer.check_modal_auth_async()
@@ -422,7 +440,7 @@ class TestConfigSystem:
         # Clear any existing environment variables
         monkeypatch.delenv("ENVIRONMENT", raising=False)
         monkeypatch.delenv("LOG_LEVEL", raising=False)
-        
+
         env_file = tmp_path / ".test_env"
         env_file.write_text("ENVIRONMENT=test\nLOG_LEVEL=INFO\n")
 
@@ -505,15 +523,21 @@ class TestIntegration:
     @patch("modal_for_noobs.cli._sanity_check_async")
     def test_management_workflow(self, mock_sanity, mock_logs, mock_kill, runner):
         """Test deployment management workflow."""
+
         # Mock all async functions
         async def mock_kill_async(*args, **kwargs):
             return None
+
         mock_kill.return_value = mock_kill_async()
+
         async def mock_logs_async():
             return None
+
         mock_logs.return_value = mock_logs_async()
+
         async def mock_sanity_async(*args, **kwargs):
             return None
+
         mock_sanity.return_value = mock_sanity_async()
 
         # Sanity check
@@ -534,9 +558,7 @@ class TestIntegration:
         result = runner.invoke(app, ["deploy", str(sample_gradio_app), "--br-huehuehue", "--dry-run"])
         assert result.exit_code == 0
         # Check for Portuguese content in Brazilian mode
-        assert ("computação" in result.stdout.lower() or 
-                "escalonamento" in result.stdout.lower() or 
-                "huehuehue" in result.stdout.lower())
+        assert "computação" in result.stdout.lower() or "escalonamento" in result.stdout.lower() or "huehuehue" in result.stdout.lower()
 
         # Examples with Brazilian mode
         result = runner.invoke(app, ["run-examples", "simple_hello", "--br-huehuehue", "--dry-run"])

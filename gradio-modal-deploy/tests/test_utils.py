@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 from gradio_modal_deploy.utils import get_modal_status, validate_app_file
 
 
-def test_validate_app_file_ml_detection(tmp_path):
+def test_validate_app_file_ml_detection(tmp_path) -> None:
     """Test ML library detection in app validation."""
     app_file = tmp_path / "ml_app.py"
     app_file.write_text("""
@@ -29,7 +29,7 @@ demo.launch()
     assert result["suggested_mode"] == "optimized"
 
 
-def test_validate_app_file_jupyter_detection(tmp_path):
+def test_validate_app_file_jupyter_detection(tmp_path) -> None:
     """Test Jupyter library detection in app validation."""
     app_file = tmp_path / "jupyter_app.py"
     app_file.write_text("""
@@ -53,14 +53,16 @@ demo.launch()
     assert result["suggested_mode"] == "gra_jupy"
 
 
-@patch('gradio_modal_deploy.core.modal_api')
-def test_get_modal_status_success(mock_modal_api):
+@patch("gradio_modal_deploy.core.modal_api")
+def test_get_modal_status_success(mock_modal_api) -> None:
     """Test successful Modal status retrieval."""
     mock_modal_api.check_auth = AsyncMock(return_value=True)
-    mock_modal_api.list_deployments = AsyncMock(return_value=[
-        {"name": "test-app", "status": "running"},
-        {"name": "other-app", "status": "stopped"}
-    ])
+    mock_modal_api.list_deployments = AsyncMock(
+        return_value=[
+            {"name": "test-app", "status": "running"},
+            {"name": "other-app", "status": "stopped"},
+        ],
+    )
 
     status = get_modal_status()
 
@@ -69,8 +71,8 @@ def test_get_modal_status_success(mock_modal_api):
     assert status["active_deployments"] == 1
 
 
-@patch('gradio_modal_deploy.core.modal_api')
-def test_get_modal_status_error(mock_modal_api):
+@patch("gradio_modal_deploy.core.modal_api")
+def test_get_modal_status_error(mock_modal_api) -> None:
     """Test Modal status retrieval with error."""
     mock_modal_api.check_auth = AsyncMock(side_effect=Exception("Test error"))
 

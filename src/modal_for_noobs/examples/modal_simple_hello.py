@@ -4,9 +4,9 @@
 # Following Modal's technical design philosophy for high-performance cloud computing
 # Timeout: 3600s | Scaledown: 1200s
 
+import gradio as gr
 import modal
 from fastapi import FastAPI
-import gradio as gr
 from gradio.routes import mount_gradio_app
 
 # 🎯 Create Modal App with semantic naming
@@ -14,13 +14,7 @@ app = modal.App("modal-for-noobs-simple_hello")
 
 # 🐳 Container Image Configuration
 # Optimized for minimum workloads with performance-tuned dependencies
-image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "gradio",
-    "fastapi[standard]",
-    "uvicorn",
-    "httpx",
-    "markdown2"
-)
+image = modal.Image.debian_slim(python_version="3.11").pip_install("gradio", "fastapi[standard]", "uvicorn", "httpx", "markdown2")
 
 # 📦 Original Gradio Application Code
 # Embedded for seamless execution in Modal's cloud infrastructure
@@ -59,12 +53,14 @@ h1 {{
 }}
 """
 
+
 def greet(name):
     """Greet function with Modal styling."""
     if not name.strip():
         return "👋 Hello! Please enter your name!"
 
     return f"🚀💚 Hello {name}! Welcome to Modal-for-noobs! 💚🚀"
+
 
 # Create interface
 demo = gr.Interface(
@@ -74,7 +70,7 @@ demo = gr.Interface(
     title="🚀💚 Modal Hello World 💚🚀",
     description="Your first Modal app - beautifully styled with Modal green theme!",
     css=modal_css,
-    theme=gr.themes.Soft()
+    theme=gr.themes.Soft(),
 )
 
 if __name__ == "__main__":
@@ -93,34 +89,32 @@ if __name__ == "__main__":
 @modal.concurrent(max_inputs=100)  # High concurrency for production-grade performance
 @modal.asgi_app()
 def deploy_gradio():
-    """
-    Deploy Gradio app with Modal's high-performance infrastructure.
-    
+    """Deploy Gradio app with Modal's high-performance infrastructure.
+
     This deployment function implements:
     - Smart Gradio interface detection using global scope analysis
     - FastAPI integration following Modal's ASGI architecture patterns
     - Performance optimization for concurrent request handling
     - Error handling and fallback mechanisms for production reliability
     """
-
     # 🔍 Smart Gradio Interface Detection
     # Using global scope analysis for maximum compatibility
     demo = None
 
     # Primary detection: Check common Gradio interface names
-    if 'demo' in globals():
-        demo = globals()['demo']
-    elif 'app' in globals() and hasattr(globals()['app'], 'queue'):
-        demo = globals()['app']
-    elif 'interface' in globals():
-        demo = globals()['interface']
-    elif 'iface' in globals():
-        demo = globals()['iface']
+    if "demo" in globals():
+        demo = globals()["demo"]
+    elif "app" in globals() and hasattr(globals()["app"], "queue"):
+        demo = globals()["app"]
+    elif "interface" in globals():
+        demo = globals()["interface"]
+    elif "iface" in globals():
+        demo = globals()["iface"]
 
     # Fallback detection: Comprehensive global scope scan
     if demo is None:
         for var_name, var_value in globals().items():
-            if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
+            if hasattr(var_value, "queue") and hasattr(var_value, "launch"):
                 demo = var_value
                 break
 
@@ -142,10 +136,11 @@ def deploy_gradio():
         description="High-performance Gradio deployment on Modal cloud infrastructure",
         version="1.0.0",
         docs_url="/docs",  # Enable API documentation
-        redoc_url="/redoc"  # Enable alternative API documentation
+        redoc_url="/redoc",  # Enable alternative API documentation
     )
-    
+
     return mount_gradio_app(fastapi_app, demo, path="/")
+
 
 # 🏃‍♂️ Direct execution support for local testing
 if __name__ == "__main__":

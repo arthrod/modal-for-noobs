@@ -24,9 +24,9 @@ class HuggingFaceSpacesMigrator:
         """Extract space information from HuggingFace URL (async)."""
         # Parse URL to get repo_id
         parsed = urlparse(spaces_url)
-        path_parts = parsed.path.strip('/').split('/')
+        path_parts = parsed.path.strip("/").split("/")
 
-        if len(path_parts) < 2 or path_parts[0] != 'spaces':
+        if len(path_parts) < 2 or path_parts[0] != "spaces":
             raise ValueError(f"Invalid HuggingFace Spaces URL: {spaces_url}")
 
         repo_id = f"{path_parts[1]}/{path_parts[2]}"
@@ -42,7 +42,7 @@ class HuggingFaceSpacesMigrator:
                 "title": space_data.get("title", repo_id),
                 "sdk": space_data.get("sdk", "gradio"),
                 "python_version": space_data.get("python_version", "3.11"),
-                "url": spaces_url
+                "url": spaces_url,
             }
         except Exception as e:
             logger.warning(f"Could not fetch space metadata: {e}")
@@ -51,7 +51,7 @@ class HuggingFaceSpacesMigrator:
                 "title": repo_id,
                 "sdk": "gradio",  # Assume Gradio
                 "python_version": "3.11",
-                "url": spaces_url
+                "url": spaces_url,
             }
 
     async def download_space_files_async(self, space_info: dict[str, Any]) -> Path:
@@ -78,7 +78,7 @@ class HuggingFaceSpacesMigrator:
                             filename=file_path,
                             repo_type="space",
                             local_dir=local_dir,
-                            local_dir_use_symlinks=False
+                            local_dir_use_symlinks=False,
                         )
                         logger.debug(f"Downloaded: {downloaded_path}")
                     except Exception as e:
@@ -105,10 +105,7 @@ class HuggingFaceSpacesMigrator:
         extra_packages = []
         if requirements_file.exists():
             requirements_content = await asyncio.to_thread(requirements_file.read_text, encoding="utf-8")
-            extra_packages = [
-                line.strip() for line in requirements_content.split('\n')
-                if line.strip() and not line.startswith('#')
-            ]
+            extra_packages = [line.strip() for line in requirements_content.split("\n") if line.strip() and not line.startswith("#")]
 
         # Generate Modal deployment
         mode = "optimized" if optimized else "minimum"
@@ -116,11 +113,7 @@ class HuggingFaceSpacesMigrator:
 
         # Base packages
         if mode == "minimum":
-            base_packages = [
-                "gradio>=4.0.0",
-                "fastapi[standard]>=0.100.0",
-                "uvicorn>=0.20.0"
-            ]
+            base_packages = ["gradio>=4.0.0", "fastapi[standard]>=0.100.0", "uvicorn>=0.20.0"]
         else:
             base_packages = [
                 "gradio>=4.0.0",
@@ -132,12 +125,12 @@ class HuggingFaceSpacesMigrator:
                 "diffusers>=0.20.0",
                 "pillow>=9.0.0",
                 "numpy>=1.21.0",
-                "pandas>=1.3.0"
+                "pandas>=1.3.0",
             ]
 
         # Combine packages
         all_packages = base_packages + extra_packages
-        packages_str = ',\n    '.join(f'"{pkg}"' for pkg in all_packages)
+        packages_str = ",\n    ".join(f'"{pkg}"' for pkg in all_packages)
 
         # GPU configuration
         gpu_config = 'gpu="any",' if optimized else ""

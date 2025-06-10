@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-🚀💚 Publishing script for gradio-modal-deploy 💚🚀
+"""🚀💚 Publishing script for gradio-modal-deploy 💚🚀
 Automates the process of building and publishing to PyPI with uv.
 
 Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨
@@ -13,113 +12,83 @@ from pathlib import Path
 
 def run_command(cmd: str, check: bool = True) -> subprocess.CompletedProcess:
     """Run a shell command and return the result."""
-    print(f"🔥 Running: {cmd}")
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False)
 
     if check and result.returncode != 0:
-        print(f"❌ Command failed: {cmd}")
-        print(f"Error: {result.stderr}")
         sys.exit(1)
 
     if result.stdout:
-        print(result.stdout.strip())
+        pass
 
     return result
 
 
-def check_prerequisites():
+def check_prerequisites() -> None:
     """Check if all prerequisites are installed."""
-    print("🔍 Checking prerequisites...")
-
     # Check uv
     result = run_command("uv --version", check=False)
     if result.returncode != 0:
-        print("❌ uv is not installed. Please install it first:")
-        print("curl -LsSf https://astral.sh/uv/install.sh | sh")
         sys.exit(1)
 
     # Check git
     result = run_command("git --version", check=False)
     if result.returncode != 0:
-        print("❌ git is not installed. Please install git first.")
         sys.exit(1)
 
-    print("✅ All prerequisites are installed!")
 
-
-def run_tests():
+def run_tests() -> None:
     """Run the test suite."""
-    print("🧪 Running tests...")
     run_command("uv run pytest")
-    print("✅ All tests passed!")
 
 
-def run_linting():
+def run_linting() -> None:
     """Run linting and formatting checks."""
-    print("🎨 Running linting...")
     run_command("uv run ruff check")
     run_command("uv run ruff format --check")
-    print("✅ Linting passed!")
 
 
-def build_package():
+def build_package() -> None:
     """Build the package."""
-    print("📦 Building package...")
-
     # Clean previous builds
     run_command("rm -rf dist/ build/ *.egg-info/")
 
     # Build with uv
     run_command("uv build")
 
-    print("✅ Package built successfully!")
 
-
-def publish_to_pypi(test: bool = False):
+def publish_to_pypi(test: bool = False) -> None:
     """Publish to PyPI."""
-    repository = "testpypi" if test else "pypi"
-    print(f"🚀 Publishing to {'Test PyPI' if test else 'PyPI'}...")
-
     if test:
         run_command("uv publish --repository testpypi")
     else:
         run_command("uv publish")
 
-    print(f"✅ Published to {'Test PyPI' if test else 'PyPI'} successfully!")
 
-
-def update_version(version: str):
+def update_version(version: str) -> None:
     """Update version in pyproject.toml."""
-    print(f"📝 Updating version to {version}...")
-
     pyproject_path = Path("pyproject.toml")
     content = pyproject_path.read_text()
 
     # Replace version line
-    lines = content.split('\n')
+    lines = content.split("\n")
     for i, line in enumerate(lines):
-        if line.startswith('version = '):
+        if line.startswith("version = "):
             lines[i] = f'version = "{version}"'
             break
 
-    pyproject_path.write_text('\n'.join(lines))
-    print(f"✅ Version updated to {version}")
+    pyproject_path.write_text("\n".join(lines))
 
 
-def create_git_tag(version: str):
+def create_git_tag(version: str) -> None:
     """Create and push git tag."""
-    print(f"🏷️ Creating git tag v{version}...")
-
     run_command("git add pyproject.toml")
     run_command(f'git commit -m "Bump version to {version}"')
     run_command(f"git tag v{version}")
     run_command("git push")
     run_command("git push --tags")
 
-    print(f"✅ Git tag v{version} created and pushed!")
 
-
-def main():
+def main() -> None:
     """Main publishing workflow."""
     import argparse
 
@@ -130,9 +99,6 @@ def main():
     parser.add_argument("--skip-tag", action="store_true", help="Skip creating git tag")
 
     args = parser.parse_args()
-
-    print("🚀💚 GRADIO MODAL DEPLOY PUBLISHING SCRIPT 💚🚀")
-    print("=" * 50)
 
     # Check prerequisites
     check_prerequisites()
@@ -156,20 +122,10 @@ def main():
     # Publish
     publish_to_pypi(test=args.test)
 
-    print("\n🎉 Publishing completed successfully!")
-
     if args.test:
-        print("📦 Package published to Test PyPI:")
-        print("https://test.pypi.org/project/gradio-modal-deploy/")
-        print("\n🧪 To install from Test PyPI:")
-        print("uv add --index https://test.pypi.org/simple/ gradio-modal-deploy")
+        pass
     else:
-        print("📦 Package published to PyPI:")
-        print("https://pypi.org/project/gradio-modal-deploy/")
-        print("\n📦 To install:")
-        print("uv add gradio-modal-deploy")
-
-    print("\n💚 Made with <3 by Neurotic Coder and assisted by Beloved Claude ✨")
+        pass
 
 
 if __name__ == "__main__":

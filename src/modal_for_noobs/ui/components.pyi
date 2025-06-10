@@ -28,10 +28,9 @@ class ModalDeployButton(gr.HTML):
         auto_auth: bool = True,
         requirements_path: str | Path | None = None,
         test_deploy: bool = False,
-        **kwargs
+        **kwargs,
     ):
-        """
-        Initialize Modal deployment button.
+        """Initialize Modal deployment button.
 
         Args:
             app_file: Path to the Gradio app file to deploy
@@ -60,7 +59,7 @@ class ModalDeployButton(gr.HTML):
         modal_green = MODAL_GREEN
         modal_light_green = MODAL_LIGHT_GREEN
         modal_black = MODAL_BLACK
-        
+
         return f"""
         <div class="modal-deploy-container">
             <style>

@@ -56,7 +56,7 @@ def __():
 
 @app.cell
 def __(mo):
-    mo.md("""
+    mo.md(r"""
     # Welcome to Modal Marimo! 🎉
     
     This Marimo notebook is running alongside your Gradio app on Modal.
@@ -78,12 +78,12 @@ def __():
     import pandas as pd
     import numpy as np
     
-    print(f"Python {{sys.version}}")
-    print(f"PyTorch {{torch.__version__}}")
-    print(f"CUDA available: {{torch.cuda.is_available()}}")
+    print(f"Python {sys.version}")
+    print(f"PyTorch {torch.__version__}")
+    print(f"CUDA available: {torch.cuda.is_available()}")
     
     if torch.cuda.is_available():
-        print(f"GPU: {{torch.cuda.get_device_name(0)}}")
+        print(f"GPU: {torch.cuda.get_device_name(0)}")
     return np, pd, sys, torch
 
 @app.cell
@@ -94,14 +94,14 @@ def __(mo):
 
 @app.cell
 def __(mo, slider):
-    mo.md(f"You selected: **{{slider.value}}**")
+    mo.md(f"You selected: **{slider.value}**")
     
     # Create a simple plot
     import matplotlib.pyplot as plt
     
     fig, ax = plt.subplots()
     ax.bar(range(slider.value), range(slider.value))
-    ax.set_title(f"Bar chart with {{slider.value}} bars")
+    ax.set_title(f"Bar chart with {slider.value} bars")
     plt.tight_layout()
     return ax, fig, plt
 
@@ -154,7 +154,7 @@ def deploy_gradio():
         deployment_mode="marimo",
         deployment_time=datetime.now().isoformat(),
         modal_version=modal.__version__,
-        python_version=f"{{sys.version_info.major}}.{{sys.version_info.minor}}.{{sys.version_info.micro}}",
+        python_version=f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
         gpu_enabled=gpu_available,
         timeout_seconds={timeout_seconds},
         max_containers=1,
@@ -168,7 +168,7 @@ def deploy_gradio():
     )
     dashboard_state.set_deployment_info(deployment_info)
     
-    logger.info(f"Starting Modal deployment in marimo mode (GPU: {{gpu_available}})")
+    logger.info(f"Starting Modal deployment in marimo mode (GPU: {gpu_available})")
     
     # Start Marimo in the background
     asyncio.create_task(start_marimo_server())
@@ -180,14 +180,14 @@ def deploy_gradio():
     for name in interface_names:
         if name in globals() and hasattr(globals()[name], 'launch'):
             demo = globals()[name]
-            logger.info(f"Found Gradio interface: {{name}}")
+            logger.info(f"Found Gradio interface: {name}")
             break
     
     if demo is None:
         for var_name, var_value in globals().items():
             if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
                 demo = var_value
-                logger.info(f"Found Gradio interface through scanning: {{var_name}}")
+                logger.info(f"Found Gradio interface through scanning: {var_name}")
                 break
     
     if demo is None:
@@ -263,7 +263,7 @@ def deploy_gradio():
     async def marimo_proxy(path: str = ""):
         """Proxy requests to Marimo."""
         # Redirect to Marimo
-        marimo_url = f"http://localhost:2718/{{path}}"
+        marimo_url = f"http://localhost:2718/{path}"
         return RedirectResponse(url=marimo_url)
     
     # Add dashboard API endpoints

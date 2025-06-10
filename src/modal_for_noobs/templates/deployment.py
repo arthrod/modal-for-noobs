@@ -6,10 +6,10 @@ the selected mode (minimum, optimized, gradio-jupyter, marimo).
 
 import importlib.util
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 
-def get_image_config(deployment_mode: str, packages: List[str]) -> str:
+def get_image_config(deployment_mode: str, packages: list[str]) -> str:
     """Get Modal image configuration based on deployment mode.
 
     Args:
@@ -19,11 +19,11 @@ def get_image_config(deployment_mode: str, packages: List[str]) -> str:
     Returns:
         str: Modal image configuration string.
     """
-    packages_str = ',\n    '.join([f'"{pkg}"' for pkg in packages])
-    
+    packages_str = ",\n    ".join([f'"{pkg}"' for pkg in packages])
+
     # For optimized and marimo modes, use GPU-optimized base image
     if deployment_mode in ["optimized", "marimo"]:
-        return f'''image = (
+        return f"""image = (
     modal.Image.from_registry("nvidia/cuda:12.1-devel-ubuntu22.04", add_python="3.11")
     .pip_install(
         {packages_str}
@@ -36,46 +36,46 @@ def get_image_config(deployment_mode: str, packages: List[str]) -> str:
         # Optimize PyTorch for GPU
         "python -c 'import torch; print(f\\"PyTorch {{torch.__version__}} - CUDA available: {{torch.cuda.is_available()}}\\");'",
     )
-)'''
+)"""
     else:
         # Standard Debian slim for minimum and gradio-jupyter modes
-        return f'''image = modal.Image.debian_slim(python_version="3.11").pip_install(
+        return f"""image = modal.Image.debian_slim(python_version="3.11").pip_install(
     {packages_str}
-)'''
+)"""
 
 
 def load_template_module(template_name: str) -> Any:
     """Load a template module dynamically.
-    
+
     Args:
         template_name: Name of the template (minimum, optimized, gradio-jupyter, marimo)
-        
+
     Returns:
         The loaded module
     """
     template_dir = Path(__file__).parent / template_name
     template_file = template_dir / "deployment_template.py"
-    
+
     if not template_file.exists():
         raise FileNotFoundError(f"Template not found: {template_name}")
-    
+
     spec = importlib.util.spec_from_file_location(f"{template_name}_template", template_file)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    
+
     return module
 
 
 def load_dashboard_module() -> str:
     """Load the dashboard module content.
-    
+
     Returns:
         str: The dashboard module content
     """
     dashboard_file = Path(__file__).parent / "dashboard.py"
     if not dashboard_file.exists():
         raise FileNotFoundError("Dashboard module not found")
-    
+
     return dashboard_file.read_text()
 
 
@@ -88,47 +88,40 @@ def generate_modal_deployment(
     image_config: str = None,
 ) -> str:
     """Generate Modal deployment code using the new template system.
-    
+
     Args:
         app_file: Path to the original Gradio app file
         original_code: Content of the original Gradio app
         deployment_mode: Deployment mode (minimum, optimized, gradio-jupyter, marimo)
         timeout_seconds: Function timeout in seconds
         scaledown_window: Scale down window in seconds
-        
+
     Returns:
         str: Complete Modal deployment Python code
     """
     # Map old mode names to new ones
-    mode_mapping = {
-        "gra_jupy": "gradio-jupyter",
-        "minimum": "minimum",
-        "optimized": "optimized",
-        "marimo": "marimo"
-    }
-    
+    mode_mapping = {"gra_jupy": "gradio-jupyter", "minimum": "minimum", "optimized": "optimized", "marimo": "marimo"}
+
     template_name = mode_mapping.get(deployment_mode, deployment_mode)
-    
+
     # Load the template module
     try:
         template_module = load_template_module(template_name)
     except FileNotFoundError:
         # Fallback to old template system for backward compatibility
-        return generate_modal_deployment_legacy(
-            app_file, original_code, deployment_mode, 
-            timeout_seconds, scaledown_window
-        )
-    
+        return generate_modal_deployment_legacy(app_file, original_code, deployment_mode, timeout_seconds, scaledown_window)
+
     # If no image_config provided, generate one based on mode
     if image_config is None:
         from modal_for_noobs.config_loader import config_loader
+
         package_config = config_loader.load_base_packages()
         packages = package_config.get(deployment_mode, package_config.get("minimum", []))
         image_config = get_image_config(deployment_mode, packages)
-    
+
     # Load dashboard module
     dashboard_content = load_dashboard_module()
-    
+
     # Format the template
     template = template_module.TEMPLATE
     formatted_code = template.format(
@@ -137,9 +130,9 @@ def generate_modal_deployment(
         timeout_seconds=timeout_seconds,
         scaledown_window=scaledown_window,
         dashboard_module=dashboard_content,
-        image_config=image_config
+        image_config=image_config,
     )
-    
+
     return formatted_code
 
 
@@ -151,20 +144,20 @@ def generate_modal_deployment_legacy(
     scaledown_window: int = 1200,
 ) -> str:
     """Legacy deployment template generation for backward compatibility.
-    
+
     This is the old template system that will be phased out.
     """
     from modal_for_noobs.config_loader import config_loader
-    
+
     # Load packages for the deployment mode
     packages = config_loader.load_base_packages().get(deployment_mode, [])
-    
+
     # Build image configuration
-    packages_str = ',\n    '.join([f'"{pkg}"' for pkg in packages])
-    image_config = f'''image = modal.Image.debian_slim(python_version="3.11").pip_install(
+    packages_str = ",\n    ".join([f'"{pkg}"' for pkg in packages])
+    image_config = f"""image = modal.Image.debian_slim(python_version="3.11").pip_install(
     {packages_str}
-)'''
-    
+)"""
+
     metadata = {
         "app_name": f"modal-for-noobs-{app_file.stem}",
         "deployment_mode": deployment_mode,
@@ -172,7 +165,7 @@ def generate_modal_deployment_legacy(
         "scaledown_window": scaledown_window,
         "gpu_line": '    gpu="any",' if deployment_mode in ["optimized", "gra_jupy"] else "",
     }
-    
+
     return f'''# 🚀 Modal Deployment Script (Async Generated)
 # Generated by modal-for-noobs - https://github.com/arthrod/modal-for-noobs
 # Deployment Mode: {deployment_mode}

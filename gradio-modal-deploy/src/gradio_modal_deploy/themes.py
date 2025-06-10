@@ -4,11 +4,11 @@ import gradio as gr
 
 
 def create_modal_theme() -> gr.Theme:
-    """
-    Create a beautiful Modal-themed Gradio theme.
+    """Create a beautiful Modal-themed Gradio theme.
 
     Returns:
         gr.Theme: Modal-themed Gradio theme with signature green colors
+
     """
     # Modal's signature colors
     modal_green = "#00D26A"
@@ -19,7 +19,7 @@ def create_modal_theme() -> gr.Theme:
     theme = gr.Theme.from_hub("soft")
 
     # Customize with Modal colors
-    theme = theme.set(
+    return theme.set(
         # Primary button styling
         button_primary_background_fill=modal_green,
         button_primary_background_fill_hover=modal_light_green,
@@ -27,7 +27,6 @@ def create_modal_theme() -> gr.Theme:
         button_primary_text_color="white",
         button_primary_text_color_hover="white",
         button_primary_text_color_dark="white",
-
         # Secondary button styling
         button_secondary_background_fill="rgba(0, 210, 106, 0.1)",
         button_secondary_background_fill_hover="rgba(0, 210, 106, 0.2)",
@@ -35,7 +34,6 @@ def create_modal_theme() -> gr.Theme:
         button_secondary_text_color_hover=modal_dark_green,
         button_secondary_border_color=modal_green,
         button_secondary_border_color_hover=modal_light_green,
-
         # Input and form styling
         input_background_fill="white",
         input_background_fill_focus="white",
@@ -43,56 +41,46 @@ def create_modal_theme() -> gr.Theme:
         input_border_color_focus=modal_light_green,
         input_border_width="2px",
         input_border_width_focus="2px",
-
         # Slider styling
         slider_color=modal_green,
         slider_color_dark=modal_green,
-
         # Checkbox and radio styling
         checkbox_background_color=modal_green,
         checkbox_background_color_selected=modal_green,
         checkbox_background_color_focus=modal_light_green,
-
         # General panel styling
         panel_background_fill="white",
         panel_background_fill_dark=modal_gray,
         panel_border_color="rgba(0, 210, 106, 0.2)",
         panel_border_width="1px",
-
         # Body background
         body_background_fill="linear-gradient(135deg, rgba(0, 210, 106, 0.05) 0%, rgba(74, 232, 138, 0.05) 100%)",
         body_background_fill_dark="linear-gradient(135deg, rgba(0, 210, 106, 0.1) 0%, rgba(74, 232, 138, 0.1) 100%)",
-
         # Text colors
         body_text_color="#1f2937",
         body_text_color_subdued="#6b7280",
-
         # Link colors
         link_text_color=modal_green,
         link_text_color_hover=modal_light_green,
         link_text_color_visited=modal_dark_green,
-
         # Block styling
         block_background_fill="white",
         block_border_color="rgba(0, 210, 106, 0.15)",
         block_border_width="1px",
         block_radius="12px",
         block_shadow="0 2px 8px rgba(0, 210, 106, 0.1)",
-
         # Font family
         font=("SF Pro Display", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"),
         font_mono=("SF Mono", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"),
     )
 
-    return theme
-
 
 def get_modal_css() -> str:
-    """
-    Get additional CSS for enhanced Modal styling.
+    """Get additional CSS for enhanced Modal styling.
 
     Returns:
         str: CSS string with Modal-specific enhancements
+
     """
     modal_green = "#00D26A"
     modal_light_green = "#4AE88A"

@@ -7,13 +7,13 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from modal_for_noobs.modal_deploy import ModalDeployer, DeploymentConfig
+from modal_for_noobs.modal_deploy import DeploymentConfig, ModalDeployer
 
 
 @pytest.fixture
 def sample_gradio_app(tmp_path):
     """Create a sample Gradio app for testing."""
-    app_content = '''
+    app_content = """
 import gradio as gr
 
 def greet(name):
@@ -23,7 +23,7 @@ demo = gr.Interface(fn=greet, inputs="text", outputs="text")
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
     app_file = tmp_path / "test_app.py"
     app_file.write_text(app_content)
     return app_file
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 @pytest.fixture
 def sample_app_with_dependencies(tmp_path):
     """Create a sample app with various dependencies."""
-    app_content = '''
+    app_content = """
 import gradio as gr
 import pandas as pd
 import numpy as np
@@ -75,7 +75,7 @@ with gr.Blocks() as demo:
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
     app_file = tmp_path / "complex_ai_app.py"
     app_file.write_text(app_content)
     return app_file
@@ -102,8 +102,7 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_check_modal_auth_without_env_vars(self):
         """Test Modal auth check without environment variables."""
-        with patch.dict("os.environ", {}, clear=True), \
-             patch("pathlib.Path.exists", return_value=False):
+        with patch.dict("os.environ", {}, clear=True), patch("pathlib.Path.exists", return_value=False):
             dummy_app_file = Path("dummy.py")
             deployer = ModalDeployer(dummy_app_file)
             result = await deployer.check_modal_auth_async()
@@ -112,8 +111,7 @@ class TestModalDeployer:
     @pytest.mark.asyncio
     async def test_check_modal_auth_partial_env_vars(self):
         """Test Modal auth check with partial environment variables."""
-        with patch.dict("os.environ", {"MODAL_TOKEN_ID": "test_id"}, clear=True), \
-             patch("pathlib.Path.exists", return_value=False):
+        with patch.dict("os.environ", {"MODAL_TOKEN_ID": "test_id"}, clear=True), patch("pathlib.Path.exists", return_value=False):
             dummy_app_file = Path("dummy.py")
             deployer = ModalDeployer(dummy_app_file)
             result = await deployer.check_modal_auth_async()
@@ -123,6 +121,7 @@ class TestModalDeployer:
     async def test_create_deployment_minimum_config(self, sample_gradio_app):
         """Test creating deployment with minimum configuration."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_gradio_app)
         config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
@@ -152,6 +151,7 @@ class TestModalDeployer:
     async def test_create_deployment_optimized_config(self, sample_gradio_app):
         """Test creating deployment with optimized configuration."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_gradio_app)
         config = DeploymentConfig(mode="optimized", app_name=sample_gradio_app.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
@@ -170,6 +170,7 @@ class TestModalDeployer:
     async def test_create_deployment_complex_app(self, sample_app_with_dependencies):
         """Test creating deployment for complex app with many dependencies."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_app_with_dependencies)
         config = DeploymentConfig(mode="optimized", app_name=sample_app_with_dependencies.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, config)
@@ -192,6 +193,7 @@ class TestModalDeployer:
     async def test_create_deployment_preserves_app_structure(self, sample_app_with_dependencies):
         """Test that deployment preserves complex app structure."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_app_with_dependencies)
         config = DeploymentConfig(mode="minimum", app_name=sample_app_with_dependencies.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_app_with_dependencies, config)
@@ -211,6 +213,7 @@ class TestModalDeployer:
     async def test_deployment_file_naming(self, sample_gradio_app):
         """Test deployment file naming convention."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_gradio_app)
         config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
@@ -223,6 +226,7 @@ class TestModalDeployer:
     async def test_deployment_app_naming(self, sample_gradio_app):
         """Test Modal app naming in deployment file."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_gradio_app)
         config = DeploymentConfig(mode="minimum", app_name=sample_gradio_app.stem)
         deployment_file = await deployer.create_modal_deployment_async(sample_gradio_app, config)
@@ -235,6 +239,7 @@ class TestModalDeployer:
     async def test_deployment_error_handling_invalid_file(self):
         """Test deployment creation with invalid file."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         dummy_app_file = Path("dummy.py")
         deployer = ModalDeployer(dummy_app_file)
         config = DeploymentConfig(mode="minimum", app_name="nonexistent")
@@ -246,6 +251,7 @@ class TestModalDeployer:
     async def test_deployment_error_handling_invalid_config(self, sample_gradio_app):
         """Test deployment creation with invalid configuration."""
         from modal_for_noobs.modal_deploy import DeploymentConfig
+
         deployer = ModalDeployer(sample_gradio_app)
         config = DeploymentConfig(mode="invalid_config", app_name=sample_gradio_app.stem)
 
@@ -323,7 +329,7 @@ class TestAsyncOperations:
         apps = []
         for i in range(3):
             app_file = tmp_path / f"app_{i}.py"
-            app_file.write_text(f'''
+            app_file.write_text(f"""
 import gradio as gr
 
 def greet_{i}(name):
@@ -333,17 +339,14 @@ demo = gr.Interface(fn=greet_{i}, inputs="text", outputs="text")
 
 if __name__ == "__main__":
     demo.launch()
-''')
+""")
             apps.append(app_file)
 
         # Use the first app as the primary app for the deployer
         deployer = ModalDeployer(apps[0])
 
         # Create deployments concurrently
-        tasks = [
-            deployer.create_modal_deployment_async(app, "minimum")
-            for app in apps
-        ]
+        tasks = [deployer.create_modal_deployment_async(app, "minimum") for app in apps]
 
         deployment_files = await asyncio.gather(*tasks)
 
@@ -358,10 +361,7 @@ if __name__ == "__main__":
         deployer = ModalDeployer(sample_gradio_app)
 
         # Should complete within reasonable time
-        deployment_file = await asyncio.wait_for(
-            deployer.create_modal_deployment_async(sample_gradio_app, "minimum"),
-            timeout=10.0
-        )
+        deployment_file = await asyncio.wait_for(deployer.create_modal_deployment_async(sample_gradio_app, "minimum"), timeout=10.0)
 
         assert deployment_file.exists()
 
@@ -423,7 +423,7 @@ class TestFileHandling:
     async def test_large_python_file(self, tmp_path):
         """Test deployment creation with large Python file."""
         large_content = "# Large file\n" + "# Comment line\n" * 1000
-        large_content += '''
+        large_content += """
 import gradio as gr
 
 def greet(name):
@@ -433,7 +433,7 @@ demo = gr.Interface(fn=greet, inputs="text", outputs="text")
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
 
         large_file = tmp_path / "large_app.py"
         large_file.write_text(large_content)
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     @pytest.mark.asyncio
     async def test_unicode_content_handling(self, tmp_path):
         """Test deployment creation with Unicode content."""
-        unicode_content = '''
+        unicode_content = """
 import gradio as gr
 
 def greet(name):
@@ -468,7 +468,7 @@ demo = gr.Interface(
 
 if __name__ == "__main__":
     demo.launch()
-'''
+"""
 
         unicode_file = tmp_path / "unicode_app.py"
         unicode_file.write_text(unicode_content, encoding="utf-8")

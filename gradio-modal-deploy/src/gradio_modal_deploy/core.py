@@ -11,7 +11,7 @@ from loguru import logger
 class ModalAPI:
     """Async Modal API client for deployment management."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize Modal API client."""
         self.client = httpx.AsyncClient(timeout=30.0)
 
@@ -23,9 +23,11 @@ class ModalAPI:
         """Check if Modal is authenticated."""
         try:
             process = await asyncio.create_subprocess_exec(
-                "modal", "auth", "current",
+                "modal",
+                "auth",
+                "current",
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
             return process.returncode == 0
@@ -37,9 +39,10 @@ class ModalAPI:
         """Setup Modal authentication."""
         try:
             process = await asyncio.create_subprocess_exec(
-                "modal", "setup",
+                "modal",
+                "setup",
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
             return process.returncode == 0
@@ -51,7 +54,7 @@ class ModalAPI:
         self,
         app_file: Path,
         mode: str = "optimized",
-        timeout_minutes: int = 60
+        timeout_minutes: int = 60,
     ) -> dict[str, any]:
         """Deploy a Gradio app to Modal."""
         try:
@@ -60,9 +63,11 @@ class ModalAPI:
 
             # Deploy to Modal
             process = await asyncio.create_subprocess_exec(
-                "modal", "deploy", str(deployment_file),
+                "modal",
+                "deploy",
+                str(deployment_file),
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
 
@@ -75,26 +80,26 @@ class ModalAPI:
                     "success": True,
                     "url": url,
                     "output": output,
-                    "deployment_file": deployment_file
+                    "deployment_file": deployment_file,
                 }
             return {
                 "success": False,
                 "error": stderr.decode(),
-                "deployment_file": deployment_file
+                "deployment_file": deployment_file,
             }
 
         except Exception as e:
             logger.error(f"Deployment failed: {e}")
             return {
                 "success": False,
-                "error": str(e)
+                "error": str(e),
             }
 
     async def _create_deployment_file(
         self,
         app_file: Path,
         mode: str,
-        timeout_minutes: int
+        timeout_minutes: int,
     ) -> Path:
         """Create Modal deployment file."""
         # This would use the same logic as the main modal-for-noobs package
@@ -154,28 +159,28 @@ if __name__ == "__main__":
     def _get_image_config(self, mode: str) -> str:
         """Get image configuration based on deployment mode."""
         if mode == "minimum":
-            return '''
+            return """
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn"
-)'''
+)"""
         if mode == "gra_jupy":
-            return '''
+            return """
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn", "jupyter", "jupyterlab",
     "notebook", "ipywidgets", "matplotlib", "plotly", "seaborn"
-)'''
+)"""
         # optimized
-        return '''
+        return """
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "gradio", "fastapi", "uvicorn", "torch", "transformers",
     "accelerate", "diffusers", "pillow", "numpy", "pandas"
-)'''
+)"""
 
     def _extract_url_from_output(self, output: str) -> str | None:
         """Extract deployment URL from Modal output."""
-        lines = output.split('\n')
+        lines = output.split("\n")
         for line in lines:
-            if 'https://' in line and 'modal.run' in line:
+            if "https://" in line and "modal.run" in line:
                 return line.strip()
         return None
 
@@ -183,26 +188,30 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
         """List active Modal deployments."""
         try:
             process = await asyncio.create_subprocess_exec(
-                "modal", "app", "list",
+                "modal",
+                "app",
+                "list",
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
 
             if process.returncode == 0:
                 # Parse output into structured data
                 deployments = []
-                lines = stdout.decode().split('\n')
+                lines = stdout.decode().split("\n")
 
                 for line in lines[1:]:  # Skip header
                     if line.strip():
                         parts = line.split()
                         if len(parts) >= 2:
-                            deployments.append({
-                                "name": parts[0],
-                                "status": parts[1] if len(parts) > 1 else "unknown",
-                                "url": self._extract_url_from_line(line)
-                            })
+                            deployments.append(
+                                {
+                                    "name": parts[0],
+                                    "status": parts[1] if len(parts) > 1 else "unknown",
+                                    "url": self._extract_url_from_line(line),
+                                },
+                            )
 
                 return deployments
             logger.error(f"Failed to list deployments: {stderr.decode()}")
@@ -214,10 +223,10 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
 
     def _extract_url_from_line(self, line: str) -> str | None:
         """Extract URL from a deployment line."""
-        if 'https://' in line:
+        if "https://" in line:
             parts = line.split()
             for part in parts:
-                if part.startswith('https://'):
+                if part.startswith("https://"):
                     return part
         return None
 
@@ -225,9 +234,12 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
         """Kill a specific deployment."""
         try:
             process = await asyncio.create_subprocess_exec(
-                "modal", "app", "stop", app_name,
+                "modal",
+                "app",
+                "stop",
+                app_name,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
             return process.returncode == 0
@@ -239,10 +251,10 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
 class GitHubAPI:
     """Async GitHub API client for Modal examples."""
 
-    def __init__(self, repo: str = "modal-labs/modal-examples"):
+    def __init__(self, repo: str = "modal-labs/modal-examples") -> None:
         """Initialize GitHub API client."""
         self.repo = repo
-        self.owner, self.repo_name = repo.split('/')
+        self.owner, self.repo_name = repo.split("/")
         self.base_url = "https://api.github.com"
         self.client = httpx.AsyncClient(timeout=30.0)
 
@@ -272,8 +284,7 @@ class GitHubAPI:
 
             data = response.json()
             if data.get("encoding") == "base64":
-                content = base64.b64decode(data["content"]).decode("utf-8")
-                return content
+                return base64.b64decode(data["content"]).decode("utf-8")
             return data.get("content", "")
 
         except httpx.HTTPError as e:
@@ -287,10 +298,12 @@ class GitHubAPI:
         folders = []
         for item in contents:
             if item.get("type") == "dir":
-                folders.append({
-                    "name": item["name"],
-                    "path": item["path"]
-                })
+                folders.append(
+                    {
+                        "name": item["name"],
+                        "path": item["path"],
+                    },
+                )
 
         return sorted(folders, key=lambda x: x["name"])
 
@@ -301,10 +314,12 @@ class GitHubAPI:
         python_files = []
         for item in contents:
             if item.get("type") == "file" and item["name"].endswith(".py"):
-                python_files.append({
-                    "name": item["name"],
-                    "path": item["path"]
-                })
+                python_files.append(
+                    {
+                        "name": item["name"],
+                        "path": item["path"],
+                    },
+                )
 
         return sorted(python_files, key=lambda x: x["name"])
 
@@ -318,8 +333,7 @@ class GitHubAPI:
                 return content
 
         # Fallback to root README
-        root_readme_content = await self.get_file_content("README.md")
-        return root_readme_content
+        return await self.get_file_content("README.md")
 
 
 # Global instances

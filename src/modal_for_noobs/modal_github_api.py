@@ -60,10 +60,7 @@ class GitHubAPI:
         folders = []
         for item in contents:
             if item.get("type") == "dir":
-                folders.append({
-                    "name": item["name"],
-                    "path": item["path"]
-                })
+                folders.append({"name": item["name"], "path": item["path"]})
 
         return sorted(folders, key=lambda x: x["name"])
 
@@ -74,10 +71,7 @@ class GitHubAPI:
         python_files = []
         for item in contents:
             if item.get("type") == "file" and item["name"].endswith(".py"):
-                python_files.append({
-                    "name": item["name"],
-                    "path": item["path"]
-                })
+                python_files.append({"name": item["name"], "path": item["path"]})
 
         return sorted(python_files, key=lambda x: x["name"])
 
@@ -101,10 +95,7 @@ class GitHubAPI:
         files = []
         for item in contents:
             if item.get("type") == "file" and item["name"].endswith(extension):
-                files.append({
-                    "name": item["name"],
-                    "path": item["path"]
-                })
+                files.append({"name": item["name"], "path": item["path"]})
             elif item.get("type") == "dir" and folder_path == "":
                 # Recursively search in subdirectories (only one level deep for performance)
                 subfolder_files = await self.search_files_by_extension(extension, item["path"])
@@ -120,7 +111,8 @@ github_api = GitHubAPI()
 # ⚡ Modal Function Configuration
 # Engineered for scalability, performance, and reliability
 @app.function(
-    image=image,    gpu="any",
+    image=image,
+    gpu="any",
     min_containers=1,
     max_containers=1,  # Single container for session consistency and state management
     timeout=3600,  # Configurable timeout for workload requirements
@@ -129,34 +121,32 @@ github_api = GitHubAPI()
 @modal.concurrent(max_inputs=100)  # High concurrency for production-grade performance
 @modal.asgi_app()
 def deploy_gradio():
-    """
-    Deploy Gradio app with Modal's high-performance infrastructure.
-    
+    """Deploy Gradio app with Modal's high-performance infrastructure.
+
     This deployment function implements:
     - Smart Gradio interface detection using global scope analysis
     - FastAPI integration following Modal's ASGI architecture patterns
     - Performance optimization for concurrent request handling
     - Error handling and fallback mechanisms for production reliability
     """
-
     # 🔍 Smart Gradio Interface Detection
     # Using global scope analysis for maximum compatibility
     demo = None
 
     # Primary detection: Check common Gradio interface names
-    if 'demo' in globals():
-        demo = globals()['demo']
-    elif 'app' in globals() and hasattr(globals()['app'], 'queue'):
-        demo = globals()['app']
-    elif 'interface' in globals():
-        demo = globals()['interface']
-    elif 'iface' in globals():
-        demo = globals()['iface']
+    if "demo" in globals():
+        demo = globals()["demo"]
+    elif "app" in globals() and hasattr(globals()["app"], "queue"):
+        demo = globals()["app"]
+    elif "interface" in globals():
+        demo = globals()["interface"]
+    elif "iface" in globals():
+        demo = globals()["iface"]
 
     # Fallback detection: Comprehensive global scope scan
     if demo is None:
         for var_name, var_value in globals().items():
-            if hasattr(var_value, 'queue') and hasattr(var_value, 'launch'):
+            if hasattr(var_value, "queue") and hasattr(var_value, "launch"):
                 demo = var_value
                 break
 
@@ -178,10 +168,11 @@ def deploy_gradio():
         description="High-performance Gradio deployment on Modal cloud infrastructure",
         version="1.0.0",
         docs_url="/docs",  # Enable API documentation
-        redoc_url="/redoc"  # Enable alternative API documentation
+        redoc_url="/redoc",  # Enable alternative API documentation
     )
-    
+
     return mount_gradio_app(fastapi_app, demo, path="/")
+
 
 # 🏃‍♂️ Direct execution support for local testing
 if __name__ == "__main__":

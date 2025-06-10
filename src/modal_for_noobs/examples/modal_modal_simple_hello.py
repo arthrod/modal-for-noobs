@@ -3,28 +3,29 @@
 # Deployment Mode: marimo
 # Following Modal's technical design philosophy for high-performance cloud computing
 
+import gradio as gr
 import modal
 from fastapi import FastAPI
-import gradio as gr
 from gradio.routes import mount_gradio_app
 
 # 🎯 Create Modal App with descriptive naming
-app = modal.App('modal-for-noobs-modal_simple_hello')
+app = modal.App("modal-for-noobs-modal_simple_hello")
 
 # 🐳 Container Image Configuration
 # Optimized for marimo workloads with efficient dependency management
-image = modal.Image.debian_slim(python_version='3.11').pip_install(
-    'gradio>=4.0.0',
-    'fastapi[standard]>=0.100.0',
-    'uvicorn>=0.20.0',
-    'torch>=2.0.0',
-    'transformers>=4.20.0',
-    'accelerate>=0.20.0',
-    'diffusers>=0.20.0',
-    'pillow>=9.0.0',
-    'numpy>=1.21.0',
-    'pandas>=1.3.0'
+image = modal.Image.debian_slim(python_version="3.11").pip_install(
+    "gradio>=4.0.0",
+    "fastapi[standard]>=0.100.0",
+    "uvicorn>=0.20.0",
+    "torch>=2.0.0",
+    "transformers>=4.20.0",
+    "accelerate>=0.20.0",
+    "diffusers>=0.20.0",
+    "pillow>=9.0.0",
+    "numpy>=1.21.0",
+    "pandas>=1.3.0",
 )
+
 
 # ⚡ Function Configuration
 # Designed for scalability and performance following Modal best practices
@@ -38,9 +39,8 @@ image = modal.Image.debian_slim(python_version='3.11').pip_install(
 @modal.concurrent(max_inputs=100)  # High concurrency for production workloads
 @modal.asgi_app()
 def deploy_gradio():
-    """
-    Deploy Gradio app with Modal's high-performance infrastructure.
-    
+    """Deploy Gradio app with Modal's high-performance infrastructure.
+
     This function implements smart Gradio interface detection and FastAPI integration
     following Modal's technical architecture patterns.
     """
@@ -54,42 +54,42 @@ def deploy_gradio():
 
     # 🔍 Smart Gradio interface detection
     import modal_simple_hello as target_module
+
     demo = None
-    
+
     # Primary detection: Common Gradio interface names
-    for attr in ['demo', 'app', 'interface', 'iface']:
+    for attr in ["demo", "app", "interface", "iface"]:
         if hasattr(target_module, attr):
             obj = getattr(target_module, attr)
-            if hasattr(obj, 'queue') and hasattr(obj, 'launch'):
+            if hasattr(obj, "queue") and hasattr(obj, "launch"):
                 demo = obj
                 break
-    
+
     # Fallback detection: Scan all module attributes
     if demo is None:
         for attr in dir(target_module):
-            if attr.startswith('_'):
+            if attr.startswith("_"):
                 continue
             obj = getattr(target_module, attr)
-            if hasattr(obj, 'queue') and hasattr(obj, 'launch'):
+            if hasattr(obj, "queue") and hasattr(obj, "launch"):
                 demo = obj
                 break
-    
+
     # 🚨 Fail-safe error handling
     if demo is None:
-        raise ValueError('Could not find Gradio interface in module')
-    
+        raise ValueError("Could not find Gradio interface in module")
+
     # 🚀 Configure for high-performance deployment
     demo.queue(max_size=10)  # Optimized queue size for responsiveness
-    
+
     # 🔗 FastAPI integration with Modal's ASGI architecture
     fastapi_app = FastAPI(
-        title='Modal-for-noobs Gradio App',
-        description='Deployed with modal-for-noobs - High-performance Gradio on Modal',
-        version='1.0.0'
+        title="Modal-for-noobs Gradio App", description="Deployed with modal-for-noobs - High-performance Gradio on Modal", version="1.0.0"
     )
-    
-    return mount_gradio_app(fastapi_app, demo, path='/')
+
+    return mount_gradio_app(fastapi_app, demo, path="/")
+
 
 # 🏃‍♂️ Direct execution support
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()

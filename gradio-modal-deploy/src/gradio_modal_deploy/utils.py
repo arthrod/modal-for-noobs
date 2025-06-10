@@ -9,11 +9,11 @@ from .core import modal_api
 
 
 def setup_modal_auth() -> bool:
-    """
-    Setup Modal authentication synchronously.
+    """Setup Modal authentication synchronously.
 
     Returns:
         bool: True if authentication was successful
+
     """
     try:
         return uvloop.run(modal_api.setup_auth())
@@ -23,11 +23,11 @@ def setup_modal_auth() -> bool:
 
 
 def get_modal_status() -> dict[str, any]:
-    """
-    Get current Modal deployment status synchronously.
+    """Get current Modal deployment status synchronously.
 
     Returns:
         dict: Status information including deployments list
+
     """
     try:
         deployments = uvloop.run(modal_api.list_deployments())
@@ -36,7 +36,7 @@ def get_modal_status() -> dict[str, any]:
             "authenticated": uvloop.run(modal_api.check_auth()),
             "deployments": deployments,
             "total_deployments": len(deployments),
-            "active_deployments": len([d for d in deployments if d.get("status") == "running"])
+            "active_deployments": len([d for d in deployments if d.get("status") == "running"]),
         }
     except Exception as e:
         logger.error(f"Failed to get Modal status: {e}")
@@ -45,7 +45,7 @@ def get_modal_status() -> dict[str, any]:
             "deployments": [],
             "total_deployments": 0,
             "active_deployments": 0,
-            "error": str(e)
+            "error": str(e),
         }
 
 
@@ -53,10 +53,9 @@ def deploy_to_modal(
     app_file: str | Path,
     mode: str = "optimized",
     timeout_minutes: int = 60,
-    auto_auth: bool = True
+    auto_auth: bool = True,
 ) -> dict[str, any]:
-    """
-    Deploy a Gradio app to Modal synchronously.
+    """Deploy a Gradio app to Modal synchronously.
 
     Args:
         app_file: Path to the Gradio app file
@@ -66,36 +65,36 @@ def deploy_to_modal(
 
     Returns:
         dict: Deployment result with success status and URL
+
     """
     app_path = Path(app_file)
 
     if not app_path.exists():
         return {
             "success": False,
-            "error": f"App file not found: {app_path}"
+            "error": f"App file not found: {app_path}",
         }
 
     try:
         # Run async deployment
-        result = uvloop.run(_deploy_async(app_path, mode, timeout_minutes, auto_auth))
-        return result
+        return uvloop.run(_deploy_async(app_path, mode, timeout_minutes, auto_auth))
     except Exception as e:
         logger.error(f"Deployment failed: {e}")
         return {
             "success": False,
-            "error": str(e)
+            "error": str(e),
         }
 
 
 def kill_deployment(app_name: str) -> bool:
-    """
-    Kill a specific Modal deployment synchronously.
+    """Kill a specific Modal deployment synchronously.
 
     Args:
         app_name: Name of the app to kill
 
     Returns:
         bool: True if kill was successful
+
     """
     try:
         return uvloop.run(modal_api.kill_deployment(app_name))
@@ -105,11 +104,11 @@ def kill_deployment(app_name: str) -> bool:
 
 
 def list_deployments() -> list[dict[str, any]]:
-    """
-    List all active Modal deployments synchronously.
+    """List all active Modal deployments synchronously.
 
     Returns:
         list: List of deployment information
+
     """
     try:
         return uvloop.run(modal_api.list_deployments())
@@ -119,14 +118,14 @@ def list_deployments() -> list[dict[str, any]]:
 
 
 def validate_app_file(app_file: str | Path) -> dict[str, any]:
-    """
-    Validate a Gradio app file for Modal deployment.
+    """Validate a Gradio app file for Modal deployment.
 
     Args:
         app_file: Path to the app file to validate
 
     Returns:
         dict: Validation result with recommendations
+
     """
     app_path = Path(app_file)
 
@@ -134,14 +133,14 @@ def validate_app_file(app_file: str | Path) -> dict[str, any]:
         return {
             "valid": False,
             "error": f"File not found: {app_path}",
-            "recommendations": ["Create the file first"]
+            "recommendations": ["Create the file first"],
         }
 
-    if not app_path.suffix == ".py":
+    if app_path.suffix != ".py":
         return {
             "valid": False,
             "error": "File must be a Python file (.py)",
-            "recommendations": ["Rename file with .py extension"]
+            "recommendations": ["Rename file with .py extension"],
         }
 
     try:
@@ -188,14 +187,14 @@ def validate_app_file(app_file: str | Path) -> dict[str, any]:
             "detected_jupyter": detected_jupyter,
             "recommendations": recommendations,
             "warnings": warnings,
-            "suggested_mode": _suggest_deployment_mode(detected_ml, detected_jupyter)
+            "suggested_mode": _suggest_deployment_mode(detected_ml, detected_jupyter),
         }
 
     except Exception as e:
         return {
             "valid": False,
             "error": f"Failed to read file: {e!s}",
-            "recommendations": ["Check file permissions and content"]
+            "recommendations": ["Check file permissions and content"],
         }
 
 
@@ -212,7 +211,7 @@ async def _deploy_async(
     app_path: Path,
     mode: str,
     timeout_minutes: int,
-    auto_auth: bool
+    auto_auth: bool,
 ) -> dict[str, any]:
     """Internal async deployment function."""
     try:

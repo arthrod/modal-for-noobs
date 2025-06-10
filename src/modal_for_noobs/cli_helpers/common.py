@@ -32,11 +32,13 @@ def print_info(message: str):
 def print_modal_banner(br_huehuehue: bool = False):
     """Print Modal-themed banner following their minimalist dark-mode design philosophy."""
     import secrets
+
     from rich.align import Align
     from rich.panel import Panel
     from rich.text import Text
+
     from modal_for_noobs.config_loader import config_loader
-    
+
     # Load marketing content
     marketing = config_loader.load_modal_marketing()
 
@@ -65,17 +67,18 @@ def print_modal_banner(br_huehuehue: bool = False):
         banner_text.append(f"\n{feature}", style=f"dim {MODAL_LIGHT_GREEN}")
 
     # Add technical tagline reflecting Modal's high-performance focus
-    banner_text.append("\nHigh-Performance Cloud Computing • Zero-Config Deployment", 
-                      style=f"dim {MODAL_DARK_GREEN}")
+    banner_text.append("\nHigh-Performance Cloud Computing • Zero-Config Deployment", style=f"dim {MODAL_DARK_GREEN}")
 
     # Panel with Modal's signature green and minimalist design
-    rprint(Panel(
-        Align.center(banner_text),
-        style=f"{MODAL_GREEN}",
-        border_style=f"{MODAL_GREEN}",
-        padding=(1, 2),
-        title="[bold white]modal-for-noobs[/bold white]",
-        title_align="center",
-        subtitle=f"[dim {MODAL_LIGHT_GREEN}]Powered by Modal Labs[/dim {MODAL_LIGHT_GREEN}]",
-        subtitle_align="center"
-    ))
+    rprint(
+        Panel(
+            Align.center(banner_text),
+            style=f"{MODAL_GREEN}",
+            border_style=f"{MODAL_GREEN}",
+            padding=(1, 2),
+            title="[bold white]modal-for-noobs[/bold white]",
+            title_align="center",
+            subtitle=f"[dim {MODAL_LIGHT_GREEN}]Powered by Modal Labs[/dim {MODAL_LIGHT_GREEN}]",
+            subtitle_align="center",
+        )
+    )
