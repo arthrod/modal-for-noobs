@@ -339,27 +339,17 @@ class ModalDeployer:
             bool: True if setup succeeded, False otherwise.
         """
         try:
-            logger.info("Running modal setup asynchronously...")
-            process = await asyncio.create_subprocess_exec("modal", "setup", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-            stdout, stderr = await process.communicate()
+            logger.info("Running Modal token flow for authentication...")
+            from modal_for_noobs.utils.auth import ModalAuthManager
 
-            if process.returncode == 0:
-                logger.debug(f"Modal setup output: {stdout.decode()}")
+            auth_mgr = ModalAuthManager()
+            success = await auth_mgr.setup_token_flow_auth()
+            if success:
                 rprint(f"[{MODAL_GREEN}]✅ Modal authentication setup complete![/{MODAL_GREEN}]")
                 return True
             else:
-                error_msg = stderr.decode()
-                logger.error(f"Modal setup failed with exit code {process.returncode}: {error_msg}")
-                rprint(f"[red]❌ Failed to setup Modal authentication: {error_msg}[/red]")
+                rprint("[red]❌ Failed to setup Modal authentication via token flow[/red]")
                 return False
-        except FileNotFoundError:
-            logger.error("Modal CLI not found")
-            rprint("[red]❌ Modal CLI not found. Please install: pip install modal[/red]")
-            return False
-        except OSError as e:
-            logger.error(f"Subprocess error during modal setup: {e}")
-            rprint(f"[red]❌ Subprocess error: {e}[/red]")
-            return False
         except Exception as e:
             logger.error(f"Unexpected error during modal setup: {e}")
             rprint(f"[red]❌ Unexpected error: {e}[/red]")

@@ -23,6 +23,7 @@ from modal_for_noobs.ui.components import ModalStatusMonitor
 
 # Import new UI components and themes
 from modal_for_noobs.ui.themes import MODAL_CSS, MODAL_THEME
+from modal_for_noobs.utils.auth import ModalAuthManager
 
 # GPU cost estimates (per hour in USD)
 GPU_COSTS = {
@@ -258,18 +259,15 @@ class ModalDashboard:
                             info="Enter the URL of the HuggingFace Space you want to deploy",
                         )
 
-                        # Feature 2: Modal API Key input (if not in env)
-                        modal_api_key = gr.Textbox(
-                            label="Modal API Key (Optional)",
-                            placeholder="Your Modal API key if not in environment",
-                            type="password",
-                            info="Leave empty if MODAL_TOKEN_ID is already set",
-                        )
+                        # Authentication inputs
+                        token_id_input = gr.Textbox(label="Modal Token ID", type="password")
+                        token_secret_input = gr.Textbox(label="Modal Token Secret", type="password")
 
-                        # Feature 3: Modal login button
                         with gr.Row():
-                            login_btn = gr.Button("🔐 Login to Modal", variant="secondary")
-                            login_status = gr.Textbox(label="Login Status", interactive=False)
+                            signup_btn = gr.Button("🆕 Create Account", variant="secondary")
+                            token_login_btn = gr.Button("🔑 Use Tokens", variant="secondary")
+                            link_login_btn = gr.Button("🌐 Public Link", variant="secondary")
+                        login_status = gr.Textbox(label="Login Status", interactive=False)
 
                         # Feature 5: Template selection dropdown
                         template_choice = gr.Dropdown(
@@ -391,29 +389,22 @@ class ModalDashboard:
                 return {logs_output: logs, status_output: f"✅ Fetched logs for {app_id}"}
 
             # Hackathon feature functions
-            async def login_to_modal(api_key: str):
-                """Handle Modal login."""
-                try:
-                    if api_key:
-                        # Set API key temporarily (don't save to env in Spaces!)
-                        import os
+            auth_mgr = ModalAuthManager()
 
-                        os.environ["MODAL_TOKEN_ID"] = api_key
+            async def signup():
+                auth_mgr.open_signup_page()
+                return "Opened sign-up page in your browser"
 
-                    # Test modal connection
-                    process = await asyncio.create_subprocess_exec(
-                        "modal", "token", "current", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-                    )
-                    stdout, stderr = await process.communicate()
+            async def login_with_tokens(tid: str, secret: str):
+                if auth_mgr.setup_env_auth(tid, secret):
+                    return "✅ Tokens configured"
+                return "❌ Invalid tokens"
 
-                    if process.returncode == 0:
-                        return "✅ Successfully logged into Modal!"
-                    else:
-                        return f"❌ Login failed: {stderr.decode()}"
-                except Exception as e:
-                    return f"❌ Error: {str(e)}"
+            async def login_via_link():
+                success = await auth_mgr.setup_token_flow_auth()
+                return "✅ Authenticated via link" if success else "❌ Authentication failed"
 
-            async def deploy_to_modal(hf_url: str, api_key: str, template: str, py_file, zip_file):
+            async def deploy_to_modal(hf_url: str, tid: str, secret: str, template: str, py_file, zip_file):
                 """Deploy to Modal using hackathon features."""
                 try:
                     output_lines = []
@@ -427,12 +418,10 @@ class ModalDashboard:
                             username, space_name = space_parts
                             output_lines.append(f"📦 Space: {username}/{space_name}")
 
-                    # 2. Set API key if provided
-                    if api_key:
-                        import os
-
-                        os.environ["MODAL_TOKEN_ID"] = api_key
-                        output_lines.append("🔑 API key configured")
+                    # 2. Configure tokens if provided
+                    if tid and secret:
+                        auth_mgr.setup_env_auth(tid, secret)
+                        output_lines.append("🔑 Tokens configured")
 
                     # 3. Handle file uploads
                     source_path = None
@@ -540,11 +529,13 @@ if __name__ == "__main__":
                     return f"❌ Deployment failed: {str(e)}", "### 🔗 Deployment Links\nDeployment failed"
 
             # Connect hackathon events
-            login_btn.click(fn=login_to_modal, inputs=[modal_api_key], outputs=[login_status])
+            signup_btn.click(fn=signup, outputs=[login_status])
+            token_login_btn.click(fn=login_with_tokens, inputs=[token_id_input, token_secret_input], outputs=[login_status])
+            link_login_btn.click(fn=login_via_link, outputs=[login_status])
 
             deploy_btn.click(
                 fn=deploy_to_modal,
-                inputs=[hf_url, modal_api_key, template_choice, file_upload, folder_upload],
+                inputs=[hf_url, token_id_input, token_secret_input, template_choice, file_upload, folder_upload],
                 outputs=[deployment_output, deployment_links],
             )
 

@@ -352,6 +352,7 @@ def mn(
 def auth(
     token_id: Annotated[str | None, typer.Option("--token-id", help="Modal token ID")] = None,
     token_secret: Annotated[str | None, typer.Option("--token-secret", help="Modal token secret")] = None,
+    create_account: Annotated[bool, typer.Option("--create-account", help="Open browser to create a Modal account")] = False,
 ) -> None:
     """🔐 Setup Modal authentication - get your keys ready!"""
     print_modal_banner()
@@ -362,7 +363,7 @@ def auth(
 
     rprint(Panel(Align.center(auth_text), border_style=f"{MODAL_GREEN}", padding=(1, 2)))
 
-    uvloop.run(_setup_auth_async(token_id, token_secret), debug=False)
+    uvloop.run(_setup_auth_async(token_id, token_secret, create_account), debug=False)
 
 
 @app.command()
@@ -727,16 +728,23 @@ async def _launch_dashboard_async(port: int, share: bool, br_huehuehue: bool) ->
     await asyncio.to_thread(launch_dashboard, port=port, share=share)
 
 
-async def _setup_auth_async(token_id: str | None, token_secret: str | None) -> None:
+async def _setup_auth_async(token_id: str | None, token_secret: str | None, create_account: bool = False) -> None:
     """Async authentication setup with progress."""
     import os
 
     deployer = ModalDeployer(app_file=Path("dummy"), mode="minimum")
+    auth_mgr = ModalAuthManager()
+
+    if create_account:
+        auth_mgr.open_signup_page()
+        print_info("Browser opened for account creation")
+        return
 
     if token_id and token_secret:
-        os.environ["MODAL_TOKEN_ID"] = token_id
-        os.environ["MODAL_TOKEN_SECRET"] = token_secret
-        print_success("Modal authentication configured via environment variables!")
+        if auth_mgr.setup_env_auth(token_id, token_secret):
+            print_success("Modal authentication configured via environment variables!")
+        else:
+            print_error("Authentication setup failed!")
     else:
         with Progress(
             SpinnerColumn(spinner_name="dots", style=f"{MODAL_GREEN}"),
