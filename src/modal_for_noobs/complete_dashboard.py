@@ -708,19 +708,18 @@ demo.launch()""",
             def show_remote_functions_config(enable_remote):
                 return gr.update(visible=enable_remote)
             
-            def start_link_authentication():
-                """Start OAuth-style link authentication."""
+            async def start_link_authentication():
+                """Run Modal's official token flow authentication."""
                 try:
-                    # In a real implementation, this would start the OAuth flow
-                    # For now, simulate opening the authorization URL
-                    auth_url = "https://modal.com/oauth/authorize?client_id=modal-for-noobs"
-                    webbrowser.open(auth_url)
-                    
+                    await self.auth_manager.setup_token_flow_auth()
+                    status = self.auth_manager.get_auth_status()
+                    workspace = status.get("workspace") if status else None
+
                     return {
-                        link_auth_btn: gr.update(visible=False),
-                        link_progress: gr.update(visible=True),
-                        link_success: gr.update(visible=False),
-                        auth_status_display: self._get_auth_status_html(False, "pending")
+                        link_auth_btn: gr.update(visible=True),
+                        link_progress: gr.update(visible=False),
+                        link_success: gr.update(visible=True),
+                        auth_status_display: self._get_auth_status_html(True, workspace),
                     }
                 except Exception as e:
                     logger.error(f"Failed to start link auth: {e}")

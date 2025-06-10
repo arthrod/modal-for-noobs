@@ -14,6 +14,9 @@ from urllib.parse import urlencode
 import gradio as gr
 import httpx
 from loguru import logger
+from modal import config
+from modal.client import _Client
+from modal.token_flow import _TokenFlow
 
 from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN
 
@@ -44,22 +47,26 @@ class EasyModalAuth:
             "expires_at": datetime.now() + timedelta(minutes=10),
         }
         
-        # Build OAuth-style authorization URL
-        auth_params = {
-            "client_id": "modal-for-noobs",
-            "response_type": "token",
-            "redirect_uri": f"http://localhost:7860/auth/callback",
-            "state": session_id,
-            "scope": "deployments:write",
-        }
-        
-        # For now, we'll use a mock URL - in production this would be Modal's OAuth endpoint
-        auth_url = f"https://modal.com/oauth/authorize?{urlencode(auth_params)}"
-        
-        # In a real implementation, we'd start a local callback server here
-        # For the demo, we'll simulate the flow
+        # Start Modal token flow to get dynamic auth URL
+        server_url = config.get("server_url")
+        client_cm = _Client.anonymous(server_url)
+        client = await client_cm.__aenter__()
+
+        token_flow = _TokenFlow(client)
+        start_cm = token_flow.start()
+        token_flow_id, auth_url, code = await start_cm.__aenter__()
+
+        self.auth_sessions[session_id].update(
+            {
+                "client_cm": client_cm,
+                "start_cm": start_cm,
+                "token_flow": token_flow,
+                "code": code,
+            }
+        )
+
         self.auth_flow_active = True
-        
+
         return auth_url, session_id
     
     async def check_auth_status(self, session_id: str) -> Dict[str, any]:
@@ -81,14 +88,17 @@ class EasyModalAuth:
             session["status"] = "expired"
             return {"status": "expired", "message": "Authentication session expired"}
         
-        # In a real implementation, we'd check if the callback was received
-        # For demo, we'll simulate success after a delay
-        if session["status"] == "pending" and (datetime.now() - session["created_at"]).seconds > 5:
-            # Simulate successful authentication
-            session["status"] = "success"
-            session["token_id"] = f"ak-demo-{secrets.token_hex(8)}"
-            session["token_secret"] = f"as-demo-{secrets.token_hex(16)}"
-            session["workspace"] = "demo-workspace"
+        # Poll Modal for authentication result
+        if session["status"] == "pending":
+            result = await session["token_flow"].finish()
+            if result is not None:
+                session["status"] = "success"
+                session["token_id"] = result.token_id
+                session["token_secret"] = result.token_secret
+                session["workspace"] = result.workspace_username
+
+                await session["start_cm"].__aexit__(None, None, None)
+                await session["client_cm"].__aexit__(None, None, None)
         
         return {
             "status": session["status"],
@@ -214,8 +224,8 @@ class EasyModalAuth:
                     
                     ### The browser tab didn't open?
                     
-                    No problem! Click this link instead: 
-                    [Open Modal Authorization](https://modal.com/oauth/authorize)
+                    No problem! Open Modal in your browser:
+                    [Modal Dashboard](https://modal.com)
                     """
                 )
             
