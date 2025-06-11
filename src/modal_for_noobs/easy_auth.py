@@ -88,17 +88,17 @@ class EasyModalAuth:
             session["status"] = "expired"
             return {"status": "expired", "message": "Authentication session expired"}
         
-        # Poll Modal for authentication result
-        if session["status"] == "pending":
-            result = await session["token_flow"].finish()
-            if result is not None:
-                session["status"] = "success"
-                session["token_id"] = result.token_id
-                session["token_secret"] = result.token_secret
-                session["workspace"] = result.workspace_username
-
-                await session["start_cm"].__aexit__(None, None, None)
-                await session["client_cm"].__aexit__(None, None, None)
+            session["status"] = "expired"
+            try:
+                if hasattr(session.get("start_cm"), "__aexit__"):
+                    await session["start_cm"].__aexit__(None, None, None)
+                if hasattr(session.get("client_cm"), "__aexit__"):
+                    await session["client_cm"].__aexit__(None, None, None)
+            except Exception as e:
+                logger.warning(f"Error during cleanup of expired session {session_id}: {e}")
+            if session_id in self.auth_sessions:
+                del self.auth_sessions[session_id]
+            return {"status": "expired", "message": "Authentication session expired"}
         
         return {
             "status": session["status"],
