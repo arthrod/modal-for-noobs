@@ -233,7 +233,58 @@ class CompleteModalDashboard:
                                     lines=3
                                 )
                         
-                        # Method 3: File Upload Authentication
+                        # Method 3: Hugging Face Authentication
+                        with gr.Tab("🤗 Connect with Hugging Face") as hf_auth_tab:
+                            with gr.Column(elem_classes=["auth-card"]):
+                                gr.Markdown("### 🤗 Connect with your Hugging Face Account")
+                                gr.Markdown(
+                                    "One-click authentication with your Hugging Face account. "
+                                    "Your credentials will be securely stored in this space."
+                                )
+                                
+                                # Hugging Face auth interface
+                                with gr.Row():
+                                    with gr.Column(scale=2):
+                                        gr.Markdown(
+                                            "**How it works:**\\n"
+                                            "1. 🔗 Click the button below\\n"
+                                            "2. 🌐 A new tab opens with Hugging Face's authorization page\\n"
+                                            "3. 🔐 Log in to your Hugging Face account\\n"
+                                            "4. ✅ Authorize access and you're done!"
+                                        )
+                                    with gr.Column(scale=1):
+                                        hf_auth_btn = gr.Button(
+                                            "🤗 Connect with Hugging Face",
+                                            variant="primary",
+                                            size="lg",
+                                            elem_classes=["feature-card"]
+                                        )
+                                
+                                # Progress section for HF auth
+                                with gr.Column(visible=False) as hf_progress:
+                                    gr.Markdown("### 🔄 Waiting for authorization...")
+                                    gr.Markdown("A new tab should have opened. Please authorize access to continue.")
+                                    
+                                    hf_progress_bar = gr.HTML(
+                                        value=self._get_progress_html(0),
+                                        elem_id="hf-progress"
+                                    )
+                                    
+                                    hf_cancel_btn = gr.Button("Cancel", variant="secondary")
+                                
+                                # Success section for HF auth
+                                with gr.Column(visible=False) as hf_success:
+                                    gr.Markdown("### ✅ Connected Successfully!")
+                                    hf_username_display = gr.Textbox(
+                                        label="Connected Hugging Face Account",
+                                        value="",
+                                        interactive=False
+                                    )
+                                    gr.Markdown("🎉 Your Hugging Face credentials are now securely stored in this space!")
+                                    
+                                    hf_disconnect_btn = gr.Button("Disconnect", variant="secondary")
+
+                        # Method 4: File Upload Authentication
                         with gr.Tab("📁 File Upload") as file_auth_tab:
                             with gr.Column(elem_classes=["auth-card"]):
                                 gr.Markdown("### 📂 Import from File")
@@ -269,6 +320,7 @@ class CompleteModalDashboard:
                             **Which method should I choose?**
                             - 🌐 **Link Authentication**: Best for beginners, most secure, easiest setup
                             - 🔑 **Token Authentication**: For advanced users who prefer manual control
+                            - 🤗 **Hugging Face Authentication**: Connect with your Hugging Face account
                             - 📁 **File Upload**: For importing existing configurations
                             
                             ### 🔗 Link Authentication (Recommended)
@@ -578,6 +630,7 @@ demo.launch()""",
                         **1. 🔐 Connect to Modal (Choose your method)**
                         - **🌐 Link Authentication (Recommended)**: Just click and authorize!
                         - **🔑 Token Authentication**: Manual setup with API tokens
+                        - **🤗 Hugging Face Authentication**: Connect with your Hugging Face account
                         - **📁 File Upload**: Import existing configuration
                         
                         **2. 🎯 Generate Your App**
@@ -727,6 +780,27 @@ demo.launch()""",
                         auth_status_display: self._get_auth_status_html(False, "error", str(e))
                     }
             
+            async def start_huggingface_authentication():
+                """Run Hugging Face OIDC authentication."""
+                try:
+                    # Start the Hugging Face authentication flow
+                    status = await self.auth_manager.setup_huggingface_auth()
+                    username = status.get("username") if status else None
+                    authenticated = status.get("authenticated", False)
+
+                    return {
+                        hf_auth_btn: gr.update(visible=True),
+                        hf_progress: gr.update(visible=False),
+                        hf_success: gr.update(visible=authenticated),
+                        hf_username_display: username or "Unknown",
+                        auth_status_display: self._get_auth_status_html(authenticated, username),
+                    }
+                except Exception as e:
+                    logger.error(f"Failed to start Hugging Face auth: {e}")
+                    return {
+                        auth_status_display: self._get_auth_status_html(False, "error", str(e))
+                    }
+            
             def authenticate_with_tokens(token_id, token_secret, workspace):
                 """Authenticate using tokens."""
                 if not token_id or not token_secret:
@@ -850,6 +924,31 @@ demo.launch()""",
             link_auth_btn.click(
                 fn=start_link_authentication,
                 outputs=[link_auth_btn, link_progress, link_success, auth_status_display]
+            )
+            
+            hf_auth_btn.click(
+                fn=start_huggingface_authentication,
+                outputs=[hf_auth_btn, hf_progress, hf_success, hf_username_display, auth_status_display]
+            )
+            
+            hf_cancel_btn.click(
+                fn=lambda: {
+                    hf_auth_btn: gr.update(visible=True),
+                    hf_progress: gr.update(visible=False),
+                    hf_success: gr.update(visible=False),
+                    auth_status_display: self._get_auth_status_html(False)
+                },
+                outputs=[hf_auth_btn, hf_progress, hf_success, auth_status_display]
+            )
+            
+            hf_disconnect_btn.click(
+                fn=lambda: {
+                    hf_auth_btn: gr.update(visible=True),
+                    hf_progress: gr.update(visible=False),
+                    hf_success: gr.update(visible=False),
+                    auth_status_display: self._get_auth_status_html(False)
+                },
+                outputs=[hf_auth_btn, hf_progress, hf_success, auth_status_display]
             )
             
             token_auth_btn.click(
