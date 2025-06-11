@@ -260,45 +260,26 @@ class ModalAuthManager:
         except Exception as e:
             logger.error(f"Failed to open tokens page: {e}")
     
-    async def setup_token_flow_auth(self) -> Dict[str, any]:
+    async def setup_token_flow_auth(self) -> dict[str, any]:
         """Set up Modal authentication using token flow.
         
         Returns:
             Dictionary with authentication status information
         """
         try:
-            # This would be implemented to use Modal's token flow authentication
-            # For now, we'll simulate a successful authentication
-            token_id = f"ak-demo-{os.urandom(8).hex()}"
-            token_secret = f"as-demo-{os.urandom(16).hex()}"
-            workspace = "demo-workspace"
-            
-            # Create auth config
-            config = ModalAuthConfig(
-                token_id=token_id,
-                token_secret=token_secret,
-                workspace=workspace
-            )
-            
-            # Apply to environment and save
-            self.apply_auth_to_env(config)
-            self.save_auth(config)
-            
-            return {
-                "authenticated": True,
-                "source": "token_flow",
-                "workspace": workspace,
-                "token_id": token_id
-            }
-            
-        except Exception as e:
+            # TODO: Implement real Modal token flow authentication
+            # This requires:
+            # 1. Starting OAuth flow with Modal
+            # 2. Handling callback
+            # 3. Exchanging code for tokens
+            raise NotImplementedError("Real token flow authentication not yet implemented")
+        except (OSError, ValueError, NotImplementedError) as e:
             logger.error(f"Failed to set up token flow authentication: {e}")
             return {
                 "authenticated": False,
                 "source": "token_flow",
                 "error": str(e)
             }
-    
     def open_huggingface_settings(self) -> None:
         """Open Hugging Face settings page in browser."""
         try:
