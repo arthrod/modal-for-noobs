@@ -287,7 +287,7 @@ class ModalAuthManager:
         except Exception as e:
             logger.error(f"Failed to open Hugging Face settings page: {e}")
     
-    async def setup_huggingface_auth(self) -> Dict[str, any]:
+    async def setup_huggingface_auth(self) -> dict[str, any]:
         """Set up Hugging Face authentication using OIDC.
         
         Returns:
@@ -318,16 +318,23 @@ class ModalAuthManager:
             # 3. Verify the tokens and extract user information
             # 4. Store the tokens securely
             
-            # For now, we'll simulate a successful authentication
-            hf_username = "huggingface_user"  # This would come from the token response
+            # TODO: Implement real OIDC flow
+            # This requires:
+            # 1. Starting local callback server
+            # 2. Handling OAuth callback
+            # 3. Exchanging code for tokens
+            # 4. Extracting user info from ID token
+            raise NotImplementedError("Real OIDC authentication not yet implemented")
             
             # Save the authentication information
-            with open(self.config_dir / "huggingface_auth.json", "w") as f:
-                json.dump({
+            # Use aiofiles for async file operations
+            import aiofiles
+            async with aiofiles.open(self.config_dir / "huggingface_auth.json", "w") as f:
+                await f.write(json.dumps({
                     "username": hf_username,
                     "authenticated": True,
-                    "timestamp": str(datetime.datetime.now())
-                }, f, indent=2)
+                    "timestamp": str(datetime.datetime.now(datetime.timezone.utc))
+                }, indent=2))
             
             return {
                 "authenticated": True,
@@ -335,14 +342,13 @@ class ModalAuthManager:
                 "username": hf_username
             }
             
-        except Exception as e:
+        except (OSError, ValueError, NotImplementedError) as e:
             logger.error(f"Failed to set up Hugging Face authentication: {e}")
             return {
                 "authenticated": False,
                 "source": "huggingface",
                 "error": str(e)
             }
-    
     def get_huggingface_auth_status(self) -> Dict[str, any]:
         """Get Hugging Face authentication status.
         
