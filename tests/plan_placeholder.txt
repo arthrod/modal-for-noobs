@@ -1,0 +1,40 @@
+1. Confirm testing framework:
+   - Scan repository for `pytest` or `unittest` imports under `tests/`.
+   - Inspect `tests/test_easy_auth.py` to determine current style and imports.
+
+2. Identify target functions in `easy_auth.py`:
+   - e.g. `login_user`, `refresh_token`, `validate_token`, error handlers.
+
+3. Create shared fixtures (in `tests/conftest.py`):
+   - `auth_client` fixture to initialize the auth service/module.
+   - `mock_identity_provider` fixture to stub external HTTP calls.
+
+4. Write happy-path tests (in `tests/test_easy_auth_extended.py`):
+   - test_login_success: valid credentials return expected user data and token.
+   - test_refresh_token_success: expired token yields a new valid token.
+
+5. Write edge-case tests:
+   - test_login_missing_username: missing field triggers validation error.
+   - test_login_missing_password: same for password.
+   - test_refresh_token_missing: no token provided => specific exception.
+
+6. Write failure-path tests:
+   - test_login_invalid_credentials: simulate 401 from identity provider.
+   - test_refresh_token_invalid: invalid refresh token returns error.
+   - test_validate_token_expired: expired token leads to rejection.
+
+7. Mock external dependencies:
+   - Use `monkeypatch` or `responses` to intercept HTTP calls to the identity provider.
+   - Return canned JSON payloads for tokens and errors.
+
+8. Setup/teardown:
+   - Ensure fixtures clean up any environment variables or temporary state.
+   - Use module-scoped fixtures for performance where appropriate.
+
+9. Integration sanity check:
+   - One end-to-end test invoking login + refresh + validate flow in sequence.
+   - Assert tokens are consistent and errors propagate correctly.
+
+10. Document test commands:
+   - `pytest --cov=easy_auth tests/`
+   - Include any required ENV vars (e.g. `IDP_URL`, `CLIENT_SECRET`) in `pytest.ini` or fixture.

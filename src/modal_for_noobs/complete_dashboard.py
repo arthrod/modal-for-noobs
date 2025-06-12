@@ -233,7 +233,95 @@ class CompleteModalDashboard:
                                     lines=3
                                 )
                         
-                        # Method 3: File Upload Authentication
+                        # Method 3: Hugging Face Authentication
+                        with gr.Tab("🤗 Connect with Hugging Face") as hf_auth_tab:
+                            with gr.Column(elem_classes=["auth-card"]):
+                                gr.Markdown("### 🤗 Connect with your Hugging Face Account")
+                                gr.Markdown(
+                                    "One-click authentication with your Hugging Face account. "
+                                    "Your credentials will be securely stored in this space."
+                                )
+                                
+                                # Hugging Face auth interface
+                                with gr.Row():
+                                    with gr.Column(scale=2):
+                                        gr.Markdown(
+                                            "**How it works:**\\n"
+                                            "1. 🔗 Click the button below\\n"
+                                            "2. 🌐 A new tab opens with Hugging Face's authorization page\\n"
+                                            "3. 🔐 Log in to your Hugging Face account\\n"
+                                            "4. ✅ Authorize access and you're done!"
+                                        )
+                                    with gr.Column(scale=1):
+                                        hf_auth_btn = gr.Button(
+                                            "🤗 Connect with Hugging Face",
+                                            variant="primary",
+                                            size="lg",
+                                            elem_classes=["feature-card"]
+                                        )
+                                        
+                                        # New OIDC one-click authentication button
+                                        hf_oidc_auth_btn = gr.Button(
+                                            "🔐 Connect with your Hugging Face account",
+                                            variant="primary",
+                                            size="lg",
+                                            elem_classes=["feature-card"]
+                                        )
+                                
+                                # Progress section for HF auth
+                                with gr.Column(visible=False) as hf_progress:
+                                    gr.Markdown("### 🔄 Waiting for authorization...")
+                                    gr.Markdown("A new tab should have opened. Please authorize access to continue.")
+                                    
+                                    hf_progress_bar = gr.HTML(
+                                        value=self._get_progress_html(0),
+                                        elem_id="hf-progress"
+                                    )
+                                    
+                                # Progress section for HF OIDC auth
+                                with gr.Column(visible=False) as hf_oidc_progress:
+                                    gr.Markdown("### 🔄 Waiting for OIDC authorization...")
+                                    gr.Markdown("A new tab should have opened. Please authorize access to continue.")
+                                    
+                                    hf_oidc_progress_bar = gr.HTML(
+                                        value=self._get_progress_html(0),
+                                        elem_id="hf-oidc-progress"
+                                    )
+                                    
+                                    hf_cancel_btn = gr.Button("Cancel", variant="secondary")
+                                
+                                # Success section for HF auth
+                                with gr.Column(visible=False) as hf_success:
+                                    gr.Markdown("### ✅ Connected Successfully!")
+                                    hf_username_display = gr.Textbox(
+                                        label="Connected Hugging Face Account",
+                                        value="",
+                                        interactive=False
+                                    )
+                                    gr.Markdown("🎉 Your Hugging Face credentials are now securely stored in this space!")
+                                    
+                                    hf_disconnect_btn = gr.Button("Disconnect", variant="secondary")
+                                    
+                                # Success section for HF OIDC auth
+                                with gr.Column(visible=False) as hf_oidc_success:
+                                    gr.Markdown("### ✅ Connected Successfully with OIDC!")
+                                    hf_oidc_username_display = gr.Textbox(
+                                        label="Connected Hugging Face Account (OIDC)",
+                                        value="",
+                                        interactive=False
+                                    )
+                                    gr.Markdown("🔐 Your Hugging Face credentials are now securely stored using OIDC authentication!")
+                                    gr.Markdown("🎉 One-click authentication complete - your token has been securely saved.")
+                                    
+                                    hf_oidc_token_status = gr.Textbox(
+                                        label="Token Status",
+                                        value="Token retrieved and stored securely",
+                                        interactive=False
+                                    )
+
+                                    hf_oidc_disconnect_btn = gr.Button("Disconnect", variant="secondary")
+
+                        # Method 4: File Upload Authentication
                         with gr.Tab("📁 File Upload") as file_auth_tab:
                             with gr.Column(elem_classes=["auth-card"]):
                                 gr.Markdown("### 📂 Import from File")
@@ -269,6 +357,7 @@ class CompleteModalDashboard:
                             **Which method should I choose?**
                             - 🌐 **Link Authentication**: Best for beginners, most secure, easiest setup
                             - 🔑 **Token Authentication**: For advanced users who prefer manual control
+                            - 🤗 **Hugging Face Authentication**: Connect with your Hugging Face account
                             - 📁 **File Upload**: For importing existing configurations
                             
                             ### 🔗 Link Authentication (Recommended)
@@ -578,6 +667,7 @@ demo.launch()""",
                         **1. 🔐 Connect to Modal (Choose your method)**
                         - **🌐 Link Authentication (Recommended)**: Just click and authorize!
                         - **🔑 Token Authentication**: Manual setup with API tokens
+                        - **🤗 Hugging Face Authentication**: Connect with your Hugging Face account
                         - **📁 File Upload**: Import existing configuration
                         
                         **2. 🎯 Generate Your App**
@@ -708,23 +798,71 @@ demo.launch()""",
             def show_remote_functions_config(enable_remote):
                 return gr.update(visible=enable_remote)
             
-            def start_link_authentication():
-                """Start OAuth-style link authentication."""
+            async def start_link_authentication():
+                """Run Modal's official token flow authentication."""
                 try:
-                    # In a real implementation, this would start the OAuth flow
-                    # For now, simulate opening the authorization URL
-                    auth_url = "https://modal.com/oauth/authorize?client_id=modal-for-noobs"
-                    webbrowser.open(auth_url)
-                    
+                    await self.auth_manager.setup_token_flow_auth()
+                    status = self.auth_manager.get_auth_status()
+                    workspace = status.get("workspace") if status else None
+
                     return {
-                        link_auth_btn: gr.update(visible=False),
-                        link_progress: gr.update(visible=True),
-                        link_success: gr.update(visible=False),
-                        auth_status_display: self._get_auth_status_html(False, "pending")
+                        link_auth_btn: gr.update(visible=True),
+                        link_progress: gr.update(visible=False),
+                        link_success: gr.update(visible=True),
+                        auth_status_display: self._get_auth_status_html(True, workspace),
                     }
                 except Exception as e:
                     logger.error(f"Failed to start link auth: {e}")
                     return {
+                        auth_status_display: self._get_auth_status_html(False, "error", str(e))
+                    }
+            
+            async def start_huggingface_authentication():
+                """Run Hugging Face OIDC authentication."""
+                try:
+                    # Start the Hugging Face authentication flow
+                    status = await self.auth_manager.setup_huggingface_auth()
+                    username = status.get("username") if status else None
+                    authenticated = status.get("authenticated", False)
+
+                    return {
+                        hf_auth_btn: gr.update(visible=True),
+                        hf_progress: gr.update(visible=False),
+                        hf_success: gr.update(visible=authenticated),
+                        hf_username_display: username or "Unknown",
+                        auth_status_display: self._get_auth_status_html(authenticated, username),
+                    }
+                except Exception as e:
+                    logger.error(f"Failed to start Hugging Face auth: {e}")
+                    return {
+                        auth_status_display: self._get_auth_status_html(False, "error", str(e))
+                    }
+                    
+            async def start_huggingface_oidc_authentication():
+                """Run Hugging Face OIDC one-click authentication."""
+                try:
+                    # Start the Hugging Face OIDC authentication flow
+                    status = await self.auth_manager.setup_huggingface_oidc_auth()
+                    username = status.get("username") if status else None
+                    authenticated = status.get("authenticated", False)
+                    has_token = status.get("has_token", False)
+                    
+                    token_status = "Token retrieved and stored securely" if has_token else "Token retrieval failed"
+
+                    return {
+                        hf_oidc_auth_btn: gr.update(visible=True),
+                        hf_oidc_progress: gr.update(visible=False),
+                        hf_oidc_success: gr.update(visible=authenticated),
+                        hf_oidc_username_display: username or "Unknown",
+                        hf_oidc_token_status: token_status,
+                        auth_status_display: self._get_auth_status_html(authenticated, username, "OIDC"),
+                    }
+                except Exception as e:
+                    logger.error(f"Failed to start Hugging Face OIDC auth: {e}")
+                    return {
+                        hf_oidc_auth_btn: gr.update(visible=True),
+                        hf_oidc_progress: gr.update(visible=False),
+                        hf_oidc_success: gr.update(visible=False),
                         auth_status_display: self._get_auth_status_html(False, "error", str(e))
                     }
             
@@ -853,6 +991,48 @@ demo.launch()""",
                 outputs=[link_auth_btn, link_progress, link_success, auth_status_display]
             )
             
+            hf_auth_btn.click(
+                fn=start_huggingface_authentication,
+                outputs=[hf_auth_btn, hf_progress, hf_success, hf_username_display, auth_status_display]
+            )
+            
+            # Connect the OIDC authentication button
+            hf_oidc_auth_btn.click(
+                fn=start_huggingface_oidc_authentication,
+                outputs=[hf_oidc_auth_btn, hf_oidc_progress, hf_oidc_success, hf_oidc_username_display, hf_oidc_token_status, auth_status_display]
+            )
+            
+            hf_cancel_btn.click(
+                fn=lambda: {
+                    hf_auth_btn: gr.update(visible=True),
+                    hf_progress: gr.update(visible=False),
+                    hf_success: gr.update(visible=False),
+                    auth_status_display: self._get_auth_status_html(False)
+                },
+                outputs=[hf_auth_btn, hf_progress, hf_success, auth_status_display]
+            )
+            
+            hf_disconnect_btn.click(
+                fn=lambda: {
+                    hf_auth_btn: gr.update(visible=True),
+                    hf_progress: gr.update(visible=False),
+                    hf_success: gr.update(visible=False),
+                    auth_status_display: self._get_auth_status_html(False)
+                },
+                outputs=[hf_auth_btn, hf_progress, hf_success, auth_status_display]
+            )
+            
+            # OIDC disconnect button
+            hf_oidc_disconnect_btn.click(
+                fn=lambda: {
+                    hf_oidc_auth_btn: gr.update(visible=True),
+                    hf_oidc_progress: gr.update(visible=False),
+                    hf_oidc_success: gr.update(visible=False),
+                    auth_status_display: self._get_auth_status_html(False)
+                },
+                outputs=[hf_oidc_auth_btn, hf_oidc_progress, hf_oidc_success, auth_status_display]
+            )
+            
             token_auth_btn.click(
                 fn=authenticate_with_tokens,
                 inputs=[token_id_input, token_secret_input, workspace_input],
@@ -873,24 +1053,43 @@ demo.launch()""",
         
         return dashboard
     
-    def _get_auth_status_html(self, is_authenticated: bool, status: str = None, workspace: str = None, error_msg: str = None) -> str:
+    def _get_auth_status_html(self, is_authenticated: bool, status: str = None, auth_type: str = None, error_msg: str = None) -> str:
         """Get authentication status HTML with all three greens."""
         if is_authenticated:
-            return f"""
-            <div style="
-                background: linear-gradient(45deg, {MODAL_GREEN} 0%, {MODAL_LIGHT_GREEN} 100%);
-                color: white;
-                padding: 16px;
-                border-radius: 8px;
-                margin: 16px 0;
-                text-align: center;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            ">
-                <span style="font-size: 24px;">✅</span>
-                <strong style="font-size: 18px; margin-left: 8px;">Connected to Modal!</strong>
-                {f'<br><span style="opacity: 0.9;">Workspace: {workspace}</span>' if workspace else ''}
-            </div>
-            """
+            # Handle different authentication types
+            if auth_type == "OIDC":
+                return f"""
+                <div style="
+                    background: linear-gradient(45deg, {MODAL_GREEN} 0%, {MODAL_LIGHT_GREEN} 100%);
+                    color: white;
+                    padding: 16px;
+                    border-radius: 8px;
+                    margin: 16px 0;
+                    text-align: center;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                ">
+                    <span style="font-size: 24px;">✅</span>
+                    <strong style="font-size: 18px; margin-left: 8px;">Connected to Hugging Face with OIDC!</strong>
+                    {f'<br><span style="opacity: 0.9;">Username: {status}</span>' if status else ''}
+                    <br><span style="opacity: 0.9;">🔐 Secure one-click authentication complete</span>
+                </div>
+                """
+            else:
+                return f"""
+                <div style="
+                    background: linear-gradient(45deg, {MODAL_GREEN} 0%, {MODAL_LIGHT_GREEN} 100%);
+                    color: white;
+                    padding: 16px;
+                    border-radius: 8px;
+                    margin: 16px 0;
+                    text-align: center;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                ">
+                    <span style="font-size: 24px;">✅</span>
+                    <strong style="font-size: 18px; margin-left: 8px;">Connected to Modal!</strong>
+                    {f'<br><span style="opacity: 0.9;">Workspace: {status}</span>' if status else ''}
+                </div>
+                """
         elif status == "pending":
             return f"""
             <div style="
