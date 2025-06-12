@@ -2,17 +2,15 @@
 
 import asyncio
 import json
-import webbrowser
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import gradio as gr
 from loguru import logger
+from modal import token_flow
 from rich import print as rprint
 
-from modal_for_noobs.cli_helpers.common import MODAL_GREEN, MODAL_LIGHT_GREEN, MODAL_DARK_GREEN
-from modal_for_noobs.auth_manager import ModalAuthManager, ModalAuthConfig
+from modal_for_noobs.auth_manager import ModalAuthConfig, ModalAuthManager
+from modal_for_noobs.cli_helpers.common import MODAL_DARK_GREEN, MODAL_GREEN, MODAL_LIGHT_GREEN
 from modal_for_noobs.template_generator import generate_from_wizard_input
 
 
@@ -66,7 +64,7 @@ class CompleteModalDashboard:
             margin: 8px 0;
             font-weight: bold;
         }}
-        .feature-card {{
+        #modal-dashboard .feature-card {{
             border: 1px solid {MODAL_LIGHT_GREEN};
             border-radius: 8px;
             padding: 16px;
@@ -78,6 +76,7 @@ class CompleteModalDashboard:
         with gr.Blocks(
             title="Modal for Noobs - Complete Dashboard",
             css=custom_css,
+            elem_id="modal-dashboard",
             theme=gr.themes.Soft(
                 primary_hue="green",
                 secondary_hue="emerald",
@@ -146,7 +145,6 @@ class CompleteModalDashboard:
                                         link_auth_btn = gr.Button(
                                             "🚀 Connect via Link",
                                             variant="primary",
-                                            size="lg",
                                             elem_classes=["feature-card"]
                                         )
                                 
@@ -499,7 +497,6 @@ demo.launch()""",
                             generate_btn = gr.Button(
                                 "🚀 Generate Enhanced Deployment",
                                 variant="primary",
-                                size="lg",
                                 elem_classes=["feature-card"]
                             )
                             
@@ -708,25 +705,59 @@ demo.launch()""",
             def show_remote_functions_config(enable_remote):
                 return gr.update(visible=enable_remote)
             
-            def start_link_authentication():
-                """Start OAuth-style link authentication."""
+            def start_link_authentication(auth):
+                """Start OAuth-style link authentication using Modal's token flow."""
+
+                async def _flow():
+                    try:
+                        await token_flow._new_token(source="modal-for-noobs")
+                        auth.update(authenticated=True, method="link")
+                    except Exception as e:
+                        logger.error(f"Link auth failed: {e}")
+                    return auth
+
+                loop = asyncio.get_event_loop()
+                fut = asyncio.run_coroutine_threadsafe(_flow(), loop)
+                return fut
+
+            def open_tokens_page():
+                """Open the Modal tokens settings page."""
                 try:
-                    # In a real implementation, this would start the OAuth flow
-                    # For now, simulate opening the authorization URL
-                    auth_url = "https://modal.com/oauth/authorize?client_id=modal-for-noobs"
-                    webbrowser.open(auth_url)
-                    
-                    return {
-                        link_auth_btn: gr.update(visible=False),
-                        link_progress: gr.update(visible=True),
-                        link_success: gr.update(visible=False),
-                        auth_status_display: self._get_auth_status_html(False, "pending")
-                    }
+                    self.auth_manager.open_tokens_page()
                 except Exception as e:
-                    logger.error(f"Failed to start link auth: {e}")
-                    return {
-                        auth_status_display: self._get_auth_status_html(False, "error", str(e))
-                    }
+                    logger.error(f"Failed to open tokens page: {e}")
+
+            def test_connection(token_id, token_secret, workspace):
+                """Test Modal authentication."""
+                config = ModalAuthConfig(
+                    token_id=token_id.strip(),
+                    token_secret=token_secret.strip(),
+                    workspace=workspace.strip() if workspace else None,
+                )
+                if self.auth_manager.test_authentication(config):
+                    return "✅ Connection successful!"
+                return "❌ Connection failed"
+
+            def import_auth_file(file_path):
+                """Import authentication details from an uploaded file."""
+                if not file_path:
+                    return "❌ Please upload a config file", self._get_auth_status_html(False)
+                try:
+                    data = Path(file_path).read_text()
+                    info = json.loads(data)
+                    config = ModalAuthConfig(
+                        token_id=info.get("token_id") or info.get("MODAL_TOKEN_ID"),
+                        token_secret=info.get("token_secret") or info.get("MODAL_TOKEN_SECRET"),
+                        workspace=info.get("workspace") or info.get("MODAL_WORKSPACE"),
+                    )
+                except Exception as e:
+                    return f"❌ Failed to parse file: {e}", self._get_auth_status_html(False)
+
+                if self.auth_manager.test_authentication(config):
+                    self.auth_manager.apply_auth_to_env(config)
+                    self.auth_manager.save_auth(config)
+                    return "✅ Authentication imported!", self._get_auth_status_html(True, config.workspace)
+                return "❌ Invalid authentication details", self._get_auth_status_html(False)
             
             def authenticate_with_tokens(token_id, token_secret, workspace):
                 """Authenticate using tokens."""
@@ -850,7 +881,22 @@ demo.launch()""",
             
             link_auth_btn.click(
                 fn=start_link_authentication,
-                outputs=[link_auth_btn, link_progress, link_success, auth_status_display]
+                inputs=[auth_state],
+                outputs=[auth_state]
+            )
+
+            open_tokens_btn.click(fn=open_tokens_page)
+
+            test_connection_btn.click(
+                fn=test_connection,
+                inputs=[token_id_input, token_secret_input, workspace_input],
+                outputs=[token_result]
+            )
+
+            config_file_upload.change(
+                fn=import_auth_file,
+                inputs=[config_file_upload],
+                outputs=[file_result, auth_status_display]
             )
             
             token_auth_btn.click(
