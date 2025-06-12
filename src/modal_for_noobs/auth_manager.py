@@ -7,7 +7,7 @@ import subprocess
 import webbrowser
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from loguru import logger
 from rich import print as rprint
@@ -260,7 +260,7 @@ class ModalAuthManager:
         except Exception as e:
             logger.error(f"Failed to open tokens page: {e}")
     
-    async def setup_token_flow_auth(self) -> dict[str, any]:
+    async def setup_token_flow_auth(self) -> Dict[str, Any]:
         """Set up Modal authentication using token flow.
         
         Returns:
@@ -287,7 +287,7 @@ class ModalAuthManager:
         except Exception as e:
             logger.error(f"Failed to open Hugging Face settings page: {e}")
     
-    async def setup_huggingface_auth(self) -> dict[str, any]:
+    async def setup_huggingface_auth(self) -> Dict[str, Any]:
         """Set up Hugging Face authentication using OIDC.
         
         Returns:
@@ -350,7 +350,7 @@ class ModalAuthManager:
                 "error": str(e)
             }
             
-    async def setup_huggingface_oidc_auth(self) -> Dict[str, any]:
+    async def setup_huggingface_oidc_auth(self) -> Dict[str, Any]:
         """Set up Hugging Face authentication using OIDC with one-click flow.
         
         This implementation uses a more streamlined OIDC flow that:
@@ -416,7 +416,7 @@ class ModalAuthManager:
                 "has_token": False
             }
             
-    def get_huggingface_auth_status(self) -> Dict[str, any]:
+    def get_huggingface_auth_status(self) -> Dict[str, Any]:
         """Get Hugging Face authentication status.
         
         Returns:
@@ -441,7 +441,7 @@ class ModalAuthManager:
                 "error": str(e)
             }
             
-    def get_huggingface_oidc_auth_status(self) -> Dict[str, any]:
+    def get_huggingface_oidc_auth_status(self) -> Dict[str, Any]:
         """Get Hugging Face OIDC authentication status.
         
         Returns:
@@ -471,7 +471,7 @@ class ModalAuthManager:
                 "has_token": False
             }
     
-    def get_auth_status(self) -> Dict[str, any]:
+    def get_auth_status(self) -> Dict[str, Any]:
         """Get current authentication status.
         
         Returns:

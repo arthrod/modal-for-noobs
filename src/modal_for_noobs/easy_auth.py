@@ -8,7 +8,7 @@ import asyncio
 import secrets
 import webbrowser
 from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 from urllib.parse import urlencode
 
 import gradio as gr
@@ -69,7 +69,7 @@ class EasyModalAuth:
 
         return auth_url, session_id
     
-    async def check_auth_status(self, session_id: str) -> Dict[str, any]:
+    async def check_auth_status(self, session_id: str) -> Dict[str, Any]:
         """Check the status of an auth session.
         
         Args:
