@@ -20,8 +20,9 @@ from modal_for_noobs.templates.template_constants import (
 )
 
 
-def create_marimo_template(app_name: str, image_config: str, original_code: str,
-                          timeout_seconds: int = 300, max_containers: int = 1) -> str:
+def create_marimo_template(
+    app_name: str, image_config: str, original_code: str, timeout_seconds: int = 300, max_containers: int = 1
+) -> str:
     """Create marimo template using safe constants."""
     # Header
     return f"""# 🚀 Modal Deployment Script (Marimo Configuration)

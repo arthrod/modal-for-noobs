@@ -1,6 +1,6 @@
 [project]
 name = "modal-for-noobs"
-version = "0.2.9"
+version = "0.3.0"
 description = "🚀 Async-first, idiot-proof Gradio deployment CLI for Modal"
 authors = [{ name = "Arthur Souza Rodrigues", email = "arthrod@umich.edu" }]
 readme = "README.md"

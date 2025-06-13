@@ -283,10 +283,10 @@ if __name__ == "__main__":
     print("🌟 Ready to create epic greetings, poetry, and wisdom! 🌟")
 
     demo.launch(
-        server_name="0.0.0.0", 
-        server_port=7860, 
+        server_name="0.0.0.0",
+        server_port=7860,
         share=False,
-        strict_cors=False  # Allow localhost, HuggingFace, and Modal cross-origin requests
+        strict_cors=False,  # Allow localhost, HuggingFace, and Modal cross-origin requests
     )
 
 

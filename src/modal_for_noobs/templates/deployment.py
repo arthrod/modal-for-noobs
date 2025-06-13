@@ -124,16 +124,17 @@ def generate_modal_deployment(
     # Load dashboard module
     dashboard_content = load_dashboard_module()
     logger.debug(f"Dashboard content loaded: {len(dashboard_content)} characters")
-    
+
     # Encode dashboard content to base64 to avoid quote conflicts
     import base64
-    dashboard_content_b64 = base64.b64encode(dashboard_content.encode('utf-8')).decode('ascii')
+
+    dashboard_content_b64 = base64.b64encode(dashboard_content.encode("utf-8")).decode("ascii")
     logger.debug(f"Dashboard content encoded to base64: {len(dashboard_content_b64)} characters")
 
     # Format the template
     template = template_module.TEMPLATE
     logger.debug(f"Template loaded: {len(template)} characters")
-    
+
     try:
         formatted_code = template.format(
             app_name=f"modal-for-noobs-{app_file.stem}",

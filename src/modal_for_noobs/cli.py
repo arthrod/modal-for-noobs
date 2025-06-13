@@ -15,14 +15,14 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
+from modal_for_noobs.auth_manager import ModalAuthManager
 from modal_for_noobs.cli_helpers.common import MODAL_BLACK, MODAL_DARK_GREEN, MODAL_GREEN, MODAL_LIGHT_GREEN
 from modal_for_noobs.config import Config, config
 from modal_for_noobs.config_loader import config_loader
 from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
-from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
-from modal_for_noobs.auth_manager import ModalAuthManager
 from modal_for_noobs.template_generator import generate_from_wizard_input
+from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
 
 app = typer.Typer(
     name="modal-for-noobs",
@@ -151,25 +151,22 @@ def deploy(
             rprint(f"\n[{MODAL_GREEN}]📱 Passo 1: Configuração do App[/{MODAL_GREEN}]")
         else:
             rprint(f"\n[{MODAL_GREEN}]📱 Step 1: App Configuration[/{MODAL_GREEN}]")
-        
+
         app_name = typer.prompt("App name", default=app_file.stem)
-        
+
         # Step 2: Deployment mode with all options
         if br_huehuehue:
             rprint(f"\n[{MODAL_GREEN}]⚡ Passo 2: Modo de Deployment[/{MODAL_GREEN}]")
         else:
             rprint(f"\n[{MODAL_GREEN}]⚡ Step 2: Deployment Mode[/{MODAL_GREEN}]")
-        
+
         rprint("Available deployment modes:")
         rprint("  [bold]minimum[/bold] - 🌱 Fast CPU-only deployment")
         rprint("  [bold]optimized[/bold] - ⚡ GPU + ML libraries")
         rprint("  [bold]marimo[/bold] - 📓 Reactive notebooks + Gradio")
         rprint("  [bold]gradio-jupyter[/bold] - 🪐 Classic notebooks + Gradio")
 
-        deployment_mode = typer.prompt(
-            "Which mode do you want? [minimum/optimized/marimo/gradio-jupyter]", 
-            default="minimum"
-        )
+        deployment_mode = typer.prompt("Which mode do you want? [minimum/optimized/marimo/gradio-jupyter]", default="minimum")
 
         # Validate choice
         if deployment_mode not in ["minimum", "optimized", "marimo", "gradio-jupyter"]:
@@ -244,7 +241,7 @@ def deploy(
             rprint(f"\n[{MODAL_GREEN}]📋 Resumo da Configuração[/{MODAL_GREEN}]")
         else:
             rprint(f"\n[{MODAL_GREEN}]📋 Configuration Summary[/{MODAL_GREEN}]")
-        
+
         rprint(f"  📱 App: {app_name}")
         rprint(f"  ⚡ Mode: {deployment_mode.upper()}")
         rprint(f"  🚀 GPU: {'YES (' + gpu_type + ')' if enable_gpu else 'NO'}")
@@ -259,7 +256,7 @@ def deploy(
             rprint(f"\n[{MODAL_GREEN}]🏃 Passo 7: Tipo de Deployment[/{MODAL_GREEN}]")
         else:
             rprint(f"\n[{MODAL_GREEN}]🏃 Step 7: Deployment Type[/{MODAL_GREEN}]")
-        
+
         wizard_dry_run = typer.confirm("Generate deployment file only? (no actual deployment)", default=False)
 
         final_confirm = typer.confirm("\nLooks good? Let's create your deployment! 🚀", default=True)
@@ -280,7 +277,7 @@ def deploy(
                 system_dependencies=system_dependencies,
                 requirements_file=requirements_path,
                 environment_variables=env_vars,
-                secrets=secrets
+                secrets=secrets,
             )
 
             # Write output file
@@ -292,7 +289,7 @@ def deploy(
                 print_info("Dry run complete! Review the generated file and deploy with:")
                 print_info(f"  modal deploy {output_file}")
                 return
-            
+
             # Continue with deployment
             dry_run = False
 
