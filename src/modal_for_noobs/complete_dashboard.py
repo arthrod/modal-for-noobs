@@ -6,10 +6,10 @@ import threading
 import webbrowser
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import gradio as gr
 from loguru import logger
+from modal import token_flow
 from rich import print as rprint
 
 # Try to use uvloop for better performance
@@ -108,7 +108,7 @@ class CompleteModalDashboard:
             margin: 8px 0;
             font-weight: bold;
         }}
-        .feature-card {{
+        #modal-dashboard .feature-card {{
             border: 1px solid {MODAL_LIGHT_GREEN};
             border-radius: 8px;
             padding: 16px;
@@ -120,6 +120,7 @@ class CompleteModalDashboard:
         with gr.Blocks(
             title="Modal for Noobs - Complete Dashboard",
             css=custom_css,
+            elem_id="modal-dashboard",
             theme=gr.themes.Soft(
                 primary_hue="green",
                 secondary_hue="emerald",
@@ -188,7 +189,6 @@ class CompleteModalDashboard:
                                         link_auth_btn = gr.Button(
                                             "🚀 Connect via Link",
                                             variant="primary",
-                                            size="lg",
                                             elem_classes=["feature-card"]
                                         )
 
@@ -541,7 +541,6 @@ demo.launch()""",
                             generate_btn = gr.Button(
                                 "🚀 Generate Enhanced Deployment",
                                 variant="primary",
-                                size="lg",
                                 elem_classes=["feature-card"]
                             )
 
