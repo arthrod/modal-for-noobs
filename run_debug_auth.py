@@ -6,6 +6,7 @@ Simple runner for the Modal authentication debug dashboard.
 import sys
 import subprocess
 from pathlib import Path
+from security import safe_command
 
 def main():
     """Run the debug authentication dashboard."""
@@ -41,7 +42,7 @@ def main():
     
     # Run the debug dashboard
     try:
-        subprocess.run([sys.executable, str(debug_file)], check=True)
+        safe_command.run(subprocess.run, [sys.executable, str(debug_file)], check=True)
     except KeyboardInterrupt:
         print("\n🛑 Dashboard stopped by user")
         return 0

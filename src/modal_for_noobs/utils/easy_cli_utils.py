@@ -18,6 +18,7 @@ import subprocess
 from pathlib import Path
 
 from loguru import logger
+from security import safe_command
 
 
 def check_modal_auth() -> bool:
@@ -59,7 +60,7 @@ def setup_modal_auth() -> bool:
         logger.info("Running modal setup...")
         # Use the full path to modal executable if available
         modal_path = subprocess.check_output(["which", "modal"], text=True).strip()
-        result = subprocess.run([modal_path, "setup"], check=True, capture_output=True, text=True)
+        result = safe_command.run(subprocess.run, [modal_path, "setup"], check=True, capture_output=True, text=True)
         logger.debug(f"Modal setup output: {result.stdout}")
         logger.success("Modal setup completed successfully")
         return True

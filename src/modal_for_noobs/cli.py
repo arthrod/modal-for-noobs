@@ -23,6 +23,7 @@ from modal_for_noobs.huggingface import HuggingFaceSpacesMigrator
 from modal_for_noobs.modal_deploy import ModalDeployer
 from modal_for_noobs.template_generator import generate_from_wizard_input
 from modal_for_noobs.utils.easy_cli_utils import check_modal_auth, create_modal_deployment, setup_modal_auth
+from security import safe_command
 
 app = typer.Typer(
     name="modal-for-noobs",
@@ -1265,8 +1266,7 @@ def _install_mn_alias(shell: str | None, force: bool, br_huehuehue: bool) -> boo
 
         # Try to find modal-for-noobs in the current environment
         try:
-            result = subprocess.run(
-                [python_executable, "-c", "import modal_for_noobs; print(modal_for_noobs.__file__)"],
+            result = safe_command.run(subprocess.run, [python_executable, "-c", "import modal_for_noobs; print(modal_for_noobs.__file__)"],
                 capture_output=True,
                 text=True,
                 check=True,
