@@ -8,6 +8,6 @@ matplotlib>=3.5.0
 seaborn
 plotly
 streamlit
-openai>=1.0.0
+openai>=2.32.0
 langchain
 # End of sample requirements
